@@ -105,19 +105,24 @@ psql -U postgres
 
 ## 7. REDIS (CACHE)
 
-### Windows:
+#### Windows:
 
 https://github.com/microsoftarchive/redis/releases
 
-### Mac:
+#### Mac:
 
+```bash
 brew install redis
+```
 
-### Linux:
+#### Linux:
 
+```bash
 sudo apt install redis-server
+```
 
 ### Cek:
+
 ```bash
 redis-server
 ```
@@ -212,5 +217,6 @@ Tambahkan ke environment variable:
 - Python → centang “Add to PATH”
 
 ![Description](assets/image.png)
+
 `pathnya harus terdaftar di environment variable semua`
 ## DONE
