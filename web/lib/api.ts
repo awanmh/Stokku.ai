@@ -1,7 +1,16 @@
 import Cookies from "js-cookie";
 import { useAuthStore } from "./auth";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+function getApiBase(): string {
+  // If an explicit API URL is set, use it (e.g. for Docker or external deploys).
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  // Default: use relative URL → proxied by Next.js rewrites → no CORS issues.
+  return "/api/v1";
+}
+
+const API_BASE = getApiBase();
 
 interface ApiResponse<T = unknown> {
   success: boolean;
