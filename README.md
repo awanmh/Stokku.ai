@@ -1,195 +1,27 @@
-# stokku.ai — Intelligent Supply Chain & Inventory Ecosystem
+# Stokku.ai — Advanced Inventory Management System
 
-*"Empowering Supply Chains with Predictive AI and Real-Time Visibility."*
+Stokku.ai adalah platform manajemen inventaris berskala besar yang dilengkapi Next.js (Web Frontend), Golang (API Backend), PostgreSQL (Database), dan Redis (Cache) - dan dijalankan via Docker.
 
-stokku.ai adalah platform manajemen inventaris dan rantai pasok end-to-end berbasis AI yang dirancang untuk membantu bisnis mengurangi kerugian akibat kesalahan stok, dead-stock, dan keputusan pengadaan yang tidak akurat.
+## 🟢 Apa yang Sudah Selesai Dibangun (Phase 1-4)
+Selama pengembangan fase 1-4, struktur inti sistem manajemen dan framework sudah 100% stabil untuk produksi, mencakup:
 
----
+1. **Authentication:** Register, Login, RBAC Roles (Admin, Staff, Viewer) berbasis Bearer token (JWT).
+2. **Dashboard & UI Utama:** Panel antarmuka dark-mode support menggunakan Next.js + CSS modern. Alert dashboard otomatis (Low stock, Dead stock).
+3. **Inventory Management (CRUD):** 
+   - Tambah/Edit/Hapus/Lihat Produk.
+   - Perhitugan total nilai produk & *warning alert* jika ada yang melampaui batas minimum.
+4. **Warehouse Management (CRUD):** 
+   - Konfigurasi berbagai gudang.
+   - Pencarian letak fisik (Alamat & Lokasi).
+5. **Transaction Management:** Stock-In dan Stock-Out langsung mempengaruhi nilai Inventory dan dicatat per-user.
+6. **API Endpoints (Handoff untuk Mobile):** Seluruh REST API CRUD rampung. Format respon distandarisasi dan endpoint aman (`/api/v1/`). Dokumentasi lengkap tersedia di `backend/API_DOCS.md`.
 
-## Problem Statement
+## 🟡 Apa yang Masih Kurang (To-Do Selanjutnya)
 
-Banyak bisnis retail dan logistik menghadapi masalah:
-
-- ❌ Selisih antara stok fisik dan sistem ("stok ghaib")
-- ❌ Dead-stock (barang tidak laku, modal tertahan)
-- ❌ Overstock / Understock karena prediksi manual
-- ❌ Proses gudang lambat dan tidak real-time
-
----
-
-## Solution
-
-stokku.ai menghadirkan solusi terintegrasi:
-
-- Web Dashboard → monitoring & analytics
-- Mobile App → scanning & operasional gudang
-- AI Engine → prediksi demand & rekomendasi stok
+1. **Integrasi Flutter Mobile App:** Tim mobile harus mengonsumsi endpoint API ini dari emulator / target API host sebelum bisa dirilis untuk *warehouse workers*. CORS sementara dibuka lebar agar emulator bisa tembus ke PC ini secara lokal.
+2. **Injeksi AI Service / Forecasting:** Route `/ai/forecast` masih berupa *placeholder response*. Service ML Python dari sisi Stokku AI perlu dilibatkan (ataupun diintegrasi via RabbitMQ/HTTP call).
+3. **Production Deployment:** Konfigurasi HTTPS, load balancer, dan integrasi CI/CD Actions (saat ini sistem dirancang masih sebatas localhost full-stack via Docker Compose).
 
 ---
 
-## System Architecture
-
-```text
-[Mobile App: Flutter] ↔️  [Golang Core API]  ↔️ [Web Dashboard: Next.js]
-                               ↓  ↑
-                       [Redis Distributed Lock]
-                               ↓  ↑
-                         [PostgreSQL DB]
-                               ↑  ↓
-                [Python AI Service (Forecasting)]
-
-````
-
----
-
-## Tech Stack
-
-### Frontend Web
-- Next.js 15
-- Tailwind CSS
-- Shadcn/UI
-
-### Mobile App
-- Flutter (Dart)
-- Local DB (Hive / SQLite)
-
-### Backend Core
-- Golang (Fiber)
-- Clean Architecture
-
-### AI Service
-- Python (FastAPI)
-- Scikit-learn / Prophet
-
-### Database & Cache
-- PostgreSQL (ACID compliance)
-- Redis (distributed locking)
-
-### DevOps
-- Docker & Docker Compose
-- GitHub Actions (CI/CD)
-
----
-
-## Key Features
-
-### AI Features
-- Demand Forecasting (30 hari ke depan)
-- Dead-Stock Detection
-- Smart Auto-Replenishment (auto draft PO)
-
-### Mobile Features
-- Offline-first scanning
-- Auto sync ketika online
-- Continuous barcode scanning
-
-### Web Dashboard
-- Multi-warehouse monitoring
-- Asset valuation (real-time)
-- Role-based access control (RBAC)
-
----
-
-## Engineering Highlights
-
-- High-performance backend dengan Golang
-- Redis Distributed Lock untuk mencegah race condition
-- Offline-first synchronization system (mobile)
-- Microservices architecture (AI service terpisah)
-- Scalable system design (production-ready)
-
----
-
-## Getting Started
-
-### 1. Clone Repository
-```bash
-git clone https://github.com/your-username/stokku-ai.git
-cd stokku-ai
-````
-
-### 2. Setup Environment
-
-Ikuti panduan:
-👉 `SETUP_ENV.md`
-
-### 3. Jalankan dengan Docker
-
-```bash
-docker-compose up --build
-```
-
----
-
-## Project Structure
-
-```
-stokku-ai/
-├── backend/        # Golang API
-├── ai-service/     # Python AI service
-├── web/            # Next.js dashboard
-├── mobile/         # Flutter app
-├── docker/         # Docker configs
-```
-
----
-
-## Workflow
-
-1. User scan barang dari mobile app
-2. Data dikirim ke backend Golang
-3. Backend validasi & simpan ke PostgreSQL
-4. Redis menghindari double stock update
-5. AI service memproses data untuk forecasting
-6. Web dashboard menampilkan insight
-
----
-
-## Testing
-
-```bash
-# Backend
-go test ./...
-
-# AI Service
-pytest
-
-# Web
-npm run test
-```
-
----
-
-## Future Improvements
-
-* Real-time streaming (Kafka / NATS)
-* Advanced ML model (LSTM / Deep Learning)
-* Multi-tenant SaaS system
-* Integration dengan ERP eksternal
-
----
-
-## Author
-
-- Setiawan Muhammad
-- Muhammad Aqil Mahdi Syarif
-- Felix Yohanes Sangapta Simamora
-- Neisya Nurul Alyazara
-- Hervin Dwicahya Kusuma
-
----
-
-## Why This Project Matters
-
-stokku.ai bukan sekadar project akademik, tetapi simulasi sistem nyata yang:
-
-* Menyelesaikan masalah bisnis kritikal
-* Mengintegrasikan AI dalam decision making
-* Menggunakan arsitektur scalable
-* Siap dikembangkan menjadi produk SaaS
-
----
-
-## License
-
-MIT License
+> Silakan baca **SETUP.md** untuk melihat panduan setup di mesin/localhost Anda.
