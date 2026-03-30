@@ -32,10 +32,11 @@ func main() {
 	// Redis
 	redisClient, err := cache.NewRedisClient(cfg.Redis)
 	if err != nil {
-		log.Fatalf("Failed to connect to Redis: %v", err)
+		log.Printf("Warning: Failed to connect to Redis: %v. Cache/Lock features will be limited.", err)
+	} else {
+		defer redisClient.Close()
+		log.Println("Connected to Redis")
 	}
-	defer redisClient.Close()
-	log.Println("Connected to Redis")
 
 	// Run migrations
 	runMigrations()

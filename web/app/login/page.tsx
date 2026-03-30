@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -36,10 +36,30 @@ function LoginForm() {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setError("");
+    setLoading(true);
+    const demoEmail = "admin@stokku.ai";
+    const demoPassword = "password";
+    
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+
+    try {
+      const res = await authApi.login(demoEmail, demoPassword);
+      setAuth(res.data.user, res.data.token);
+      router.push(redirectPath);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Demo login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-md">
       <div className="lg:hidden mb-8 flex justify-center">
-        <Image src="/logo.png" alt="stokku.ai" width={160} height={40} priority />
+        <Image src="/logo.png" alt="stokku.ai" width={160} height={40} priority style={{ width: "auto" }} />
       </div>
 
       <div className="mb-8">
@@ -95,16 +115,41 @@ function LoginForm() {
           </div>
         </div>
 
-        <Button type="submit" className="w-full h-10" disabled={loading}>
-          {loading ? (
-            <>
+        <div className="space-y-3">
+          <Button type="submit" className="w-full h-10" disabled={loading}>
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin mr-2" size={16} />
+                Memproses...
+              </>
+            ) : (
+              "Masuk"
+            )}
+          </Button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-muted" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground font-medium">Atau</span>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full h-10 border-dashed border-primary/40 hover:border-primary hover:bg-primary/5 text-primary"
+            onClick={handleDemoLogin}
+            disabled={loading}
+          >
+            {loading ? (
               <Loader2 className="animate-spin" size={16} />
-              Memproses...
-            </>
-          ) : (
-            "Masuk"
-          )}
-        </Button>
+            ) : (
+              "Masuk sebagai Admin (Demo)"
+            )}
+          </Button>
+        </div>
       </form>
 
       <p className="mt-8 text-center text-xs text-muted-foreground">
@@ -115,6 +160,12 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div className="min-h-screen flex">
       {/* Left panel — branding */}
@@ -133,6 +184,7 @@ export default function LoginPage() {
               height={50}
               className="brightness-0 invert"
               priority
+              style={{ width: "auto" }}
             />
           </div>
           <h1 className="text-4xl font-bold leading-tight mb-4">
@@ -162,9 +214,13 @@ export default function LoginPage() {
 
       {/* Right panel — login form */}
       <div className="flex-1 flex items-center justify-center p-8 bg-background">
-        <Suspense fallback={<div className="w-full max-w-md animate-pulse"><div className="h-8 w-48 bg-muted rounded mb-8" /><div className="space-y-4"><div className="h-10 bg-muted rounded" /><div className="h-10 bg-muted rounded" /><div className="h-10 bg-muted rounded" /></div></div>}>
-          <LoginForm />
-        </Suspense>
+        {mounted ? (
+          <Suspense fallback={<div className="w-full max-w-md animate-pulse"><div className="h-8 w-48 bg-muted rounded mb-8" /><div className="space-y-4"><div className="h-10 bg-muted rounded" /><div className="h-10 bg-muted rounded" /><div className="h-10 bg-muted rounded" /></div></div>}>
+            <LoginForm />
+          </Suspense>
+        ) : (
+          <div className="w-full max-w-md animate-pulse"><div className="h-8 w-48 bg-muted rounded mb-8" /><div className="space-y-4"><div className="h-10 bg-muted rounded" /><div className="h-10 bg-muted rounded" /><div className="h-10 bg-muted rounded" /></div></div>
+        )}
       </div>
     </div>
   );

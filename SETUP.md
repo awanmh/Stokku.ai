@@ -88,11 +88,21 @@ If you prefer to run the components manually for development, follow these steps
 | `DB_HOST` | PostgreSQL host | `localhost` |
 | `DB_PORT` | PostgreSQL port | `5432` |
 | `DB_USER` | PostgreSQL user | `postgres` |
-| `DB_PASSWORD` | PostgreSQL password | `postgres` |
+| `DB_PASSWORD` | PostgreSQL password | `root` |
 | `DB_NAME` | PostgreSQL database name | `stokku` |
 | `REDIS_HOST` | Redis host | `localhost` |
 | `REDIS_PORT` | Redis port | `6379` |
 | `JWT_SECRET` | Secret key for JWT signing | `change-me` |
+
+---
+
+## 🔐 Default Credentials
+
+For initial setup and development, you can use the following administrator account:
+
+| Role | Email | Password |
+|---|---|---|
+| **Admin** | `admin@stokku.ai` | `password` |
 
 ---
 
