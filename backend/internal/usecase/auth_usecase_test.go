@@ -142,3 +142,135 @@ func TestLogin_UserNotFound(t *testing.T) {
 	assert.Equal(t, "invalid email or password", err.Error())
 	mockRepo.AssertExpectations(t)
 }
+
+func TestLogin_DeactivatedUser(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	ctx := context.Background()
+
+	user := &domain.User{
+		ID:       uuid.New(),
+		Email:    "inactive@test.com",
+		Name:     "Inactive User",
+		Password: hashedPassword("password123"),
+		Role:     domain.RoleViewer,
+		IsActive: false,
+	}
+
+	mockRepo.On("GetByEmail", ctx, "inactive@test.com").Return(user, nil)
+
+	result, err := uc.Login(ctx, domain.LoginRequest{
+		Email:    "inactive@test.com",
+		Password: "password123",
+	})
+
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	assert.Equal(t, "account is deactivated", err.Error())
+	mockRepo.AssertExpectations(t)
+}
+
+func TestRegister_Success(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	ctx := context.Background()
+
+	mockRepo.On("GetByEmail", ctx, "newuser@test.com").Return(nil, errors.New("not found"))
+	mockRepo.On("Create", ctx, mock.AnythingOfType("*domain.User")).Return(nil)
+
+	result, err := uc.Register(ctx, domain.RegisterRequest{
+		Email:    "newuser@test.com",
+		Name:     "New User",
+		Password: "securepassword",
+		Role:     domain.RoleViewer,
+	})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.NotEmpty(t, result.Token)
+	assert.Equal(t, "newuser@test.com", result.User.Email)
+	assert.Equal(t, "New User", result.User.Name)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestRegister_DuplicateEmail(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	ctx := context.Background()
+
+	existingUser := &domain.User{
+		ID:    uuid.New(),
+		Email: "existing@test.com",
+	}
+	mockRepo.On("GetByEmail", ctx, "existing@test.com").Return(existingUser, nil)
+
+	result, err := uc.Register(ctx, domain.RegisterRequest{
+		Email:    "existing@test.com",
+		Name:     "Duplicate",
+		Password: "password",
+	})
+
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	assert.Equal(t, "email already registered", err.Error())
+	mockRepo.AssertExpectations(t)
+}
+
+func TestRegister_DefaultRole(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	ctx := context.Background()
+
+	mockRepo.On("GetByEmail", ctx, "norole@test.com").Return(nil, errors.New("not found"))
+	mockRepo.On("Create", ctx, mock.AnythingOfType("*domain.User")).Return(nil)
+
+	result, err := uc.Register(ctx, domain.RegisterRequest{
+		Email:    "norole@test.com",
+		Name:     "No Role User",
+		Password: "password",
+		Role:     "", // empty role
+	})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, domain.RoleViewer, result.User.Role)
+}
+
+func TestGetProfile_Success(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	ctx := context.Background()
+
+	userID := uuid.New()
+	user := &domain.User{
+		ID:       userID,
+		Email:    "admin@test.com",
+		Name:     "Admin",
+		Role:     domain.RoleAdmin,
+		IsActive: true,
+	}
+	mockRepo.On("GetByID", ctx, userID).Return(user, nil)
+
+	result, err := uc.GetProfile(ctx, userID)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, userID, result.ID)
+	assert.Equal(t, "admin@test.com", result.Email)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestGetProfile_NotFound(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	ctx := context.Background()
+
+	userID := uuid.New()
+	mockRepo.On("GetByID", ctx, userID).Return(nil, errors.New("not found"))
+
+	result, err := uc.GetProfile(ctx, userID)
+
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	mockRepo.AssertExpectations(t)
+}
