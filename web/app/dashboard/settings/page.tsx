@@ -30,7 +30,7 @@ import type { User } from "@/lib/api";
 
 const roleLabels: Record<string, { label: string; variant: "default" | "secondary" | "outline" }> = {
   admin: { label: "Admin", variant: "default" },
-  warehouse_staff: { label: "Staff Gudang", variant: "secondary" },
+  warehouse_staff: { label: "Staff", variant: "secondary" },
   viewer: { label: "Viewer", variant: "outline" },
 };
 
@@ -38,8 +38,6 @@ export default function SettingsPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // Modal state
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -52,7 +50,7 @@ export default function SettingsPage() {
       const res = await authApi.getUsers(50);
       setUsers(res.data || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal memuat data pengguna");
+      setError(err instanceof Error ? err.message : "Failed to load users");
     } finally {
       setLoading(false);
     }
@@ -82,64 +80,61 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold flex items-center gap-2">
-          <SettingsIcon size={22} />
-          Pengaturan
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Kelola pengguna dan konfigurasi sistem
+        <h1 className="text-2xl font-semibold text-foreground tracking-tight">Settings</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Manage users and system configuration.
         </p>
       </div>
 
-      {/* RBAC Info */}
+      {/* RBAC */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Shield size={16} className="text-primary" />
-            Role & Permission
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <Shield size={14} />
+            Roles & permissions
           </CardTitle>
-          <CardDescription>Sistem role-based access control (RBAC)</CardDescription>
+          <CardDescription>Role-based access control (RBAC) overview.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg bg-muted/50 border border-border">
+            <div className="p-4 rounded-lg bg-secondary border border-border">
               <Badge className="mb-2">Admin</Badge>
-              <p className="text-xs text-muted-foreground">
-                Akses penuh: CRUD produk, gudang, transaksi, user management, dan konfigurasi sistem.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Full access: manage products, warehouses, transactions, users, and system configuration.
               </p>
             </div>
-            <div className="p-4 rounded-lg bg-muted/50 border border-border">
-              <Badge variant="secondary" className="mb-2">Staff Gudang</Badge>
-              <p className="text-xs text-muted-foreground">
-                Buat produk, transaksi stock in/out. Tidak bisa kelola user atau hapus gudang.
+            <div className="p-4 rounded-lg bg-secondary border border-border">
+              <Badge variant="secondary" className="mb-2">Staff</Badge>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Create products, record stock-in/out transactions. Cannot manage users or delete warehouses.
               </p>
             </div>
-            <div className="p-4 rounded-lg bg-muted/50 border border-border">
+            <div className="p-4 rounded-lg bg-secondary border border-border">
               <Badge variant="outline" className="mb-2">Viewer</Badge>
-              <p className="text-xs text-muted-foreground">
-                Hanya bisa melihat data. Tidak bisa membuat atau mengedit apapun.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Read-only access. Cannot create, edit, or delete any data.
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* User Management */}
+      {/* User management */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Users size={16} />
-                Daftar Pengguna
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Users size={14} />
+                User management
               </CardTitle>
               <CardDescription className="mt-1">
-                {users.length} pengguna terdaftar
+                {users.length} registered users
               </CardDescription>
             </div>
             <Button size="sm" onClick={() => setAddModalOpen(true)}>
               <Plus size={14} />
-              Tambah User
+              Add user
             </Button>
           </div>
         </CardHeader>
@@ -151,103 +146,82 @@ export default function SettingsPage() {
               <p className="text-sm text-muted-foreground">{error}</p>
               <Button variant="outline" size="sm" onClick={fetchUsers}>
                 <RefreshCw size={14} />
-                Coba Lagi
+                Retry
               </Button>
             </div>
           ) : users.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-              <Users size={40} className="mb-3 opacity-40" />
-              <p className="text-sm">Belum ada pengguna terdaftar</p>
+            <div className="flex flex-col items-center justify-center py-16">
+              <Users size={32} className="text-muted-foreground mb-3" />
+              <p className="text-sm font-medium text-foreground mb-1">No users yet</p>
+              <p className="text-xs text-muted-foreground">Add your first user to get started.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nama</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Terdaftar</TableHead>
-                  <TableHead className="w-20">Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{user.email}</TableCell>
-                    <TableCell>
-                      <Badge variant={roleLabels[user.role]?.variant || "outline"}>
-                        {roleLabels[user.role]?.label || user.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={user.is_active ? "success" : "secondary"}>
-                        {user.is_active ? "Aktif" : "Nonaktif"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(user.created_at)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7"
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setEditModalOpen(true);
-                          }}
-                        >
-                          <Edit2 size={12} />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-destructive hover:text-destructive"
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setDeleteDialogOpen(true);
-                          }}
-                        >
-                          <Trash2 size={12} />
-                        </Button>
-                      </div>
-                    </TableCell>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Registered</TableHead>
+                    <TableHead className="w-20">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {users.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium text-foreground">{user.name}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <Badge variant={roleLabels[user.role]?.variant || "outline"}>
+                          {roleLabels[user.role]?.label || user.role}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={user.is_active ? "success" : "secondary"}>
+                          {user.is_active ? "Active" : "Inactive"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs">{formatDate(user.created_at)}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => { setSelectedUser(user); setEditModalOpen(true); }}
+                          >
+                            <Edit2 size={12} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-destructive hover:text-destructive"
+                            onClick={() => { setSelectedUser(user); setDeleteDialogOpen(true); }}
+                          >
+                            <Trash2 size={12} />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Add User Modal */}
-      <UserFormModal
-        open={addModalOpen}
-        onOpenChange={setAddModalOpen}
-        onSubmitAdd={handleAddUser}
-      />
-
-      {/* Edit User Modal */}
-      <UserFormModal
-        open={editModalOpen}
-        onOpenChange={setEditModalOpen}
-        user={selectedUser}
-        onSubmitEdit={handleEditUser}
-      />
-
-      {/* Delete Confirmation */}
+      <UserFormModal open={addModalOpen} onOpenChange={setAddModalOpen} onSubmitAdd={handleAddUser} />
+      <UserFormModal open={editModalOpen} onOpenChange={setEditModalOpen} user={selectedUser} onSubmitEdit={handleEditUser} />
       <DeleteConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteUser}
-        title="Hapus Pengguna"
-        description={`Apakah Anda yakin ingin menghapus pengguna "${selectedUser?.name}"? Tindakan ini tidak dapat dibatalkan.`}
-        confirmLabel="Hapus Pengguna"
+        title="Delete user"
+        description={`Are you sure you want to delete "${selectedUser?.name}"? This action cannot be undone.`}
+        confirmLabel="Delete user"
       />
     </div>
   );
