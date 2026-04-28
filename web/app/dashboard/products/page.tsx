@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { productApi } from "@/lib/api";
+import { useDebounce } from "@/hooks/use-debounce";
+import { motion, AnimatePresence } from "framer-motion";
 import type { Product, CreateProductRequest } from "@/lib/api";
 
 const PAGE_SIZE = 15;
@@ -36,6 +38,7 @@ export default function ProductsPage() {
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -49,7 +52,7 @@ export default function ProductsPage() {
     setError("");
     try {
       const res = await productApi.getAll({
-        search: search || undefined,
+        search: debouncedSearch || undefined,
         limit: PAGE_SIZE,
         offset,
       });
@@ -60,7 +63,7 @@ export default function ProductsPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, offset]);
+  }, [debouncedSearch, offset]);
 
   useEffect(() => {
     fetchProducts();
@@ -83,59 +86,78 @@ export default function ProductsPage() {
     fetchProducts();
   };
 
+  // Helper for category colors
+  const getCategoryVariant = (category: string) => {
+    const c = category?.toLowerCase() || "";
+    if (c.includes("electro")) return "success";
+    if (c.includes("food") || c.includes("bever")) return "warning";
+    if (c.includes("cloth") || c.includes("apparel")) return "default";
+    return "secondary";
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+        >
           <h1 className="text-2xl font-semibold text-foreground tracking-tight">Produk</h1>
-          <p className="text-sm text-muted-foreground mt-1">Kelola master data produk.</p>
-        </div>
-        <Button size="sm" onClick={() => { setEditProduct(null); setModalOpen(true); }}>
-          <Plus size={14} />
-          Tambah Produk
-        </Button>
+          <p className="text-sm text-muted-foreground mt-1">Kelola master data produk Anda secara terpusat.</p>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+        >
+          <Button size="sm" onClick={() => { setEditProduct(null); setModalOpen(true); }} className="shadow-lg shadow-primary/20">
+            <Plus size={14} className="mr-1.5" />
+            Tambah Produk
+          </Button>
+        </motion.div>
       </div>
 
-      <Card>
+      <Card className="bg-card/50 backdrop-blur-sm border-border/50">
         <CardContent className="p-4">
-          <div className="relative max-w-sm w-full">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative max-w-sm w-full group">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <Input
               placeholder="Cari SKU atau nama produk..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setOffset(0); }}
-              className="pl-9 h-8"
+              className="pl-9 h-9 bg-background/50 border-border/50 focus-visible:ring-primary/20"
             />
           </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="pb-0">
+      <Card className="bg-card/50 backdrop-blur-sm border-border/50 overflow-hidden">
+        <CardHeader className="pb-0 border-b border-border/50 pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-medium">Database Produk</CardTitle>
-            <span className="text-xs text-muted-foreground">{total} produk</span>
+            <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-secondary">{total} produk</span>
           </div>
         </CardHeader>
-        <CardContent className="p-0 mt-4">
-          {loading ? (
+        <CardContent className="p-0">
+          {loading && products.length === 0 ? (
             <TableSkeleton rows={8} columns={6} />
           ) : error ? (
-            <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <div className="flex flex-col items-center justify-center py-24 gap-3">
               <p className="text-sm text-muted-foreground">{error}</p>
               <Button variant="outline" size="sm" onClick={fetchProducts}>
-                <RefreshCw size={14} />
-                Retry
+                <RefreshCw size={14} className="mr-1.5" />
+                Coba Lagi
               </Button>
             </div>
           ) : products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16">
-              <PackageSearch size={32} className="text-muted-foreground mb-3" />
-              <p className="text-sm font-medium text-foreground mb-1">No products found</p>
-              <p className="text-xs text-muted-foreground mb-4">Add your first product to master data.</p>
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <div className="p-4 rounded-full bg-secondary/50 mb-4">
+                <PackageSearch size={32} className="text-muted-foreground" />
+              </div>
+              <p className="text-sm font-medium text-foreground mb-1">Belum ada produk</p>
+              <p className="text-xs text-muted-foreground mb-6 max-w-[200px]">Mulai dengan menambahkan produk pertama ke dalam sistem.</p>
               <Button variant="outline" size="sm" onClick={() => { setEditProduct(null); setModalOpen(true); }}>
-                <Plus size={14} />
-                Add product
+                <Plus size={14} className="mr-1.5" />
+                Tambah Sekarang
               </Button>
             </div>
           ) : (
@@ -143,66 +165,83 @@ export default function ProductsPage() {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Product</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead className="text-right">Price</TableHead>
-                      <TableHead className="text-right">Min/Max limits</TableHead>
+                    <TableRow className="hover:bg-transparent border-border/50">
+                      <TableHead className="w-[300px]">Produk</TableHead>
+                      <TableHead>Kategori</TableHead>
+                      <TableHead className="text-right">Harga</TableHead>
+                      <TableHead className="text-right">Min/Max Stok</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead className="text-right">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {products.map((p) => (
-                      <TableRow key={p.id}>
-                        <TableCell>
-                          <div>
-                            <p className="font-medium text-foreground text-sm">{p.name}</p>
-                            <p className="text-xs text-muted-foreground font-mono">{p.sku}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary" className="font-normal text-[10px]">
-                            {p.category || "Uncategorized"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right font-medium">
-                          {formatCurrency(p.price)}
-                        </TableCell>
-                        <TableCell className="text-right text-muted-foreground text-sm">
-                          {p.min_stock} / {p.max_stock} <span className="text-[10px] uppercase tracking-widest">{p.unit}</span>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={p.is_active ? "success" : "secondary"}>
-                            {p.is_active ? "Active" : "Archived"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7"
-                              onClick={() => { setEditProduct(p); setModalOpen(true); }}
-                            >
-                              <Edit2 size={12} />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 text-destructive hover:text-destructive"
-                              onClick={() => { setDeleteProduct(p); setDeleteDialogOpen(true); }}
-                            >
-                              <Trash2 size={12} />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    <AnimatePresence mode="popLayout">
+                      {products.map((p, idx) => (
+                        <motion.tr
+                          key={p.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.2, delay: idx * 0.03 }}
+                          className="group border-border/50 hover:bg-secondary/30 transition-colors"
+                        >
+                          <TableCell>
+                            <div className="flex flex-col">
+                              <p className="font-medium text-foreground text-sm group-hover:text-primary transition-colors">{p.name}</p>
+                              <p className="text-[10px] text-muted-foreground font-mono tracking-tighter">{p.sku}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={getCategoryVariant(p.category)} className="font-normal text-[10px] capitalize">
+                              {p.category || "General"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right font-medium text-foreground/80">
+                            {formatCurrency(p.price)}
+                          </TableCell>
+                          <TableCell className="text-right text-muted-foreground text-sm">
+                            <span className="font-medium text-foreground/70">{p.min_stock}</span>
+                            <span className="mx-1 text-border">/</span>
+                            <span>{p.max_stock}</span>
+                            <span className="ml-1.5 text-[9px] uppercase tracking-widest text-muted-foreground/60">{p.unit}</span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1.5">
+                              <span className={`h-1.5 w-1.5 rounded-full ${p.is_active ? "bg-success shadow-[0_0_8px_rgba(34,197,94,0.5)]" : "bg-muted"}`} />
+                              <span className="text-[11px] text-muted-foreground">
+                                {p.is_active ? "Aktif" : "Nonaktif"}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
+                                onClick={() => { setEditProduct(p); setModalOpen(true); }}
+                              >
+                                <Edit2 size={12} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                onClick={() => { setDeleteProduct(p); setDeleteDialogOpen(true); }}
+                              >
+                                <Trash2 size={12} />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </motion.tr>
+                      ))}
+                    </AnimatePresence>
                   </TableBody>
                 </Table>
               </div>
-              <Pagination total={total} limit={PAGE_SIZE} offset={offset} onPageChange={setOffset} />
+              <div className="p-4 border-t border-border/50">
+                <Pagination total={total} limit={PAGE_SIZE} offset={offset} onPageChange={setOffset} />
+              </div>
             </>
           )}
         </CardContent>
@@ -218,9 +257,9 @@ export default function ProductsPage() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteProduct}
-        title="Delete product"
-        description={`Are you sure you want to delete "${deleteProduct?.name}"? You cannot delete this product if it has existing inventory or transactions.`}
-        confirmLabel="Delete product"
+        title="Hapus Produk"
+        description={`Apakah Anda yakin ingin menghapus "${deleteProduct?.name}"? Tindakan ini tidak dapat dibatalkan jika produk sudah memiliki data transaksi.`}
+        confirmLabel="Hapus Produk"
       />
     </div>
   );

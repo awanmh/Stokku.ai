@@ -21,10 +21,10 @@ const navSections = [
     label: "Dashboard",
     items: [
       { title: "Overview", href: "/dashboard", icon: LayoutDashboard },
-      { title: "Products", href: "/dashboard/products", icon: PackageSearch },
-      { title: "Inventory", href: "/dashboard/inventory", icon: Package },
-      { title: "Warehouses", href: "/dashboard/warehouses", icon: Building2 },
-      { title: "Transactions", href: "/dashboard/transactions", icon: ArrowRightLeft },
+      { title: "Produk", href: "/dashboard/products", icon: PackageSearch },
+      { title: "Gudang", href: "/dashboard/warehouses", icon: Building2 },
+      { title: "Inventaris", href: "/dashboard/inventory", icon: Package },
+      { title: "Transaksi", href: "/dashboard/transactions", icon: ArrowRightLeft },
     ],
   },
   {
