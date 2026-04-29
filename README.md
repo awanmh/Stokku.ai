@@ -39,8 +39,9 @@ Selama pengembangan fase terbaru, struktur inti sistem manajemen dan frontend da
 ## 🚀 Pembaruan Utama (Frontend Enterprise Redesign)
 Sistem web dashboard baru saja mengalami perombakan besar-besaran (Redesign UI/UX) untuk memenuhi standar kelas **Enterprise** (terinspirasi dari Stripe, Linear):
 - **Sistem Desain (Tokens):** Migrasi dari warna *hardcoded* ke sistem CSS Variable (Tokens) menggunakan Tailwind CSS v4.
-- **Visual Bersih & Stabil:** Penghapusan efek *glassmorphism*, *blur*, dan bayangan *neon/gaming* yang berlebihan demi performa dan keterbacaan yang optimal.
+- **Visual Bersih & Stabil:** Keseimbangan antara efek *glassmorphism* modern dan performa serta keterbacaan yang optimal.
 - **Komponen Fungsional:** Tabel, Kartu, Tombol, dan Form Input telah dirombak untuk terlihat profesional. Tabel sekarang menggunakan gaya *Stripe-style* (bersih, jarak rapi).
+- **Tema (Dark Mode / Light Mode):** Sistem mendukung fitur mode gelap (Dark Mode), mode terang (Light Mode), dan mode sistem secara otomatis.
 - **Penambahan Modul Penuh:**
   1. Halaman **Overview Dashboard**: Metrik bisnis, grafik pergerakan stok, dan peringatan *Low Stock*.
   2. Halaman **Products (Master Data)**: Penambahan, pengeditan, dan hapus master data katalog produk.
@@ -48,35 +49,7 @@ Sistem web dashboard baru saja mengalami perombakan besar-besaran (Redesign UI/U
   4. Halaman **Warehouses**: Cek dan edit data gudang dengan tata letak Grid Card.
   5. Halaman **Transactions**: *Ledger* lengkap setiap mutasi (Stock In / Stock Out).
   6. Halaman **Settings**: Manajemen *RBAC Role* (Admin, Staff, Viewer) dan pendaftaran pengguna baru.
-
----
-
-> Silakan baca **SETUP.md** untuk melihat panduan setup di mesin/localhost Anda.
-as minimum.
-4. **Warehouse Management (CRUD):** 
-   - Konfigurasi berbagai gudang.
-   - Pencarian letak fisik (Alamat & Lokasi).
-5. **Transaction Management:** Stock-In dan Stock-Out langsung mempengaruhi nilai Inventory dan dicatat per-user.
-6. **API Endpoints (Handoff untuk Mobile):** Seluruh REST API CRUD rampung. Format respon distandarisasi dan endpoint aman (`/api/v1/`). Dokumentasi lengkap tersedia di `backend/API_DOCS.md`.
-
-## 🟡 Apa yang Masih Kurang (To-Do Selanjutnya)
-
-1. **Integrasi Flutter Mobile App:** Tim mobile harus mengonsumsi endpoint API ini dari emulator / target API host sebelum bisa dirilis untuk *warehouse workers*. CORS sementara dibuka lebar agar emulator bisa tembus ke PC ini secara lokal.
-2. **Injeksi AI Service / Forecasting:** Route `/ai/forecast` masih berupa *placeholder response*. Service ML Python dari sisi Stokku AI perlu dilibatkan (ataupun diintegrasi via RabbitMQ/HTTP call).
-3. **Production Deployment:** Konfigurasi HTTPS, load balancer, dan integrasi CI/CD Actions (saat ini sistem dirancang masih sebatas localhost full-stack via Docker Compose).
-
-## 🚀 Pembaruan Utama (Frontend Enterprise Redesign)
-Sistem web dashboard baru saja mengalami perombakan besar-besaran (Redesign UI/UX) untuk memenuhi standar kelas **Enterprise** (terinspirasi dari Stripe, Linear):
-- **Sistem Desain (Tokens):** Migrasi dari warna *hardcoded* ke sistem CSS Variable (Tokens) menggunakan Tailwind CSS v4.
-- **Visual Bersih & Stabil:** Penghapusan efek *glassmorphism*, *blur*, dan bayangan *neon/gaming* yang berlebihan demi performa dan keterbacaan yang optimal.
-- **Komponen Fungsional:** Tabel, Kartu, Tombol, dan Form Input telah dirombak untuk terlihat profesional. Tabel sekarang menggunakan gaya *Stripe-style* (bersih, jarak rapi).
-- **Penambahan Modul Penuh:**
-  1. Halaman **Overview Dashboard**: Metrik bisnis, grafik pergerakan stok, dan peringatan *Low Stock*.
-  2. Halaman **Products (Master Data)**: Penambahan, pengeditan, dan hapus master data katalog produk.
-  3. Halaman **Inventory**: Menampilkan total stok asli per produk per gudang dengan status visual (OK / Low).
-  4. Halaman **Warehouses**: Cek dan edit data gudang dengan tata letak Grid Card.
-  5. Halaman **Transactions**: *Ledger* lengkap setiap mutasi (Stock In / Stock Out).
-  6. Halaman **Settings**: Manajemen *RBAC Role* (Admin, Staff, Viewer) dan pendaftaran pengguna baru.
+  7. Halaman **Profile**: Menampilkan detail pengguna dan fitur *Edit Profil* (Ubah Nama).
 
 ---
 
