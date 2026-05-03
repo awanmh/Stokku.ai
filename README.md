@@ -2,25 +2,28 @@
 
 Stokku.ai adalah platform manajemen inventaris berskala besar yang dilengkapi Next.js (Web Frontend), Golang (API Backend), PostgreSQL (Database), dan Redis (Cache) - dan dijalankan via Docker.
 
-## 🟢 Apa yang Sudah Selesai Dibangun (Phase 1-4)
-Selama pengembangan fase 1-4, struktur inti sistem manajemen dan framework sudah 100% stabil untuk produksi, mencakup:
+## 🟢 Apa yang Sudah Selesai Dibangun (Phase 1-5 & UI/UX Fixes)
+Selama pengembangan fase terbaru, struktur inti sistem manajemen dan frontend dashboard sudah 100% stabil untuk produksi, mencakup:
 
-1. **Authentication:** Register, Login, RBAC Roles (Admin, Staff, Viewer) berbasis Bearer token (JWT).
-2. **Dashboard & UI Utama:** Panel antarmuka dark-mode support menggunakan Next.js + CSS modern. Alert dashboard otomatis (Low stock, Dead stock).
-3. **Inventory Management (CRUD):** 
-   - Tambah/Edit/Hapus/Lihat Produk.
-   - Perhitugan total nilai produk & *warning alert* jika ada yang melampaui batas minimum.
-4. **Warehouse Management (CRUD):** 
-   - Konfigurasi berbagai gudang.
-   - Pencarian letak fisik (Alamat & Lokasi).
-5. **Transaction Management:** Stock-In dan Stock-Out langsung mempengaruhi nilai Inventory dan dicatat per-user.
-6. **API Endpoints (Handoff untuk Mobile):** Seluruh REST API CRUD rampung. Format respon distandarisasi dan endpoint aman (`/api/v1/`). Dokumentasi lengkap tersedia di `backend/API_DOCS.md`.
+1. **Authentication & Session:** Register, Login, RBAC Roles (Admin, Staff, Viewer) berbasis Bearer token (JWT). Dilengkapi deteksi otomatis (auto-logout) jika JWT kedaluwarsa atau user sudah dihapus di database.
+2. **Dashboard & Alur Kerja:** Antarmuka Next.js modern yang responsif. Navigasi telah diurutkan sesuai alur logika bisnis: **Produk → Gudang → Inventaris → Transaksi**, dan seluruh antarmuka 100% menggunakan Bahasa Indonesia yang konsisten.
+3. **Product Management (Master Data):** 
+   - Tambah/Edit/Hapus produk dengan validasi form (bebas dari error *400 Bad Request* akibat input kosong/NaN).
+4. **Warehouse Management (Lokasi):** 
+   - Pembuatan dan manajemen titik gudang.
+   - Telah terintegrasi dengan data real-time: menampilkan **jumlah produk unik** dan **total stok per gudang** dengan detail *expandable*.
+5. **Inventory Management (Ketersediaan):** 
+   - Gabungan data antara Produk dan Gudang. Menampilkan total nilai aset produk & *badge* peringatan visual (Stok Rendah / Aman).
+6. **Transaction Management (Log Mutasi):** 
+   - Pencatatan mutasi Stock-In dan Stock-Out yang langsung mempengaruhi kuantitas *Inventory*. 
+   - Form telah diperbaiki sehingga bebas dari error UUID kosong maupun isu validasi *Foreign Key*.
+7. **API Endpoints Backend:** Seluruh REST API berbasis Golang Fiber telah rampung dan diamankan. Dokumentasi lengkap tersedia di `backend/API_DOCS.md`.
 
 ## 🟡 Apa yang Masih Kurang (To-Do Selanjutnya)
 
-1. **Integrasi Flutter Mobile App:** Tim mobile harus mengonsumsi endpoint API ini dari emulator / target API host sebelum bisa dirilis untuk *warehouse workers*. CORS sementara dibuka lebar agar emulator bisa tembus ke PC ini secara lokal.
-2. **Injeksi AI Service / Forecasting:** Route `/ai/forecast` masih berupa *placeholder response*. Service ML Python dari sisi Stokku AI perlu dilibatkan (ataupun diintegrasi via RabbitMQ/HTTP call).
-3. **Production Deployment:** Konfigurasi HTTPS, load balancer, dan integrasi CI/CD Actions (saat ini sistem dirancang masih sebatas localhost full-stack via Docker Compose).
+1. **Integrasi Flutter Mobile App:** Tim mobile harus mengonsumsi endpoint API dari aplikasi backend ini sebelum aplikasi bisa dirilis untuk pekerja gudang (*warehouse workers*).
+2. **Injeksi AI Service / Forecasting:** Route prediksi stok `/ai/forecast` masih berupa *placeholder*. Integrasi dengan *machine learning service* (Python) perlu dikonfigurasi melalui HTTP call atau Message Queue.
+3. **Production Deployment:** Setup *environment* untuk *Production* seperti konfigurasi HTTPS, Load Balancer, pengaturan CI/CD, dan pemindahan dari localhost Docker Compose ke Cloud Server asli.
 
 ## 🚀 Pembaruan Utama (Frontend Enterprise Redesign)
 Sistem web dashboard baru saja mengalami perombakan besar-besaran (Redesign UI/UX) untuk memenuhi standar kelas **Enterprise** (terinspirasi dari Stripe, Linear):
