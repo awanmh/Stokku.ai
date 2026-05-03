@@ -28,8 +28,9 @@ Selama pengembangan fase terbaru, struktur inti sistem manajemen dan frontend da
 ## 🚀 Pembaruan Utama (Frontend Enterprise Redesign)
 Sistem web dashboard baru saja mengalami perombakan besar-besaran (Redesign UI/UX) untuk memenuhi standar kelas **Enterprise** (terinspirasi dari Stripe, Linear):
 - **Sistem Desain (Tokens):** Migrasi dari warna *hardcoded* ke sistem CSS Variable (Tokens) menggunakan Tailwind CSS v4.
-- **Visual Bersih & Stabil:** Penghapusan efek *glassmorphism*, *blur*, dan bayangan *neon/gaming* yang berlebihan demi performa dan keterbacaan yang optimal.
+- **Visual Bersih & Stabil:** Keseimbangan antara efek *glassmorphism* modern dan performa serta keterbacaan yang optimal.
 - **Komponen Fungsional:** Tabel, Kartu, Tombol, dan Form Input telah dirombak untuk terlihat profesional. Tabel sekarang menggunakan gaya *Stripe-style* (bersih, jarak rapi).
+- **Tema (Dark Mode / Light Mode):** Sistem mendukung fitur mode gelap (Dark Mode), mode terang (Light Mode), dan mode sistem secara otomatis.
 - **Penambahan Modul Penuh:**
   1. Halaman **Overview Dashboard**: Metrik bisnis, grafik pergerakan stok, dan peringatan *Low Stock*.
   2. Halaman **Products (Master Data)**: Penambahan, pengeditan, dan hapus master data katalog produk.
@@ -37,6 +38,7 @@ Sistem web dashboard baru saja mengalami perombakan besar-besaran (Redesign UI/U
   4. Halaman **Warehouses**: Cek dan edit data gudang dengan tata letak Grid Card.
   5. Halaman **Transactions**: *Ledger* lengkap setiap mutasi (Stock In / Stock Out).
   6. Halaman **Settings**: Manajemen *RBAC Role* (Admin, Staff, Viewer) dan pendaftaran pengguna baru.
+  7. Halaman **Profile**: Menampilkan detail pengguna dan fitur *Edit Profil* (Ubah Nama).
 
 ---
 
