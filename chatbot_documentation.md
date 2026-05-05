@@ -1,52 +1,162 @@
-# Stokku Assistant Chatbot Documentation
+# Stokku AI — Floating Chatbot Documentation
 
-## 1. Fitur yang Telah Dibuat
-- **Antarmuka Chat (Chat Interface):** Halaman responsif yang dirancang menyerupai aplikasi perpesanan modern. 
-- **Auto-scroll:** Tampilan otomatis bergulir ke pesan terbaru ketika ada pesan baru dari pengguna maupun *chatbot*.
-- **Pembedaan Pesan (Chat Bubbles):** Warna, penempatan, dan avatar yang berbeda untuk membedakan antara pesan pengguna (user) dan *chatbot* (Stokku Assistant).
-- **Indikator Typing:** Animasi *loading dots* untuk memberikan umpan balik visual bahwa *chatbot* sedang "berpikir" dan memproses jawaban.
-- **Dukungan Enter-key & Validasi:** Pengguna dapat mengirim pesan menggunakan tombol Enter. Sistem juga mencegah pengiriman pesan kosong.
-- **Konsistensi Tema:** Terintegrasi penuh dengan sistem *light/dark mode* yang ada di Stokku.ai.
+## 1. Deskripsi Fitur
+Stokku AI adalah chatbot berbasis **Floating Action Button (FAB)** yang terintegrasi di seluruh halaman dashboard Stokku.ai. Chatbot ini dapat diakses kapan saja oleh pengguna melalui tombol melayang di pojok kanan bawah layar, tanpa berpindah halaman.
 
-## 2. Tujuan dan Fungsi Chatbot dalam Sistem Stokku.ai
-Stokku Assistant berfungsi sebagai **asisten pintar (virtual assistant)** bagi manajer dan staf gudang. Tujuannya adalah mempermudah pengguna mendapatkan *insights* terkait data inventaris tanpa harus membuka banyak halaman secara manual. Fitur ini dirancang untuk:
-- Memberikan informasi cepat tentang level stok produk.
-- Menyarankan tindakan pengadaan (*restock*).
-- Mengidentifikasi barang yang lambat terjual (*dead-stock*).
+Saat tombol ditekan, sebuah **panel percakapan pop-up** akan muncul dengan animasi slide-up. Panel ini berukuran compact (380×520px) sehingga tidak menutupi seluruh layar dan tidak mengganggu aktivitas utama pengguna.
 
-## 3. Teknologi & Pendekatan yang Digunakan
-- **Frontend Framework:** Next.js (App Router) dengan React.
-- **Styling:** Tailwind CSS untuk tata letak yang responsif dan konsisten.
-- **UI Components:** Menggunakan komponen kustom bawaan (shadcn/ui-based) seperti `Card`, `Input`, `Button`, dan `Avatar`.
-- **Iconography:** `lucide-react` untuk ikon-ikon antarmuka yang bersih.
-- **Animasi:** `framer-motion` untuk memberikan transisi kemunculan *bubble chat* yang halus (micro-animations), memberikan kesan *premium*.
+## 2. Tujuan dan Manfaat dalam Sistem Stokku.ai
+Stokku AI berfungsi sebagai **asisten pintar (virtual assistant)** yang membantu pengguna:
+- Mendapatkan informasi cepat tentang **stok kritis** tanpa membuka halaman inventaris.
+- Menerima **rekomendasi restock** berdasarkan prediksi AI Forecast.
+- Mengidentifikasi **dead-stock** (barang tidak terjual dalam 3 bulan).
+- Melihat **ringkasan inventaris** secara instan.
+- Mengambil keputusan bisnis dengan lebih cepat dan efisien.
 
-## 4. Alur Kerja Sistem Chat
-1. **Inisialisasi:** Saat halaman dimuat, *chatbot* mengirimkan pesan sapaan pertama.
-2. **Input:** Pengguna mengetik pertanyaan pada *textbox*.
-3. **Pengiriman:** Pengguna menekan *Send* atau menekan Enter. Pesan pengguna ditambahkan ke *state* `messages`.
-4. **Proses (Simulasi):** Input dikunci sesaat, dan animasi *typing* (`Loader2` atau *dots*) muncul.
-5. **Respons:** Berdasarkan kata kunci (seperti *stok*, *restock*, *dead*), sistem (saat ini *mock data*) menghasilkan jawaban, yang kemudian ditambahkan ke *state* `messages` setelah jeda simulasi `setTimeout`.
-6. **Selesai:** Area pesan bergulir ke bawah, input kembali terbuka untuk pertanyaan selanjutnya.
+## 3. Desain dan Pendekatan UI/UX
+### Prinsip Desain
+- **Non-intrusive:** Panel chat tidak menutupi seluruh layar; pengguna tetap bisa melihat konten di belakangnya.
+- **Aksesibel dari mana saja:** FAB tampil di semua halaman dashboard (Overview, Produk, Gudang, dll.).
+- **Konsisten:** Menggunakan design tokens yang sama dengan sistem (warna, border, font).
+- **Responsif:** Panel menyesuaikan ukuran layar dengan `max-w-[calc(100vw-2rem)]` dan `max-h-[80vh]`.
 
-## 5. Hasil Pengujian (Testing QA)
-- [x] **Pengiriman & Penerimaan Pesan:** Berjalan normal tanpa error. Tombol Enter berfungsi dengan baik.
-- [x] **Tampilan Pesan:** Pembedaan antara *User* (kanan, warna primer) dan *Bot* (kiri, warna sekunder) terlihat jelas dan estetis.
-- [x] **Indikator Loading:** *Typing dots* muncul dengan animasi *bounce* yang mulus sebelum pesan balasan muncul.
-- [x] **Responsivitas Layar:** *Input bar sticky* di bawah dan *chat area* menyesuaikan tinggi layar secara fleksibel, baik di desktop maupun mobile.
-- [x] **Dark/Light Mode:** Komponen membaca *design token* (seperti `bg-background`, `text-foreground`) dengan sempurna.
-- [x] **Validasi Input:** Tombol *send* nonaktif jika input hanya berisi spasi atau kosong. Tidak ada pesan kosong yang terkirim.
+### Komponen Visual
+| Komponen | Deskripsi |
+|---|---|
+| **FAB (Floating Action Button)** | Tombol bulat `h-12 w-12` di pojok kanan bawah, ikon berubah antara `MessageSquare` (tutup) dan `X` (buka) dengan animasi rotasi. |
+| **Header Panel** | Nama "Stokku AI", indikator status online (titik hijau berkedip), tombol minimize & close. |
+| **Area Chat** | Container scrollable dengan auto-scroll ke pesan terbaru. |
+| **Bubble Chat** | User (kanan, warna primer) vs Bot (kiri, warna sekunder + border). Avatar kecil di setiap pesan. |
+| **Typing Indicator** | Tiga titik yang bounce bergantian menggunakan Framer Motion. |
+| **Quick Replies** | Tombol-tombol saran cepat yang muncul saat awal percakapan. |
+| **Input Area** | Text input + tombol send, dengan disclaimer di bawahnya. |
 
-## 6. Kendala yang Ditemukan & Solusi
-- **Kendala:** Pengguna bisa terus menekan Enter atau tombol *Send* berkali-kali saat bot sedang merespons (menimbulkan pesan *spam*).
-- **Solusi:** Menambahkan parameter *state* `isTyping`. Jika bernilai `true`, *input field* dan tombol *send* akan masuk ke status `disabled`.
-- **Kendala:** Respons *backend* AI yang sesungguhnya belum tersedia.
-- **Solusi:** Membuat fungsi `generateBotResponse(userInput)` di frontend yang melakukan pengecekan teks (*string matching*) sementara sebagai *mock response*.
+### Teknologi
+- **Framework:** Next.js 16 (App Router) + React 19
+- **Styling:** Tailwind CSS v4 dengan custom design tokens
+- **Animasi:** Framer Motion — slide-up panel, fade-in pesan, bounce typing dots, rotasi ikon FAB
+- **Komponen UI:** Avatar, Button (dari shadcn/ui-based library)
+- **Iconography:** lucide-react (MessageSquare, Bot, User, Send, X, Minus, Sparkles, Loader2)
 
-## 7. Evaluasi & Saran Pengembangan Fitur Lanjutan
-Meskipun simulasi saat ini berjalan baik secara UI/UX, untuk membuat asisten ini benar-benar "pintar", disarankan pengembangan berikut:
-1. **Chat History (Riwayat Percakapan):** Menyimpan percakapan ke dalam *database* (misalnya PostgreSQL yang sudah ada) sehingga pengguna dapat melanjutkan konteks obrolan yang terputus.
-2. **Quick Reply / Auto Suggestion:** Menampilkan *chip button* berisi pertanyaan umum (misal: *"Cek stok kritis"*) di atas *textbox* agar mempercepat interaksi.
-3. **Integrasi AI/NLP Canggih:** Mengganti logika *string matching* (`generateBotResponse`) dengan *endpoint API backend* yang memanggil model LLM (Large Language Model) untuk memahami konteks dan maksud (*intent*) secara alami.
-4. **Data Real-time:** LLM harus diberikan kemampuan pemanggilan fungsi (*function calling*) untuk melakukan kueri ke *database* Stokku.ai secara *real-time* sebelum menjawab pengguna.
-5. **Notifikasi Insight:** *Chatbot* dapat secara proaktif mengirim pesan saat pengguna membuka halaman jika ada stok yang baru saja mencapai batas kritis (tanpa harus ditanya lebih dulu).
+## 4. Alur Interaksi Pengguna dengan Chatbot
+```
+┌─────────────────────────────────────────────────┐
+│ Pengguna berada di halaman dashboard mana saja  │
+└──────────────────┬──────────────────────────────┘
+                   ▼
+         ┌─────────────────┐
+         │ Klik tombol FAB  │ (pojok kanan bawah)
+         └────────┬────────┘
+                  ▼
+     ┌────────────────────────┐
+     │ Panel chat muncul      │ (animasi slide-up)
+     │ + Pesan sapaan bot     │
+     │ + Quick reply buttons  │
+     └───────────┬────────────┘
+                 ▼
+    ┌─────────────────────────┐
+    │ Pengguna mengetik pesan │ (atau klik quick reply)
+    │ → Tekan Enter / Send    │
+    └───────────┬─────────────┘
+                ▼
+     ┌──────────────────────┐
+     │ Input dikunci         │
+     │ Typing indicator      │ (1-2 detik)
+     │ muncul                │
+     └──────────┬───────────┘
+                ▼
+     ┌──────────────────────┐
+     │ Bot merespons         │
+     │ Auto-scroll ke bawah  │
+     │ Input terbuka kembali │
+     └──────────┬───────────┘
+                ▼
+     ┌──────────────────────┐
+     │ Ulangi / Tutup panel  │
+     │ (klik X, Minimize,    │
+     │  atau FAB lagi)       │
+     └──────────────────────┘
+```
+
+## 5. Kata Kunci Mock Response
+| Kata Kunci | Respons Chatbot |
+|---|---|
+| `stok`, `habis`, `kritis`, `stock` | Daftar produk dengan stok kritis |
+| `restock`, `pengadaan`, `rekomendasi`, `beli` | Rekomendasi restock berdasarkan AI Forecast |
+| `dead`, `mati`, `lama`, `tidak laku` | Deteksi dead-stock dan saran promo |
+| `info`, `inventaris`, `ringkasan`, `summary` | Ringkasan keseluruhan inventaris |
+| `halo`, `hai`, `hi` | Sapaan dan panduan fitur |
+| `terima kasih`, `makasih`, `thanks` | Respons terima kasih |
+| Lainnya | Pesan fallback dengan panduan kata kunci |
+
+## 6. Hasil Pengujian (QA Testing)
+
+### Pengujian Fungsional
+| Test Case | Status | Catatan |
+|---|---|---|
+| FAB muncul di semua halaman dashboard | ✅ Pass | Dirender di `dashboard/layout.tsx` |
+| Klik FAB membuka panel chat | ✅ Pass | Animasi slide-up smooth |
+| Klik FAB saat panel terbuka → menutup | ✅ Pass | Ikon berubah dari X ke MessageSquare |
+| Klik tombol X/Minimize menutup panel | ✅ Pass | Panel tertutup dengan animasi |
+| Kirim pesan via tombol Send | ✅ Pass | Pesan muncul di bubble kanan |
+| Kirim pesan via Enter key | ✅ Pass | Same behavior |
+| Input kosong tidak bisa dikirim | ✅ Pass | Tombol Send disabled saat input kosong |
+| Input hanya spasi tidak bisa dikirim | ✅ Pass | `.trim()` validation |
+| Typing indicator muncul saat bot memproses | ✅ Pass | Dots bounce animation |
+| Bot merespons setelah delay | ✅ Pass | Random 1-2 detik |
+| Auto-scroll ke pesan terbaru | ✅ Pass | Smooth scroll behavior |
+| Quick replies muncul di awal | ✅ Pass | Hilang setelah percakapan dimulai |
+| Input disabled saat bot mengetik | ✅ Pass | Mencegah spam |
+
+### Pengujian Visual & Responsivitas
+| Test Case | Status | Catatan |
+|---|---|---|
+| Dark mode konsisten | ✅ Pass | Menggunakan design tokens |
+| Light mode konsisten | ✅ Pass | Menggunakan design tokens |
+| Responsif di desktop (>1024px) | ✅ Pass | Panel 380×520px |
+| Responsif di mobile (<640px) | ✅ Pass | `max-w-[calc(100vw-2rem)]` |
+| Panel tidak menutupi seluruh layar | ✅ Pass | Ukuran compact |
+| TypeScript compilation | ✅ Pass | Zero errors (`tsc --noEmit`) |
+
+## 7. Kendala yang Ditemukan & Solusi
+
+| Kendala | Solusi |
+|---|---|
+| Pengguna bisa spam pesan saat bot memproses | State `isTyping` → disable input & send button |
+| Backend AI belum tersedia untuk chatbot | Implementasi mock response dengan keyword matching |
+| Markdown rendering di chat bubble | Membuat fungsi `renderMessageText()` untuk bold text (`**text**`) |
+| FAB bisa tertutup oleh elemen lain | Menggunakan `z-50` fixed positioning |
+
+## 8. Evaluasi & Saran Pengembangan Lanjutan
+
+### Prioritas Tinggi
+1. **Chat History (Riwayat Percakapan):** Simpan percakapan ke database/localStorage agar pengguna bisa melanjutkan sesi chat yang terputus.
+2. **Smart Suggestion / Quick Reply Dinamis:** Tampilkan saran berdasarkan konteks percakapan terakhir, bukan hanya di awal.
+3. **Integrasi Backend AI:** Hubungkan dengan endpoint API yang menggunakan LLM (Large Language Model) untuk memahami intent dan konteks secara natural.
+
+### Prioritas Menengah
+4. **Analisis Inventory Real-time:** LLM dengan function calling untuk query langsung ke database Stokku.ai dan memberikan jawaban berbasis data aktual.
+5. **Notifikasi Insight Penting:** Chatbot secara proaktif menginformasikan stok kritis, overstock, atau anomali saat pengguna membuka panel.
+6. **Personalisasi Respons:** Sesuaikan respons berdasarkan peran pengguna (admin vs. staff gudang) dan data bisnis spesifik.
+
+### Prioritas Rendah
+7. **Voice Input:** Dukungan input suara untuk mempercepat interaksi.
+8. **Export Chat:** Kemampuan mengunduh riwayat percakapan dalam format PDF/CSV.
+9. **Multi-language Support:** Dukungan bahasa Inggris selain Bahasa Indonesia.
+
+## 9. Struktur File
+
+```
+web/
+├── app/dashboard/
+│   └── layout.tsx              ← Mounting FloatingChatbot
+├── components/
+│   ├── chat/
+│   │   └── FloatingChatbot.tsx ← Komponen utama chatbot
+│   ├── layout/
+│   │   ├── header.tsx
+│   │   └── sidebar.tsx
+│   └── ui/
+│       ├── avatar.tsx
+│       └── button.tsx
+```

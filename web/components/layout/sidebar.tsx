@@ -13,7 +13,6 @@ import {
   Lightbulb,
   Settings,
   LogOut,
-  Bot,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/auth";
 
@@ -32,7 +31,6 @@ const navSections = [
     label: "Intelligence",
     items: [
       { title: "AI Forecast", href: "/dashboard/forecast", icon: Lightbulb },
-      { title: "Stokku Assistant", href: "/dashboard/chat", icon: Bot },
     ],
   },
   {
