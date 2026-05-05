@@ -43,3 +43,14 @@ Sistem web dashboard baru saja mengalami perombakan besar-besaran (Redesign UI/U
 ---
 
 > Silakan baca **SETUP.md** untuk melihat panduan setup di mesin/localhost Anda.
+
+## 🤖 Chatbot (AI Integration)
+
+Proyek ini menyertakan integrasi chatbot sederhana yang memanfaatkan Google Generative Language API (Gemini / Gemma) melalui route server-side Next.js:
+
+- Location: `web/app/api/chat/route.ts`
+- Purpose: berikan jawaban kontekstual terkait inventaris dengan mengambil data ringkasan dari backend, alert stok rendah, dead-stock, rekomendasi replenishment, dan hasil pencarian inventaris.
+- Models: `gemini-2.5-flash` (default, cepat) dan `gemma-3-27b-it` (model besar). Beberapa model Gemma memiliki aturan payload yang berbeda (contoh: menolak `system` role atau `systemInstruction`).
+- Behavior: server otomatis menyesuaikan payload per-model dan akan mencoba fallback ke `GEMINI_DEFAULT_MODEL` jika model yang dipilih menolak developer instruction.
+
+Lihat [SETUP.md](SETUP.md) untuk langkah konfigurasi `GEMINI_API_KEY` dan keterangan model lebih lengkap.

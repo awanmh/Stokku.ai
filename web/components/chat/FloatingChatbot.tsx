@@ -14,6 +14,13 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  CHAT_HISTORY_LIMIT,
+  CHAT_MODEL_OPTIONS,
+  DEFAULT_CHAT_MODEL,
+  type ChatMessage,
+  type ChatModelId,
+} from "@/lib/chatbot";
 
 /* ──────────── Types ──────────── */
 type Message = {
@@ -23,74 +30,19 @@ type Message = {
   timestamp: Date;
 };
 
-/* ──────────── Mock response engine ──────────── */
 const INITIAL_MESSAGE: Message = {
   id: "initial",
-  text: "Halo! 👋 Saya **Stokku AI**, asisten pintar untuk manajemen inventaris Anda. Tanyakan soal stok, restock, atau dead-stock kapan saja!",
+  text: "Halo! 👋 Saya **Stokku AI**, asisten inventaris untuk Stokku.ai. Tanyakan soal stok, restock, dead-stock, atau forecast kapan saja.",
   sender: "bot",
   timestamp: new Date(),
 };
 
 const QUICK_REPLIES = [
-  "Cek stok kritis",
-  "Rekomendasi restock",
+  "Apa stok kritis hari ini?",
+  "Berikan rekomendasi restock",
   "Deteksi dead-stock",
-  "Info inventaris",
+  "Ringkas kondisi inventaris",
 ];
-
-function generateBotResponse(userInput: string): string {
-  const lower = userInput.toLowerCase();
-
-  if (
-    lower.includes("stok") ||
-    lower.includes("habis") ||
-    lower.includes("kritis") ||
-    lower.includes("stock")
-  ) {
-    return "📦 **Stok Kritis Terdeteksi:**\n\n• Beras Setra Ramos 5kg — sisa **2 unit**\n• Minyak Goreng 2L — sisa **5 unit**\n• Tepung Terigu 1kg — sisa **3 unit**\n\nSegera lakukan restock untuk menghindari kehabisan barang.";
-  }
-
-  if (
-    lower.includes("restock") ||
-    lower.includes("pengadaan") ||
-    lower.includes("rekomendasi") ||
-    lower.includes("beli")
-  ) {
-    return "📊 **Rekomendasi Restock (AI Forecast):**\n\n• Kopi Bubuk 250g — tambah **50 unit**\n• Gula Pasir 1kg — tambah **100 unit**\n• Mie Instan — tambah **200 unit**\n\nPermintaan diprediksi naik **15%** minggu depan berdasarkan tren historis.";
-  }
-
-  if (
-    lower.includes("dead") ||
-    lower.includes("mati") ||
-    lower.includes("lama") ||
-    lower.includes("tidak laku")
-  ) {
-    return "⚠️ **Dead-Stock Terdeteksi (3 bulan tanpa penjualan):**\n\n• Snack Brand X — 45 unit\n• Minuman Bersoda 1.5L — 30 unit\n• Sarden Kaleng — 20 unit\n\n💡 **Saran:** Adakan promo bundling atau diskon clearance untuk produk ini.";
-  }
-
-  if (
-    lower.includes("info") ||
-    lower.includes("inventaris") ||
-    lower.includes("ringkasan") ||
-    lower.includes("summary")
-  ) {
-    return "📋 **Ringkasan Inventaris:**\n\n• Total SKU aktif: **1,247**\n• Nilai inventaris: **Rp 2.4 Miliar**\n• Produk stok kritis: **8 item**\n• Rata-rata turnover: **4.2x/bulan**\n\nGunakan halaman **AI Forecast** untuk analisis prediktif lebih lanjut.";
-  }
-
-  if (
-    lower.includes("terima kasih") ||
-    lower.includes("makasih") ||
-    lower.includes("thanks")
-  ) {
-    return "Sama-sama! 😊 Jangan ragu bertanya lagi kapan saja. Saya selalu siap membantu mengelola inventaris Anda.";
-  }
-
-  if (lower.includes("halo") || lower.includes("hai") || lower.includes("hi")) {
-    return "Halo! 👋 Ada yang bisa saya bantu hari ini? Anda bisa bertanya tentang:\n\n• **Stok kritis** — cek barang hampir habis\n• **Rekomendasi restock** — saran pengadaan\n• **Dead-stock** — barang tidak terjual\n• **Info inventaris** — ringkasan keseluruhan";
-  }
-
-  return "Maaf, saya belum memahami pertanyaan tersebut. 🤔\n\nSaat ini saya dapat membantu:\n• Cek **stok kritis**\n• **Rekomendasi restock**\n• Deteksi **dead-stock**\n• **Info inventaris**\n\nCoba gunakan salah satu kata kunci di atas!";
-}
 
 /* ──────────── Markdown-lite renderer ──────────── */
 function renderMessageText(text: string) {
@@ -121,6 +73,7 @@ export function FloatingChatbot() {
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<ChatModelId>(DEFAULT_CHAT_MODEL);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -140,7 +93,7 @@ export function FloatingChatbot() {
   }, [isOpen]);
 
   const handleSend = useCallback(
-    (text?: string) => {
+    async (text?: string) => {
       const messageText = (text || input).trim();
       if (!messageText || isTyping) return;
 
@@ -151,24 +104,62 @@ export function FloatingChatbot() {
         timestamp: new Date(),
       };
 
-      setMessages((prev) => [...prev, userMsg]);
+      const nextMessages = [...messages, userMsg];
+
+      setMessages(nextMessages);
       setInput("");
       setIsTyping(true);
 
-      // Simulate processing delay (1-2s)
-      const delay = 1000 + Math.random() * 1000;
-      setTimeout(() => {
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: selectedModel,
+            message: messageText,
+            messages: nextMessages
+              .slice(-CHAT_HISTORY_LIMIT)
+              .map((message): ChatMessage => ({
+                role: message.sender === "user" ? "user" : "model",
+                content: message.text,
+              })),
+          }),
+        });
+
+        const payload = (await response.json().catch(() => null)) as
+          | { success?: boolean; data?: { reply?: string }; message?: string }
+          | null;
+
+        if (!response.ok || !payload?.success || !payload?.data?.reply) {
+          throw new Error(payload?.message || "Gagal memproses jawaban dari Gemini.");
+        }
+
         const botMsg: Message = {
           id: (Date.now() + 1).toString(),
-          text: generateBotResponse(messageText),
+          text: payload.data.reply,
           sender: "bot",
           timestamp: new Date(),
         };
+
         setMessages((prev) => [...prev, botMsg]);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan tak terduga.";
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            text: `Maaf, chatbot sedang tidak tersedia. ${errorMessage}`,
+            sender: "bot",
+            timestamp: new Date(),
+          },
+        ]);
+      } finally {
         setIsTyping(false);
-      }, delay);
+      }
     },
-    [input, isTyping]
+    [input, isTyping, messages, selectedModel]
   );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -209,7 +200,28 @@ export function FloatingChatbot() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 rounded-full border border-border bg-secondary/60 p-1 text-[10px]">
+                  {CHAT_MODEL_OPTIONS.map((option) => {
+                    const isActive = selectedModel === option.id;
+
+                    return (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => setSelectedModel(option.id)}
+                        className={`rounded-full px-2.5 py-1 transition-colors ${isActive
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                          }`}
+                        aria-pressed={isActive}
+                        aria-label={`Pilih model ${option.label}`}
+                      >
+                        {option.id === "gemini-2.5-flash" ? "Flash" : "Gemma"}
+                      </button>
+                    );
+                  })}
+                </div>
                 <button
                   onClick={() => setIsOpen(false)}
                   className="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
@@ -236,11 +248,10 @@ export function FloatingChatbot() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2 }}
-                    className={`flex gap-2 ${
-                      msg.sender === "user"
+                    className={`flex gap-2 ${msg.sender === "user"
                         ? "ml-auto flex-row-reverse max-w-[85%]"
                         : "mr-auto max-w-[85%]"
-                    }`}
+                      }`}
                   >
                     <Avatar className="h-6 w-6 shrink-0 border border-border">
                       <AvatarFallback
@@ -259,16 +270,14 @@ export function FloatingChatbot() {
                     </Avatar>
 
                     <div
-                      className={`flex flex-col gap-0.5 ${
-                        msg.sender === "user" ? "items-end" : "items-start"
-                      }`}
+                      className={`flex flex-col gap-0.5 ${msg.sender === "user" ? "items-end" : "items-start"
+                        }`}
                     >
                       <div
-                        className={`px-3 py-2 rounded-xl text-[13px] leading-relaxed ${
-                          msg.sender === "user"
+                        className={`px-3 py-2 rounded-xl text-[13px] leading-relaxed ${msg.sender === "user"
                             ? "bg-primary text-primary-foreground rounded-tr-sm"
                             : "bg-secondary text-secondary-foreground rounded-tl-sm border border-border"
-                        }`}
+                          }`}
                       >
                         {renderMessageText(msg.text)}
                       </div>
@@ -354,7 +363,7 @@ export function FloatingChatbot() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Tanya soal stok, restock..."
+                  placeholder="Tanya soal stok, restock, atau forecast..."
                   disabled={isTyping}
                   className="flex-1 bg-secondary border border-border rounded-lg px-3 py-2 text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 transition-colors"
                 />
@@ -372,8 +381,7 @@ export function FloatingChatbot() {
                 </Button>
               </div>
               <p className="text-[9px] text-muted-foreground text-center mt-1.5">
-                Stokku AI dapat membuat kesalahan. Periksa kembali informasi
-                penting.
+                Model aktif: {selectedModel === "gemini-2.5-flash" ? "Gemini 2.5 Flash" : "Gemma 3 27B"}. Stokku AI dapat membuat kesalahan. Periksa kembali informasi penting.
               </p>
             </div>
           </motion.div>
