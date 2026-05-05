@@ -12,6 +12,7 @@ import (
 	"github.com/stokku-ai/backend/internal/delivery/http/handler"
 	"github.com/stokku-ai/backend/internal/infrastructure/cache"
 	"github.com/stokku-ai/backend/internal/infrastructure/database"
+	"github.com/stokku-ai/backend/internal/infrastructure/email"
 	"github.com/stokku-ai/backend/internal/repository/postgres"
 	redisrepo "github.com/stokku-ai/backend/internal/repository/redis"
 	"github.com/stokku-ai/backend/internal/usecase"
@@ -48,9 +49,13 @@ func main() {
 	stockRepo := postgres.NewStockRepository(pool)
 	txRepo := postgres.NewTransactionRepository(pool)
 	lockRepo := redisrepo.NewLockRepository(redisClient)
+	otpRepo := redisrepo.NewOTPRepository(redisClient)
+
+	// Email
+	mailer := email.NewSMTPMailer(cfg.SMTP)
 
 	// Usecases
-	authUC := usecase.NewAuthUsecase(userRepo, cfg.JWT)
+	authUC := usecase.NewAuthUsecase(userRepo, otpRepo, mailer, cfg.JWT)
 	productUC := usecase.NewProductUsecase(productRepo)
 	warehouseUC := usecase.NewWarehouseUsecase(warehouseRepo)
 	txUC := usecase.NewTransactionUsecase(txRepo, stockRepo, lockRepo)
