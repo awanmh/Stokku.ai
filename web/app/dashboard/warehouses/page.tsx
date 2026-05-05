@@ -15,11 +15,22 @@ import {
   Edit2,
   Trash2,
   RefreshCw,
+  Package,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
-import { warehouseApi } from "@/lib/api";
-import type { Warehouse } from "@/lib/api";
+import { warehouseApi, inventoryApi } from "@/lib/api";
+import { formatNumber } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import type { Warehouse, StockView } from "@/lib/api";
 
 const PAGE_SIZE = 12;
+
+interface WarehouseStockSummary {
+  totalProducts: number;
+  totalQuantity: number;
+  items: StockView[];
+}
 
 export default function WarehousesPage() {
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
@@ -27,20 +38,41 @@ export default function WarehousesPage() {
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [editWarehouse, setEditWarehouse] = useState<Warehouse | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteWarehouse, setDeleteWarehouse] = useState<Warehouse | null>(null);
+
+  // Stock data per warehouse
+  const [stockMap, setStockMap] = useState<Record<string, WarehouseStockSummary>>({});
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const fetchWarehouses = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const res = await warehouseApi.getAll(PAGE_SIZE, offset);
-      setWarehouses(res.data || []);
+      const whList = res.data || [];
+      setWarehouses(whList);
       setTotal(res.meta?.total || 0);
+
+      // Fetch stock summary for each warehouse
+      const stockEntries = await Promise.all(
+        whList.map(async (wh) => {
+          try {
+            const invRes = await inventoryApi.getAll({
+              warehouse_id: wh.id,
+              limit: 100,
+            });
+            const items = invRes.data || [];
+            const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+            return [wh.id, { totalProducts: items.length, totalQuantity, items }] as const;
+          } catch {
+            return [wh.id, { totalProducts: 0, totalQuantity: 0, items: [] }] as const;
+          }
+        })
+      );
+      setStockMap(Object.fromEntries(stockEntries));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal memuat data gudang");
     } finally {
@@ -69,117 +101,206 @@ export default function WarehousesPage() {
     fetchWarehouses();
   };
 
+  const toggleExpand = (id: string) => {
+    setExpandedId((prev) => (prev === id ? null : id));
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold">Gudang</h2>
-          <p className="text-sm text-muted-foreground">
-            Kelola gudang dan lokasi penyimpanan
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Gudang & Lokasi</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Kelola titik penyimpanan dan pantau ketersediaan stok di setiap gudang.
           </p>
-        </div>
-        <Button onClick={() => { setEditWarehouse(null); setModalOpen(true); }}>
-          <Plus size={16} />
-          Tambah Gudang
-        </Button>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <Button size="sm" onClick={() => { setEditWarehouse(null); setModalOpen(true); }} className="shadow-lg shadow-primary/20">
+            <Plus size={14} className="mr-1.5" />
+            Tambah Gudang
+          </Button>
+        </motion.div>
       </div>
 
-      {loading ? (
+      {loading && warehouses.length === 0 ? (
         <WarehouseCardSkeleton count={6} />
       ) : error ? (
-        <div className="flex flex-col items-center justify-center h-64 gap-4">
-          <p className="text-muted-foreground">{error}</p>
-          <Button variant="outline" onClick={fetchWarehouses}>
-            <RefreshCw size={14} />
+        <div className="flex flex-col items-center justify-center py-24 gap-4 bg-card/30 rounded-2xl border border-dashed border-border">
+          <p className="text-sm text-muted-foreground">{error}</p>
+          <Button variant="outline" size="sm" onClick={fetchWarehouses}>
+            <RefreshCw size={14} className="mr-1.5" />
             Coba Lagi
           </Button>
         </div>
       ) : warehouses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-          <Building2 size={48} className="mb-3 opacity-40" />
-          <p className="text-sm">Belum ada gudang terdaftar</p>
-          <Button variant="outline" size="sm" className="mt-4" onClick={() => setModalOpen(true)}>
-            <Plus size={14} />
-            Tambah Gudang Pertama
+        <div className="flex flex-col items-center justify-center py-32 bg-card/30 rounded-2xl border border-dashed border-border text-center">
+          <div className="p-5 rounded-full bg-secondary/50 mb-5">
+            <Building2 size={40} className="text-muted-foreground" />
+          </div>
+          <p className="text-sm font-medium text-foreground mb-2">Belum ada gudang terdaftar</p>
+          <p className="text-xs text-muted-foreground mb-8 max-w-[250px]">Daftarkan lokasi penyimpanan pertama Anda untuk mulai mengelola inventaris.</p>
+          <Button variant="outline" size="sm" onClick={() => setModalOpen(true)}>
+            <Plus size={14} className="mr-1.5" />
+            Tambah Gudang Baru
           </Button>
         </div>
       ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {warehouses.map((wh) => (
-              <Card key={wh.id} className="hover:shadow-md transition-all duration-200 group">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 rounded-xl bg-chart-4/10">
-                        <Building2 size={20} className="text-chart-4" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-sm font-semibold">{wh.name}</CardTitle>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <MapPin size={12} className="text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">{wh.location}</span>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            <AnimatePresence mode="popLayout">
+              {warehouses.map((wh, idx) => {
+                const stock = stockMap[wh.id];
+                const isExpanded = expandedId === wh.id;
+                return (
+                  <motion.div
+                    key={wh.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                    transition={{ delay: idx * 0.05 }}
+                  >
+                    <Card className="group relative overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
+                      {/* Decorative element */}
+                      <div className="absolute top-0 right-0 p-8 -mr-8 -mt-8 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
+                      
+                      <CardHeader className="pb-3 relative">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
+                              <Building2 size={20} />
+                            </div>
+                            <div>
+                              <CardTitle className="text-base font-semibold group-hover:text-primary transition-colors">{wh.name}</CardTitle>
+                              <div className="flex items-center gap-1.5 mt-1">
+                                <MapPin size={12} className="text-muted-foreground" />
+                                <span className="text-xs text-muted-foreground font-medium">{wh.location}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <Badge variant={wh.is_active ? "success" : "secondary"} className="rounded-full px-2.5">
+                            {wh.is_active ? "Aktif" : "Nonaktif"}
+                          </Badge>
                         </div>
-                      </div>
-                    </div>
-                    <Badge variant={wh.is_active ? "success" : "secondary"}>
-                      {wh.is_active ? "Aktif" : "Nonaktif"}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xs text-muted-foreground mb-4 line-clamp-1">
-                    {wh.address || "Alamat belum diisi"}
-                  </p>
-                  <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => {
-                        setEditWarehouse(wh);
-                        setModalOpen(true);
-                      }}
-                      title="Edit gudang"
-                    >
-                      <Edit2 size={14} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => {
-                        setDeleteWarehouse(wh);
-                        setDeleteDialogOpen(true);
-                      }}
-                      title="Hapus gudang"
-                    >
-                      <Trash2 size={14} />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                      </CardHeader>
+                      
+                      <CardContent className="relative">
+                        <div className="space-y-4">
+                          <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 min-h-[32px]">
+                            {wh.address || "Alamat belum ditambahkan."}
+                          </p>
+                          
+                          {/* Real stock data */}
+                          <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                            <div className="flex items-center gap-4">
+                              <div className="flex flex-col">
+                                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Jenis Produk</span>
+                                <span className="text-sm font-bold text-foreground">{stock ? formatNumber(stock.totalProducts) : "—"}</span>
+                              </div>
+                              <div className="h-8 w-[1px] bg-border/50" />
+                              <div className="flex flex-col">
+                                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Total Stok</span>
+                                <span className="text-sm font-bold text-foreground">{stock ? formatNumber(stock.totalQuantity) : "—"}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
+                                onClick={() => { setEditWarehouse(wh); setModalOpen(true); }}
+                                title="Edit"
+                              >
+                                <Edit2 size={14} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                onClick={() => { setDeleteWarehouse(wh); setDeleteDialogOpen(true); }}
+                                title="Hapus"
+                              >
+                                <Trash2 size={14} />
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Expandable stock details */}
+                          {stock && stock.items.length > 0 && (
+                            <div>
+                              <button
+                                onClick={() => toggleExpand(wh.id)}
+                                className="flex items-center gap-1.5 text-[11px] text-primary hover:text-primary/80 font-medium transition-colors w-full justify-center py-1"
+                              >
+                                {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                                {isExpanded ? "Sembunyikan Detail" : `Lihat ${stock.totalProducts} Produk`}
+                              </button>
+                              <AnimatePresence>
+                                {isExpanded && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className="mt-2 space-y-1.5 max-h-[200px] overflow-y-auto">
+                                      {stock.items.map((item) => (
+                                        <div
+                                          key={item.id}
+                                          className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/30 text-xs"
+                                        >
+                                          <div className="flex items-center gap-2 min-w-0">
+                                            <Package size={12} className="text-muted-foreground shrink-0" />
+                                            <span className="font-medium text-foreground truncate">{item.product_name}</span>
+                                          </div>
+                                          <Badge
+                                            variant={item.quantity <= item.min_stock ? "destructive" : "success"}
+                                            className="rounded-full px-2 text-[9px] shrink-0 ml-2"
+                                          >
+                                            {formatNumber(item.quantity)} unit
+                                          </Badge>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
-          <Pagination total={total} limit={PAGE_SIZE} offset={offset} onPageChange={setOffset} />
-        </>
+          <div className="pt-4 border-t border-border/50">
+            <Pagination total={total} limit={PAGE_SIZE} offset={offset} onPageChange={setOffset} />
+          </div>
+        </div>
       )}
 
-      {/* Warehouse Form Modal (Add + Edit) */}
       <WarehouseFormModal
         open={modalOpen}
         onOpenChange={setModalOpen}
         onSubmit={editWarehouse ? handleEditWarehouse : handleAddWarehouse}
         warehouse={editWarehouse}
       />
-
-      {/* Delete Confirmation */}
       <DeleteConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteWarehouse}
         title="Hapus Gudang"
-        description={`Apakah Anda yakin ingin menghapus gudang "${deleteWarehouse?.name}"? Semua data stok di gudang ini akan terhapus.`}
+        description={`Apakah Anda yakin ingin menghapus "${deleteWarehouse?.name}"? Seluruh data stok yang ada di gudang ini akan terhapus permanen.`}
         confirmLabel="Hapus Gudang"
       />
     </div>

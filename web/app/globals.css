@@ -2,71 +2,136 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * ━━━━ STOKKU.AI ENTERPRISE DESIGN TOKENS ━━━━
+ * Stripe × Linear aesthetic. No gaming. No neon. Business trust.
+ */
+
 :root {
-  --background: 0 0% 100%;
-  --foreground: 222 47% 11%;
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --primary: 215 80% 48%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 210 40% 96%;
-  --accent-foreground: 222 47% 11%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 215 80% 48%;
+  /* Backgrounds */
+  --bg-base: 220 20% 97%;
+  --bg-surface: 0 0% 100%;
+  --bg-subtle: 220 14% 96%;
+  --bg-overlay: 220 13% 91%;
+
+  /* Borders */
+  --border-default: 220 13% 91%;
+  --border-subtle: 220 14% 94%;
+  --border-focus: 198 80% 50%;
+
+  /* Text */
+  --text-primary: 222 47% 11%;
+  --text-secondary: 215 16% 47%;
+  --text-muted: 215 14% 64%;
+
+  /* Brand accent — cyan, used sparingly */
+  --accent: 198 80% 46%;
+  --accent-hover: 198 80% 40%;
+
+  /* Semantic */
+  --success: 152 70% 42%;
+  --warning: 38 90% 52%;
+  --danger: 4 74% 54%;
+  --success-bg: 152 40% 96%;
+  --warning-bg: 38 40% 96%;
+  --danger-bg: 4 40% 96%;
+
+  /* Legacy compat */
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
+  --card: var(--bg-surface);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--accent);
+  --primary-foreground: 0 0% 100%;
+  --secondary: var(--bg-subtle);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--bg-subtle);
+  --muted-foreground: var(--text-muted);
+  --accent-foreground: 0 0% 100%;
+  --destructive: var(--danger);
+  --destructive-foreground: 0 0% 100%;
+  --border: var(--border-default);
+  --input: var(--border-default);
+  --ring: var(--border-focus);
   --radius: 0.5rem;
-  --success: 142 71% 45%;
-  --warning: 38 92% 50%;
-  --chart-1: 215 80% 48%;
-  --chart-2: 142 71% 45%;
-  --chart-3: 38 92% 50%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 0 84% 60%;
-  --sidebar-bg: 220 20% 97%;
-  --sidebar-fg: 222 47% 11%;
-  --sidebar-border: 214 32% 91%;
-  --sidebar-hover: 210 40% 93%;
+
+  /* Chart palette */
+  --chart-1: var(--accent);
+  --chart-2: var(--success);
+  --chart-3: var(--warning);
+  --chart-4: 262 60% 55%;
+  --chart-5: var(--danger);
+
+  /* Sidebar */
+  --sidebar-bg: var(--bg-base);
+  --sidebar-fg: var(--text-primary);
+  --sidebar-border: var(--border-default);
+  --sidebar-hover: var(--bg-subtle);
 }
 
 .dark {
-  --background: 222 47% 8%;
-  --foreground: 210 40% 98%;
-  --card: 222 47% 11%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222 47% 11%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 213 94% 64%;
-  --primary-foreground: 222 47% 8%;
-  --secondary: 217 33% 17%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20% 65%;
-  --accent: 217 33% 17%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 62% 54%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 217 33% 17%;
-  --input: 217 33% 17%;
-  --ring: 213 94% 64%;
-  --success: 142 71% 45%;
-  --warning: 38 92% 50%;
-  --chart-1: 213 94% 64%;
-  --chart-2: 142 71% 45%;
-  --chart-3: 38 92% 50%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 0 62% 54%;
-  --sidebar-bg: 222 47% 6%;
-  --sidebar-fg: 210 40% 98%;
-  --sidebar-border: 217 33% 17%;
-  --sidebar-hover: 217 33% 20%;
+  /* Backgrounds */
+  --bg-base: 220 20% 5%;
+  --bg-surface: 222 18% 8%;
+  --bg-subtle: 224 16% 11%;
+  --bg-overlay: 226 14% 14%;
+
+  /* Borders */
+  --border-default: 224 12% 18%;
+  --border-subtle: 224 12% 14%;
+  --border-focus: 198 80% 50%;
+
+  /* Text */
+  --text-primary: 210 20% 94%;
+  --text-secondary: 214 16% 64%;
+  --text-muted: 216 12% 40%;
+
+  /* Brand accent */
+  --accent: 196 80% 48%;
+  --accent-hover: 196 80% 56%;
+
+  /* Semantic */
+  --success: 152 70% 42%;
+  --warning: 38 90% 52%;
+  --danger: 4 74% 54%;
+  --success-bg: 152 40% 10%;
+  --warning-bg: 38 40% 10%;
+  --danger-bg: 4 40% 10%;
+
+  /* Legacy compat */
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
+  --card: var(--bg-surface);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-overlay);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--accent);
+  --primary-foreground: 220 20% 5%;
+  --secondary: var(--bg-subtle);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--bg-subtle);
+  --muted-foreground: var(--text-muted);
+  --accent-foreground: 220 20% 5%;
+  --destructive: var(--danger);
+  --destructive-foreground: 210 20% 94%;
+  --border: var(--border-default);
+  --input: var(--border-default);
+  --ring: var(--border-focus);
+
+  /* Chart palette */
+  --chart-1: var(--accent);
+  --chart-2: var(--success);
+  --chart-3: var(--warning);
+  --chart-4: 262 60% 55%;
+  --chart-5: var(--danger);
+
+  /* Sidebar */
+  --sidebar-bg: 220 20% 4%;
+  --sidebar-fg: var(--text-primary);
+  --sidebar-border: var(--border-default);
+  --sidebar-hover: var(--bg-subtle);
 }
 
 @theme inline {
@@ -91,6 +156,9 @@
   --color-ring: hsl(var(--ring));
   --color-success: hsl(var(--success));
   --color-warning: hsl(var(--warning));
+  --color-success-bg: hsl(var(--success-bg));
+  --color-warning-bg: hsl(var(--warning-bg));
+  --color-danger-bg: hsl(var(--danger-bg));
   --color-chart-1: hsl(var(--chart-1));
   --color-chart-2: hsl(var(--chart-2));
   --color-chart-3: hsl(var(--chart-3));
@@ -104,6 +172,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --font-outfit: var(--font-outfit);
 }
 
 @layer base {
@@ -116,7 +185,7 @@
   }
 }
 
-/* Scrollbar styling */
+/* Scrollbar — minimal, not distracting */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -125,11 +194,11 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.3);
+  background: hsl(var(--text-muted) / 0.2);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
+  background: hsl(var(--text-muted) / 0.4);
 }
 
 /* Mobile responsive: dialog full-screen */
@@ -144,8 +213,7 @@
   }
 }
 
-/* Ensure tables don't squish on mobile — they scroll horizontally */
+/* Tables scroll horizontally on mobile */
 .overflow-x-auto table {
   min-width: 700px;
 }
-

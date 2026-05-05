@@ -58,6 +58,18 @@ async function request<T>(
   const data = await res.json();
 
   if (!res.ok) {
+    console.error(`[API Error] ${res.status} ${res.statusText}`, data);
+
+    // Detect stale JWT — user no longer exists in DB (FK constraint on performed_by)
+    const msg = data.message || "";
+    if (msg.includes("performed_by") || msg.includes("23503")) {
+      if (typeof window !== "undefined") {
+        useAuthStore.getState().logout();
+        window.location.href = "/login?redirect=" + encodeURIComponent(window.location.pathname);
+        throw new Error("Sesi tidak valid. Silakan login kembali.");
+      }
+    }
+
     throw new Error(data.message || "Something went wrong");
   }
 

@@ -75,12 +75,12 @@ export function ProductFormModal({
         reset({
           sku: product.sku,
           name: product.name,
-          description: product.description,
-          category: product.category,
+          description: product.description || "",
+          category: product.category || "",
           unit: product.unit,
-          price: product.price,
-          min_stock: product.min_stock,
-          max_stock: product.max_stock,
+          price: product.price || 0,
+          min_stock: product.min_stock || 0,
+          max_stock: product.max_stock || 0,
         });
       } else {
         reset({
@@ -98,9 +98,18 @@ export function ProductFormModal({
   }, [open, product, reset]);
 
   const handleFormSubmit = async (data: ProductFormData) => {
+    // Sanitize NaN values before sending to API
+    const sanitized = {
+      ...data,
+      description: data.description || "",
+      category: data.category || "",
+      price: Number.isNaN(data.price) ? 0 : data.price,
+      min_stock: Number.isNaN(data.min_stock) ? 0 : data.min_stock,
+      max_stock: Number.isNaN(data.max_stock) ? 0 : data.max_stock,
+    };
     setSubmitting(true);
     try {
-      await onSubmit(data);
+      await onSubmit(sanitized);
       toast.success(isEdit ? "Produk berhasil diperbarui" : "Produk berhasil ditambahkan");
       reset();
       onOpenChange(false);
