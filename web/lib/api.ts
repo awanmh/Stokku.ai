@@ -201,6 +201,7 @@ export interface User {
   email: string;
   name: string;
   role: "admin" | "warehouse_staff" | "viewer";
+  avatar_url?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
