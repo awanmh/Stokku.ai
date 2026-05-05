@@ -56,6 +56,36 @@ func (m *MockUserRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	return args.Error(0)
 }
 
+// --- Mock OTPRepository ---
+type MockOTPRepository struct {
+	mock.Mock
+}
+
+func (m *MockOTPRepository) StoreOTP(ctx context.Context, sessionID, email, otpCode string) error {
+	args := m.Called(ctx, sessionID, email, otpCode)
+	return args.Error(0)
+}
+
+func (m *MockOTPRepository) GetOTP(ctx context.Context, sessionID string) (string, string, error) {
+	args := m.Called(ctx, sessionID)
+	return args.String(0), args.String(1), args.Error(2)
+}
+
+func (m *MockOTPRepository) DeleteOTP(ctx context.Context, sessionID string) error {
+	args := m.Called(ctx, sessionID)
+	return args.Error(0)
+}
+
+// --- Mock OTPMailer ---
+type MockOTPMailer struct {
+	mock.Mock
+}
+
+func (m *MockOTPMailer) SendOTP(toEmail, otpCode string) error {
+	args := m.Called(toEmail, otpCode)
+	return args.Error(0)
+}
+
 // --- Tests ---
 
 func jwtConfig() config.JWTConfig {
@@ -72,7 +102,9 @@ func hashedPassword(raw string) string {
 
 func TestLogin_Success(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	mockOTP := new(MockOTPRepository)
+	mockMailer := new(MockOTPMailer)
+	uc := NewAuthUsecase(mockRepo, mockOTP, mockMailer, jwtConfig())
 	ctx := context.Background()
 
 	user := &domain.User{
@@ -85,6 +117,8 @@ func TestLogin_Success(t *testing.T) {
 	}
 
 	mockRepo.On("GetByEmail", ctx, "admin@test.com").Return(user, nil)
+	mockOTP.On("StoreOTP", ctx, mock.Anything, "admin@test.com", mock.Anything).Return(nil)
+	mockMailer.On("SendOTP", "admin@test.com", mock.Anything).Return(nil)
 
 	result, err := uc.Login(ctx, domain.LoginRequest{
 		Email:    "admin@test.com",
@@ -93,14 +127,18 @@ func TestLogin_Success(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
-	assert.NotEmpty(t, result.Token)
-	assert.Equal(t, "admin@test.com", result.User.Email)
+	assert.NotEmpty(t, result.SessionID)
+	assert.Contains(t, result.Message, "Kode OTP telah dikirim")
 	mockRepo.AssertExpectations(t)
+	mockOTP.AssertExpectations(t)
+	mockMailer.AssertExpectations(t)
 }
 
 func TestLogin_WrongPassword(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	mockOTP := new(MockOTPRepository)
+	mockMailer := new(MockOTPMailer)
+	uc := NewAuthUsecase(mockRepo, mockOTP, mockMailer, jwtConfig())
 	ctx := context.Background()
 
 	user := &domain.User{
@@ -127,7 +165,9 @@ func TestLogin_WrongPassword(t *testing.T) {
 
 func TestLogin_UserNotFound(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	mockOTP := new(MockOTPRepository)
+	mockMailer := new(MockOTPMailer)
+	uc := NewAuthUsecase(mockRepo, mockOTP, mockMailer, jwtConfig())
 	ctx := context.Background()
 
 	mockRepo.On("GetByEmail", ctx, "unknown@test.com").Return(nil, errors.New("not found"))
@@ -145,7 +185,9 @@ func TestLogin_UserNotFound(t *testing.T) {
 
 func TestLogin_DeactivatedUser(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	mockOTP := new(MockOTPRepository)
+	mockMailer := new(MockOTPMailer)
+	uc := NewAuthUsecase(mockRepo, mockOTP, mockMailer, jwtConfig())
 	ctx := context.Background()
 
 	user := &domain.User{
@@ -172,7 +214,9 @@ func TestLogin_DeactivatedUser(t *testing.T) {
 
 func TestRegister_Success(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	mockOTP := new(MockOTPRepository)
+	mockMailer := new(MockOTPMailer)
+	uc := NewAuthUsecase(mockRepo, mockOTP, mockMailer, jwtConfig())
 	ctx := context.Background()
 
 	mockRepo.On("GetByEmail", ctx, "newuser@test.com").Return(nil, errors.New("not found"))
@@ -195,7 +239,9 @@ func TestRegister_Success(t *testing.T) {
 
 func TestRegister_DuplicateEmail(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	mockOTP := new(MockOTPRepository)
+	mockMailer := new(MockOTPMailer)
+	uc := NewAuthUsecase(mockRepo, mockOTP, mockMailer, jwtConfig())
 	ctx := context.Background()
 
 	existingUser := &domain.User{
@@ -218,7 +264,9 @@ func TestRegister_DuplicateEmail(t *testing.T) {
 
 func TestRegister_DefaultRole(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	mockOTP := new(MockOTPRepository)
+	mockMailer := new(MockOTPMailer)
+	uc := NewAuthUsecase(mockRepo, mockOTP, mockMailer, jwtConfig())
 	ctx := context.Background()
 
 	mockRepo.On("GetByEmail", ctx, "norole@test.com").Return(nil, errors.New("not found"))
@@ -238,7 +286,9 @@ func TestRegister_DefaultRole(t *testing.T) {
 
 func TestGetProfile_Success(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	mockOTP := new(MockOTPRepository)
+	mockMailer := new(MockOTPMailer)
+	uc := NewAuthUsecase(mockRepo, mockOTP, mockMailer, jwtConfig())
 	ctx := context.Background()
 
 	userID := uuid.New()
@@ -262,7 +312,9 @@ func TestGetProfile_Success(t *testing.T) {
 
 func TestGetProfile_NotFound(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	uc := NewAuthUsecase(mockRepo, jwtConfig())
+	mockOTP := new(MockOTPRepository)
+	mockMailer := new(MockOTPMailer)
+	uc := NewAuthUsecase(mockRepo, mockOTP, mockMailer, jwtConfig())
 	ctx := context.Background()
 
 	userID := uuid.New()

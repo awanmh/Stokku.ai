@@ -39,6 +39,9 @@ func SetupRouter(app *fiber.App, h Handlers, jwtSecret string) {
 	// Public routes
 	auth := api.Group("/auth")
 	auth.Post("/login", h.Auth.Login)
+	auth.Post("/login/direct", h.Auth.LoginDirect)
+	auth.Post("/verify-otp", h.Auth.VerifyOTP)
+	auth.Post("/resend-otp", h.Auth.ResendOTP)
 	auth.Post("/register", h.Auth.Register)
 
 	// Protected routes
