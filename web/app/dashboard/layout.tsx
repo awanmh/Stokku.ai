@@ -1,14 +1,38 @@
 "use client";
 
+import { useEffect } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { Toaster } from "sonner";
+import { useAuthStore } from "@/lib/auth";
+import { authApi } from "@/lib/api";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user, setUser, isAuthenticated, logout } = useAuthStore();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (isAuthenticated && !user) {
+        try {
+          const response = await authApi.getProfile();
+          if (response.success) {
+            setUser(response.data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch profile:", error);
+          // If profile fetch fails (e.g. invalid token), logout
+          logout();
+        }
+      }
+    };
+
+    fetchProfile();
+  }, [isAuthenticated, user, setUser, logout]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Sidebar />

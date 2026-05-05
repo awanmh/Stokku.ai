@@ -160,7 +160,7 @@ export default function DashboardOverview() {
             </div>
           </CardHeader>
           <CardContent className="pt-4">
-            <div className="h-72 w-full">
+            <div className="h-72 w-full min-h-[0] min-w-[0]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={mockChartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                   <defs>
