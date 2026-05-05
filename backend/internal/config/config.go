@@ -13,6 +13,7 @@ type Config struct {
 	Database DatabaseConfig
 	Redis    RedisConfig
 	JWT      JWTConfig
+	SMTP     SMTPConfig
 }
 
 type ServerConfig struct {
@@ -39,6 +40,14 @@ type RedisConfig struct {
 type JWTConfig struct {
 	Secret     string
 	Expiration time.Duration
+}
+
+type SMTPConfig struct {
+	Host     string
+	Port     string
+	Email    string
+	Password string
+	FromName string
 }
 
 func Load() *Config {
@@ -68,6 +77,13 @@ func Load() *Config {
 		JWT: JWTConfig{
 			Secret:     getEnv("JWT_SECRET", "stokku-secret-key-change-in-production"),
 			Expiration: time.Duration(jwtExpHours) * time.Hour,
+		},
+		SMTP: SMTPConfig{
+			Host:     getEnv("SMTP_HOST", "smtp.gmail.com"),
+			Port:     getEnv("SMTP_PORT", "587"),
+			Email:    getEnv("SMTP_EMAIL", ""),
+			Password: getEnv("SMTP_PASSWORD", ""),
+			FromName: getEnv("SMTP_FROM_NAME", "Stokku.ai"),
 		},
 	}
 }

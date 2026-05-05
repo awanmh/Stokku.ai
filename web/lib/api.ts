@@ -55,7 +55,17 @@ async function request<T>(
     }
   }
 
-  const data = await res.json();
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    // Response is not valid JSON (e.g. backend is down, proxy returned plain text)
+    throw new Error(
+      res.status === 502 || res.status === 503
+        ? "Server sedang tidak tersedia. Pastikan backend sudah berjalan."
+        : `Server error (${res.status}). Pastikan backend sudah berjalan.`
+    );
+  }
 
   if (!res.ok) {
     throw new Error(data.message || "Something went wrong");
@@ -74,10 +84,15 @@ export const api = {
     request<T>(endpoint, { method: "DELETE" }),
 };
 
-// Auth
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post<{ token: string; user: User }>("/auth/login", { email, password }),
+    api.post<LoginOTPResponse>("/auth/login", { email, password }),
+  loginDirect: (email: string, password: string) =>
+    api.post<{ token: string; user: User }>("/auth/login/direct", { email, password }),
+  verifyOTP: (session_id: string, otp_code: string) =>
+    api.post<{ token: string; user: User }>("/auth/verify-otp", { session_id, otp_code }),
+  resendOTP: (session_id: string) =>
+    api.post<LoginOTPResponse>("/auth/resend-otp", { session_id }),
   register: (data: { email: string; name: string; password: string; role?: string }) =>
     api.post<{ token: string; user: User }>("/auth/register", data),
   getProfile: () => api.get<User>("/auth/profile"),
@@ -192,6 +207,11 @@ export interface User {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface LoginOTPResponse {
+  session_id: string;
+  message: string;
 }
 
 export interface Product {
