@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { FloatingChatbot } from "@/components/chat/FloatingChatbot";
 import { Toaster } from "sonner";
 import { useAuthStore } from "@/lib/auth";
 import { authApi } from "@/lib/api";
@@ -44,6 +45,7 @@ export default function DashboardLayout({
           </div>
         </main>
       </div>
+      <FloatingChatbot />
       <Toaster
         theme="dark"
         richColors
