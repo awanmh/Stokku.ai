@@ -25,6 +25,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Nama minimal 2 karakter"),
@@ -82,8 +83,8 @@ export default function ProfilePage() {
         setUser({ ...user, name: response.data.name });
         toast.success("Profil berhasil diperbarui");
       }
-    } catch (error: any) {
-      toast.error(error.message || "Gagal memperbarui profil");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Gagal memperbarui profil");
     } finally {
       setIsSubmittingProfile(false);
     }
@@ -96,8 +97,8 @@ export default function ProfilePage() {
       await new Promise(resolve => setTimeout(resolve, 1500));
       toast.success("Password berhasil diperbarui");
       passwordForm.reset();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal memperbarui password");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Gagal memperbarui password");
     } finally {
       setIsSubmittingPassword(false);
     }
@@ -132,8 +133,8 @@ export default function ProfilePage() {
       await new Promise(resolve => setTimeout(resolve, 1500));
       if (user) setUser({ ...user, avatar_url: avatarPreview });
       toast.success("Foto profil berhasil diperbarui");
-    } catch (error: any) {
-      toast.error("Gagal mengunggah foto profil");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Gagal mengunggah foto profil");
     } finally {
       setIsSubmittingAvatar(false);
     }
@@ -176,9 +177,11 @@ export default function ProfilePage() {
               <div className="relative group">
                 <div className="h-32 w-32 rounded-full border-2 border-primary/20 p-1 bg-gradient-to-tr from-primary/10 to-transparent">
                   {avatarPreview ? (
-                    <img 
+                    <Image 
                       src={avatarPreview} 
                       alt="Avatar" 
+                      width={128}
+                      height={128}
                       className="h-full w-full rounded-full object-cover shadow-xl"
                     />
                   ) : (

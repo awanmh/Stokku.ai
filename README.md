@@ -2,6 +2,8 @@
 
 Stokku.ai adalah platform manajemen inventaris berskala besar yang dilengkapi Next.js (Web Frontend), Golang (API Backend), PostgreSQL (Database), dan Redis (Cache) - dan dijalankan via Docker.
 
+---
+
 ## 🟢 Apa yang Sudah Selesai Dibangun (Phase 1-5 & UI/UX Fixes)
 Selama pengembangan fase terbaru, struktur inti sistem manajemen dan frontend dashboard sudah 100% stabil untuk produksi, mencakup:
 
@@ -19,38 +21,55 @@ Selama pengembangan fase terbaru, struktur inti sistem manajemen dan frontend da
    - Form telah diperbaiki sehingga bebas dari error UUID kosong maupun isu validasi *Foreign Key*.
 7. **API Endpoints Backend:** Seluruh REST API berbasis Golang Fiber telah rampung dan diamankan. Dokumentasi lengkap tersedia di `backend/API_DOCS.md`.
 
-## 🟡 Apa yang Masih Kurang (To-Do Selanjutnya)
+---
 
-1. **Integrasi Flutter Mobile App:** Tim mobile harus mengonsumsi endpoint API dari aplikasi backend ini sebelum aplikasi bisa dirilis untuk pekerja gudang (*warehouse workers*).
-2. **Injeksi AI Service / Forecasting:** Route prediksi stok `/ai/forecast` masih berupa *placeholder*. Integrasi dengan *machine learning service* (Python) perlu dikonfigurasi melalui HTTP call atau Message Queue.
-3. **Production Deployment:** Setup *environment* untuk *Production* seperti konfigurasi HTTPS, Load Balancer, pengaturan CI/CD, dan pemindahan dari localhost Docker Compose ke Cloud Server asli.
+## 🚀 Pembaruan Utama UI/UX (Enterprise Dashboard & TDD Integration)
 
-## 🚀 Pembaruan Utama (Frontend Enterprise Redesign)
-Sistem web dashboard baru saja mengalami perombakan besar-besaran (Redesign UI/UX) untuk memenuhi standar kelas **Enterprise** (terinspirasi dari Stripe, Linear):
-- **Sistem Desain (Tokens):** Migrasi dari warna *hardcoded* ke sistem CSS Variable (Tokens) menggunakan Tailwind CSS v4.
-- **Visual Bersih & Stabil:** Keseimbangan antara efek *glassmorphism* modern dan performa serta keterbacaan yang optimal.
-- **Komponen Fungsional:** Tabel, Kartu, Tombol, dan Form Input telah dirombak untuk terlihat profesional. Tabel sekarang menggunakan gaya *Stripe-style* (bersih, jarak rapi).
-- **Tema (Dark Mode / Light Mode):** Sistem mendukung fitur mode gelap (Dark Mode), mode terang (Light Mode), dan mode sistem secara otomatis.
-- **Penambahan Modul Penuh:**
-  1. Halaman **Overview Dashboard**: Metrik bisnis, grafik pergerakan stok, dan peringatan *Low Stock*.
-  2. Halaman **Products (Master Data)**: Penambahan, pengeditan, dan hapus master data katalog produk.
-  3. Halaman **Inventory**: Menampilkan total stok asli per produk per gudang dengan status visual (OK / Low).
-  4. Halaman **Warehouses**: Cek dan edit data gudang dengan tata letak Grid Card.
-  5. Halaman **Transactions**: *Ledger* lengkap setiap mutasi (Stock In / Stock Out).
-  6. Halaman **Settings**: Manajemen *RBAC Role* (Admin, Staff, Viewer) dan pendaftaran pengguna baru.
-  7. Halaman **Profile**: Menampilkan detail pengguna dan fitur *Edit Profil* (Ubah Nama).
+Dashboard utama Stokku.ai baru saja menerima perombakan besar untuk memenuhi standar kelas **Enterprise**:
+
+### 1. Dashboard Overview Redesign
+- **Staggered Entrance Animation**: Efek transisi masuk kartu KPI berurutan yang indah dengan `framer-motion`.
+- **Counter-Up Animation**: Angka metrik bisnis secara otomatis beranimasi naik saat halaman dimuat.
+- **Advanced Data Analytics**: Integrasi Area Chart (aktivitas stok bulanan) dan Donut Chart (distribusi kategori barang) menggunakan **Recharts**.
+- **Real-time Alerting**: Bagian Low Stock & Recent Transactions yang interaktif.
+
+### 2. Standardisasi Tabel & Debounced Search
+- **Client-Side Sorting**: Kolom tabel pada rute Products, Inventory, dan Transactions dapat diurutkan secara real-time dengan indikator panah aktif (`ArrowUp` / `ArrowDown`).
+- **Debounced Real-time Filter**: Pencarian real-time pada master produk, transaksi, dan gudang menggunakan debounce `useDebounce` hook 400ms untuk performa tinggi.
+- **Aesthetic Enhancements**: Baris tabel bergaris belang (*Zebra stripes*) untuk keterbacaan tinggi dan efek hover highlight.
+
+### 3. Komponen EmptyState & Form Modals Polish
+- **Reusable `EmptyState`**: Komponen visual kosong yang interaktif dengan dekorasi pulse rings dan tombol ajakan aksi (CTA).
+- **Standardized Form Validation**: Semua error validasi form pada modal telah distandardisasi menggunakan warna design token semantic `text-destructive`.
+
+### 4. Navigasi & Kontrol Tambahan (Task 2)
+- **Auto-generated Breadcrumbs**: Navigasi breadcrumb otomatis berbasis pathname URL (`Dashboard ➔ Produk`) yang ramping dengan support responsif.
+- **System Configuration**: Panel pengaturan premium di halaman settings untuk Backup Database, Peringatan Email, dan Mode Pemeliharaan.
+- **Danger Zone**: Kartu pengaturan berisolasi merah khusus untuk instruksi tingkat tinggi yang sensitif.
+
+---
+
+## 🧪 5. Unit Testing & TDD (Test-Driven Development)
+Kami telah menerapkan metodologi TDD untuk menjamin reliabilitas penuh aplikasi:
+- **Frontend (Vitest & JSDom)**: Unit test lengkap untuk utilitas pemformatan (`web/lib/utils.test.ts`) dan asinkron custom hook (`web/hooks/use-debounce.test.ts`). **5/5 tes lolos dengan sukses!**
+- **Backend (Go Test)**: Seluruh usecase core service (Auth, Products, Warehouses, Transactions) teruji penuh dan **100% lulus**.
+- Baca laporan pengujian selengkapnya di [TESTING_REPORT.md](TESTING_REPORT.md).
+
+---
+
+## 📱 6. Verifikasi Responsivitas Seluler
+Aplikasi telah dioptimalkan dan diuji di semua perangkat (ponsel, tablet, desktop):
+- Hamburger menu menggantikan sidebar pada ukuran tablet ke bawah.
+- Modal input beralih ke overlay layar penuh (full-screen) di perangkat seluler agar keyboard virtual tidak mengganggu area pandang.
+- Baca laporan responsivitas selengkapnya di [WEB_RESPONSIVE_TEST.md](WEB_RESPONSIVE_TEST.md).
+
+---
+
+## 🤖 Chatbot (AI Integration)
+Proyek ini menyertakan integrasi chatbot sederhana yang memanfaatkan Google Generative Language API (Gemini / Gemma) melalui route server-side Next.js:
+- Location: `web/app/api/chat/route.ts`
+- Models: `gemini-2.5-flash` dan `gemma-3-27b-it`.
 
 ---
 
 > Silakan baca **SETUP.md** untuk melihat panduan setup di mesin/localhost Anda.
-
-## 🤖 Chatbot (AI Integration)
-
-Proyek ini menyertakan integrasi chatbot sederhana yang memanfaatkan Google Generative Language API (Gemini / Gemma) melalui route server-side Next.js:
-
-- Location: `web/app/api/chat/route.ts`
-- Purpose: berikan jawaban kontekstual terkait inventaris dengan mengambil data ringkasan dari backend, alert stok rendah, dead-stock, rekomendasi replenishment, dan hasil pencarian inventaris.
-- Models: `gemini-2.5-flash` (default, cepat) dan `gemma-3-27b-it` (model besar). Beberapa model Gemma memiliki aturan payload yang berbeda (contoh: menolak `system` role atau `systemInstruction`).
-- Behavior: server otomatis menyesuaikan payload per-model dan akan mencoba fallback ke `GEMINI_DEFAULT_MODEL` jika model yang dipilih menolak developer instruction.
-
-Lihat [SETUP.md](SETUP.md) untuk langkah konfigurasi `GEMINI_API_KEY` dan keterangan model lebih lengkap.

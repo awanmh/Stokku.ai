@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { Pagination } from "@/components/ui/pagination";
 import { TableSkeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ProductFormModal } from "@/components/modals/product-form-modal";
 import { DeleteConfirmDialog } from "@/components/modals/delete-confirm-dialog";
 import {
@@ -24,6 +25,9 @@ import {
   Edit2,
   Trash2,
   RefreshCw,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { productApi } from "@/lib/api";
@@ -33,6 +37,9 @@ import type { Product, CreateProductRequest } from "@/lib/api";
 
 const PAGE_SIZE = 15;
 
+type SortKey = "name" | "category" | "price" | "min_stock";
+type SortDir = "asc" | "desc";
+
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [total, setTotal] = useState(0);
@@ -40,6 +47,8 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
   const [loading, setLoading] = useState(true);
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [error, setError] = useState("");
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -95,6 +104,32 @@ export default function ProductsPage() {
     return "secondary";
   };
 
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
+
+  const SortIcon = ({ col }: { col: SortKey }) => {
+    if (sortKey !== col) return <ArrowUpDown size={12} className="ml-1 opacity-30" />;
+    return sortDir === "asc"
+      ? <ArrowUp size={12} className="ml-1 text-primary" />
+      : <ArrowDown size={12} className="ml-1 text-primary" />;
+  };
+
+  const sortedProducts = [...products].sort((a, b) => {
+    if (!sortKey) return 0;
+    const dir = sortDir === "asc" ? 1 : -1;
+    if (sortKey === "name") return a.name.localeCompare(b.name) * dir;
+    if (sortKey === "category") return (a.category || "").localeCompare(b.category || "") * dir;
+    if (sortKey === "price") return (a.price - b.price) * dir;
+    if (sortKey === "min_stock") return (a.min_stock - b.min_stock) * dir;
+    return 0;
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -149,41 +184,45 @@ export default function ProductsPage() {
               </Button>
             </div>
           ) : products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <div className="p-4 rounded-full bg-secondary/50 mb-4">
-                <PackageSearch size={32} className="text-muted-foreground" />
-              </div>
-              <p className="text-sm font-medium text-foreground mb-1">Belum ada produk</p>
-              <p className="text-xs text-muted-foreground mb-6 max-w-[200px]">Mulai dengan menambahkan produk pertama ke dalam sistem.</p>
-              <Button variant="outline" size="sm" onClick={() => { setEditProduct(null); setModalOpen(true); }}>
-                <Plus size={14} className="mr-1.5" />
-                Tambah Sekarang
-              </Button>
-            </div>
+            <EmptyState
+              icon={PackageSearch}
+              title="Belum ada produk"
+              description="Mulai dengan menambahkan produk pertama ke dalam sistem."
+              actionLabel="Tambah Sekarang"
+              onAction={() => { setEditProduct(null); setModalOpen(true); }}
+            />
           ) : (
             <>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow className="hover:bg-transparent border-border/50">
-                      <TableHead className="w-[300px]">Produk</TableHead>
-                      <TableHead>Kategori</TableHead>
-                      <TableHead className="text-right">Harga</TableHead>
-                      <TableHead className="text-right">Min/Max Stok</TableHead>
+                      <TableHead className="w-[300px] cursor-pointer select-none" onClick={() => toggleSort("name")}>
+                        <span className="flex items-center">Produk <SortIcon col="name" /></span>
+                      </TableHead>
+                      <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("category")}>
+                        <span className="flex items-center">Kategori <SortIcon col="category" /></span>
+                      </TableHead>
+                      <TableHead className="text-right cursor-pointer select-none" onClick={() => toggleSort("price")}>
+                        <span className="flex items-center justify-end">Harga <SortIcon col="price" /></span>
+                      </TableHead>
+                      <TableHead className="text-right cursor-pointer select-none" onClick={() => toggleSort("min_stock")}>
+                        <span className="flex items-center justify-end">Min/Max Stok <SortIcon col="min_stock" /></span>
+                      </TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     <AnimatePresence mode="popLayout">
-                      {products.map((p, idx) => (
+                      {sortedProducts.map((p, idx) => (
                         <motion.tr
                           key={p.id}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
                           transition={{ duration: 0.2, delay: idx * 0.03 }}
-                          className="group border-border/50 hover:bg-secondary/30 transition-colors"
+                          className={`group border-border/50 hover:bg-secondary/30 transition-colors ${idx % 2 === 1 ? "bg-secondary/10" : ""}`}
                         >
                           <TableCell>
                             <div className="flex flex-col">

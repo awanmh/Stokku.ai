@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { Pagination } from "@/components/ui/pagination";
 import { TableSkeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 import { TransactionFormModal } from "@/components/modals/transaction-form-modal";
 import {
   Search,
@@ -23,8 +24,10 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   RefreshCw,
-  Calendar,
   User as UserIcon,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { formatNumber, formatDate } from "@/lib/utils";
 import { transactionApi, productApi, warehouseApi } from "@/lib/api";
@@ -32,6 +35,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { TransactionView, Product, Warehouse } from "@/lib/api";
 
 const PAGE_SIZE = 15;
+
+type TxSortKey = "product_name" | "quantity" | "created_at";
+type SortDir = "asc" | "desc";
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<TransactionView[]>([]);
@@ -41,6 +47,8 @@ export default function TransactionsPage() {
   const [typeFilter, setTypeFilter] = useState<"all" | "stock_in" | "stock_out">("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [sortKey, setSortKey] = useState<TxSortKey | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [modalOpen, setModalOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
@@ -94,10 +102,35 @@ export default function TransactionsPage() {
     fetchFormData();
   }, [fetchFormData]);
 
-  const handleCreateTransaction = async (data: any) => {
+  const handleCreateTransaction = async (data: Parameters<typeof transactionApi.create>[0]) => {
     await transactionApi.create(data);
     fetchTransactions();
   };
+
+  const toggleSort = (key: TxSortKey) => {
+    if (sortKey === key) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
+
+  const SortIcon = ({ col }: { col: TxSortKey }) => {
+    if (sortKey !== col) return <ArrowUpDown size={12} className="ml-1 opacity-30" />;
+    return sortDir === "asc"
+      ? <ArrowUp size={12} className="ml-1 text-primary" />
+      : <ArrowDown size={12} className="ml-1 text-primary" />;
+  };
+
+  const sortedTransactions = [...transactions].sort((a, b) => {
+    if (!sortKey) return 0;
+    const dir = sortDir === "asc" ? 1 : -1;
+    if (sortKey === "product_name") return a.product_name.localeCompare(b.product_name) * dir;
+    if (sortKey === "quantity") return (a.quantity - b.quantity) * dir;
+    if (sortKey === "created_at") return (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * dir;
+    return 0;
+  });
 
   return (
     <div className="space-y-6">
@@ -170,13 +203,13 @@ export default function TransactionsPage() {
               </Button>
             </div>
           ) : transactions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <div className="p-4 rounded-full bg-secondary/50 mb-4">
-                <ArrowRightLeft size={32} className="text-muted-foreground" />
-              </div>
-              <p className="text-sm font-medium text-foreground mb-1">Tidak ada transaksi</p>
-              <p className="text-xs text-muted-foreground mb-6">Sesuaikan filter atau catat pergerakan stok baru.</p>
-            </div>
+            <EmptyState
+              icon={ArrowRightLeft}
+              title="Tidak ada transaksi"
+              description="Sesuaikan filter atau catat pergerakan stok baru."
+              actionLabel="Transaksi Baru"
+              onAction={() => setModalOpen(true)}
+            />
           ) : (
             <>
               <div className="overflow-x-auto">
@@ -184,23 +217,29 @@ export default function TransactionsPage() {
                   <TableHeader>
                     <TableRow className="hover:bg-transparent border-border/50">
                       <TableHead className="w-[80px]">Tipe</TableHead>
-                      <TableHead className="min-w-[200px]">Produk</TableHead>
+                      <TableHead className="min-w-[200px] cursor-pointer select-none" onClick={() => toggleSort("product_name")}>
+                        <span className="flex items-center">Produk <SortIcon col="product_name" /></span>
+                      </TableHead>
                       <TableHead>Gudang</TableHead>
-                      <TableHead className="text-right">Jumlah</TableHead>
+                      <TableHead className="text-right cursor-pointer select-none" onClick={() => toggleSort("quantity")}>
+                        <span className="flex items-center justify-end">Jumlah <SortIcon col="quantity" /></span>
+                      </TableHead>
                       <TableHead>Referensi</TableHead>
                       <TableHead>Operator</TableHead>
-                      <TableHead className="text-right">Waktu</TableHead>
+                      <TableHead className="text-right cursor-pointer select-none" onClick={() => toggleSort("created_at")}>
+                        <span className="flex items-center justify-end">Waktu <SortIcon col="created_at" /></span>
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     <AnimatePresence mode="popLayout">
-                      {transactions.map((tx, idx) => (
+                      {sortedTransactions.map((tx, idx) => (
                         <motion.tr
                           key={tx.id}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: idx * 0.02 }}
-                          className="group border-border/50 hover:bg-secondary/30 transition-colors"
+                          className={`group border-border/50 hover:bg-secondary/30 transition-colors ${idx % 2 === 1 ? "bg-secondary/10" : ""}`}
                         >
                           <TableCell>
                             <div className="flex items-center justify-center">

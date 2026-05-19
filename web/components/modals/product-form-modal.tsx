@@ -137,19 +137,19 @@ export function ProductFormModal({
             <div className="space-y-1.5">
               <Label htmlFor="sku">SKU *</Label>
               <Input id="sku" placeholder="BT-M820" {...register("sku")} disabled={isEdit} />
-              {errors.sku && <p className="text-xs text-red-500 mt-1">{errors.sku.message}</p>}
+              {errors.sku && <p className="text-xs text-destructive mt-1">{errors.sku.message}</p>}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="unit">Satuan *</Label>
               <Input id="unit" placeholder="pcs, kg, m" {...register("unit")} />
-              {errors.unit && <p className="text-xs text-red-500 mt-1">{errors.unit.message}</p>}
+              {errors.unit && <p className="text-xs text-destructive mt-1">{errors.unit.message}</p>}
             </div>
           </div>
 
           <div className="space-y-1.5">
             <Label htmlFor="name">Nama Produk *</Label>
             <Input id="name" placeholder="Baut M8x20" {...register("name")} />
-            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
+            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
           </div>
 
           <div className="space-y-1.5">
@@ -166,17 +166,17 @@ export function ProductFormModal({
             <div className="space-y-1.5">
               <Label htmlFor="price">Harga (Rp)</Label>
               <Input id="price" type="number" min="0" {...register("price", { valueAsNumber: true })} />
-              {errors.price && <p className="text-xs text-red-500 mt-1">{errors.price.message}</p>}
+              {errors.price && <p className="text-xs text-destructive mt-1">{errors.price.message}</p>}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="min_stock">Min Stock</Label>
               <Input id="min_stock" type="number" min="0" {...register("min_stock", { valueAsNumber: true })} />
-              {errors.min_stock && <p className="text-xs text-red-500 mt-1">{errors.min_stock.message}</p>}
+              {errors.min_stock && <p className="text-xs text-destructive mt-1">{errors.min_stock.message}</p>}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="max_stock">Max Stock</Label>
               <Input id="max_stock" type="number" min="0" {...register("max_stock", { valueAsNumber: true })} />
-              {errors.max_stock && <p className="text-xs text-red-500 mt-1">{errors.max_stock.message}</p>}
+              {errors.max_stock && <p className="text-xs text-destructive mt-1">{errors.max_stock.message}</p>}
             </div>
           </div>
 

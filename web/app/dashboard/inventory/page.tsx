@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Pagination } from "@/components/ui/pagination";
 import { TableSkeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 import { TransactionFormModal } from "@/components/modals/transaction-form-modal";
 import {
   Package,
@@ -30,6 +31,9 @@ import {
   RefreshCw,
   ArrowRightLeft,
   Filter,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { inventoryApi, productApi, warehouseApi, transactionApi } from "@/lib/api";
 import { formatCurrency, formatNumber } from "@/lib/utils";
@@ -38,6 +42,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { StockView, Product, Warehouse } from "@/lib/api";
 
 const PAGE_SIZE = 15;
+
+type InvSortKey = "product_name" | "warehouse_name" | "quantity" | "total_value";
+type SortDir = "asc" | "desc";
 
 export default function InventoryPage() {
   const [inventory, setInventory] = useState<StockView[]>([]);
@@ -48,6 +55,8 @@ export default function InventoryPage() {
   const [warehouseFilter, setWarehouseFilter] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [sortKey, setSortKey] = useState<InvSortKey | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
 
   // Modal state for stock transaction
   const [modalOpen, setModalOpen] = useState(false);
@@ -112,6 +121,32 @@ export default function InventoryPage() {
     });
     setModalOpen(true);
   };
+
+  const toggleSort = (key: InvSortKey) => {
+    if (sortKey === key) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
+
+  const SortIcon = ({ col }: { col: InvSortKey }) => {
+    if (sortKey !== col) return <ArrowUpDown size={12} className="ml-1 opacity-30" />;
+    return sortDir === "asc"
+      ? <ArrowUp size={12} className="ml-1 text-primary" />
+      : <ArrowDown size={12} className="ml-1 text-primary" />;
+  };
+
+  const sortedInventory = [...inventory].sort((a, b) => {
+    if (!sortKey) return 0;
+    const dir = sortDir === "asc" ? 1 : -1;
+    if (sortKey === "product_name") return a.product_name.localeCompare(b.product_name) * dir;
+    if (sortKey === "warehouse_name") return a.warehouse_name.localeCompare(b.warehouse_name) * dir;
+    if (sortKey === "quantity") return (a.quantity - b.quantity) * dir;
+    if (sortKey === "total_value") return (a.total_value - b.total_value) * dir;
+    return 0;
+  });
 
   return (
     <div className="space-y-6">
@@ -186,35 +221,39 @@ export default function InventoryPage() {
               </Button>
             </div>
           ) : inventory.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <div className="p-4 rounded-full bg-secondary/50 mb-4">
-                <Package size={32} className="text-muted-foreground" />
-              </div>
-              <p className="text-sm font-medium text-foreground mb-1">Stok Kosong</p>
-              <p className="text-xs text-muted-foreground mb-6 max-w-[200px]">Belum ada data stok yang tercatat untuk filter ini.</p>
-              <Button variant="outline" size="sm" onClick={() => { setPrefillData(null); setModalOpen(true); }}>
-                <Plus size={14} className="mr-1.5" />
-                Buat Transaksi
-              </Button>
-            </div>
+            <EmptyState
+              icon={Package}
+              title="Stok Kosong"
+              description="Belum ada data stok yang tercatat untuk filter ini."
+              actionLabel="Buat Transaksi"
+              onAction={() => { setPrefillData(null); setModalOpen(true); }}
+            />
           ) : (
             <>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow className="hover:bg-transparent border-border/50">
-                      <TableHead className="w-[300px]">Produk</TableHead>
-                      <TableHead>Gudang</TableHead>
-                      <TableHead className="text-right">Jumlah</TableHead>
+                      <TableHead className="w-[300px] cursor-pointer select-none" onClick={() => toggleSort("product_name")}>
+                        <span className="flex items-center">Produk <SortIcon col="product_name" /></span>
+                      </TableHead>
+                      <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("warehouse_name")}>
+                        <span className="flex items-center">Gudang <SortIcon col="warehouse_name" /></span>
+                      </TableHead>
+                      <TableHead className="text-right cursor-pointer select-none" onClick={() => toggleSort("quantity")}>
+                        <span className="flex items-center justify-end">Jumlah <SortIcon col="quantity" /></span>
+                      </TableHead>
                       <TableHead className="text-right">Min Stok</TableHead>
-                      <TableHead className="text-right">Nilai</TableHead>
+                      <TableHead className="text-right cursor-pointer select-none" onClick={() => toggleSort("total_value")}>
+                        <span className="flex items-center justify-end">Nilai <SortIcon col="total_value" /></span>
+                      </TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     <AnimatePresence mode="popLayout">
-                      {inventory.map((item, idx) => {
+                      {sortedInventory.map((item, idx) => {
                         const isLow = item.quantity <= item.min_stock;
                         return (
                           <motion.tr
@@ -222,7 +261,7 @@ export default function InventoryPage() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.02 }}
-                            className="group border-border/50 hover:bg-secondary/30 transition-colors"
+                            className={`group border-border/50 hover:bg-secondary/30 transition-colors ${idx % 2 === 1 ? "bg-secondary/10" : ""}`}
                           >
                             <TableCell>
                               <div className="flex flex-col">

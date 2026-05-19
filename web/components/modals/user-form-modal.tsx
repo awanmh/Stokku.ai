@@ -133,7 +133,7 @@ export function UserFormModal({
             <div className="space-y-1.5">
               <Label htmlFor="edit-name">Nama *</Label>
               <Input id="edit-name" placeholder="Nama lengkap" {...register("name")} />
-              {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
+              {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
             </div>
             <div className="space-y-1.5">
               <Label>Role *</Label>
@@ -153,7 +153,7 @@ export function UserFormModal({
                   </Select>
                 )}
               />
-              {errors.role && <p className="text-xs text-red-500 mt-1">{errors.role.message}</p>}
+              {errors.role && <p className="text-xs text-destructive mt-1">{errors.role.message}</p>}
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
@@ -186,17 +186,17 @@ export function UserFormModal({
           <div className="space-y-1.5">
             <Label htmlFor="add-email">Email *</Label>
             <Input id="add-email" type="email" placeholder="email@perusahaan.com" {...register("email")} />
-            {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
+            {errors.email && <p className="text-xs text-destructive mt-1">{errors.email.message}</p>}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="add-name">Nama *</Label>
             <Input id="add-name" placeholder="Nama lengkap" {...register("name")} />
-            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
+            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="add-password">Password *</Label>
             <Input id="add-password" type="password" placeholder="Minimal 6 karakter" {...register("password")} />
-            {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
+            {errors.password && <p className="text-xs text-destructive mt-1">{errors.password.message}</p>}
           </div>
           <div className="space-y-1.5">
             <Label>Role *</Label>
@@ -216,7 +216,7 @@ export function UserFormModal({
                 </Select>
               )}
             />
-            {errors.role && <p className="text-xs text-red-500 mt-1">{errors.role.message}</p>}
+            {errors.role && <p className="text-xs text-destructive mt-1">{errors.role.message}</p>}
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
