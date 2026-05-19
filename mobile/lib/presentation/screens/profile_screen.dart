@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/auth_provider.dart';
@@ -24,7 +25,9 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Profil', style: Theme.of(context).textTheme.headlineMedium),
+            Text('Profil', style: Theme.of(context).textTheme.headlineMedium)
+                .animate()
+                .fadeIn(duration: 400.ms),
             const SizedBox(height: 24),
 
             // Avatar card
@@ -86,7 +89,10 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
+            )
+                .animate()
+                .fadeIn(duration: 400.ms, delay: 100.ms)
+                .slideY(begin: 0.05, end: 0, duration: 400.ms, delay: 100.ms),
             const SizedBox(height: 24),
 
             // Settings section
@@ -117,7 +123,10 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
+            )
+                .animate()
+                .fadeIn(duration: 400.ms, delay: 200.ms)
+                .slideY(begin: 0.05, end: 0, duration: 400.ms, delay: 200.ms),
 
             // Sync info
             GlassCard(
@@ -160,7 +169,10 @@ class ProfileScreen extends StatelessWidget {
                     ),
                 ],
               ),
-            ),
+            )
+                .animate()
+                .fadeIn(duration: 400.ms, delay: 300.ms)
+                .slideY(begin: 0.05, end: 0, duration: 400.ms, delay: 300.ms),
 
             const SizedBox(height: 32),
 
@@ -188,7 +200,9 @@ class ProfileScreen extends StatelessWidget {
                   }
                 },
               ),
-            ),
+            )
+                .animate()
+                .fadeIn(duration: 400.ms, delay: 400.ms),
             const SizedBox(height: 20),
             Center(
               child: Text('stokku.ai v1.0.0',

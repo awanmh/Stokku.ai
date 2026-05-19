@@ -1,10 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/auth_provider.dart';
 
-/// Premium login screen with glassmorphism card.
+/// Premium login screen with glassmorphism card and micro-animations.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -91,13 +92,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Brand
+                    // Brand — animated
                     Image.asset(
                       'assets/images/logo.png',
                       width: 80,
                       height: 80,
                       fit: BoxFit.contain,
-                    ),
+                    )
+                        .animate()
+                        .fadeIn(duration: 600.ms)
+                        .scale(
+                          begin: const Offset(0.8, 0.8),
+                          end: const Offset(1, 1),
+                          duration: 600.ms,
+                          curve: Curves.easeOutBack,
+                        ),
                     const SizedBox(height: 16),
                     ShaderMask(
                       shaderCallback: (bounds) => const LinearGradient(
@@ -111,7 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: Colors.white,
                         ),
                       ),
-                    ),
+                    )
+                        .animate()
+                        .fadeIn(duration: 600.ms, delay: 200.ms),
                     const SizedBox(height: 6),
                     const Text(
                       'Masuk ke akun Anda',
@@ -119,10 +130,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: AppColors.textMuted,
                         fontSize: 14,
                       ),
-                    ),
+                    )
+                        .animate()
+                        .fadeIn(duration: 500.ms, delay: 400.ms),
                     const SizedBox(height: 32),
 
-                    // Glass form card
+                    // Glass form card — animated
                     ClipRRect(
                       borderRadius: BorderRadius.circular(20),
                       child: BackdropFilter(
@@ -202,7 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                 // Password
                                 Text(
-                                  'PASSWORD',
+                                  'KATA SANDI',
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
@@ -232,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                   validator: (v) =>
-                                      v == null || v.isEmpty ? 'Password wajib diisi' : null,
+                                      v == null || v.isEmpty ? 'Kata sandi wajib diisi' : null,
                                 ),
                                 const SizedBox(height: 28),
 
@@ -270,7 +283,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                    ),
+                    )
+                        .animate()
+                        .fadeIn(duration: 600.ms, delay: 500.ms)
+                        .slideY(
+                          begin: 0.15,
+                          end: 0,
+                          duration: 600.ms,
+                          delay: 500.ms,
+                          curve: Curves.easeOut,
+                        ),
                   ],
                 ),
               ),

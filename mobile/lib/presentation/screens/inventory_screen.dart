@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/inventory_provider.dart';
@@ -100,8 +101,19 @@ class _InventoryScreenState extends State<InventoryScreen> {
             else if (inv.stocks.isEmpty)
               SliverFillRemaining(
                 child: Center(
-                    child: Text('Tidak ada data inventaris',
-                        style: TextStyle(color: muted))),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.inventory_2_outlined, size: 56, color: muted),
+                      const SizedBox(height: 12),
+                      Text('Tidak ada data inventaris',
+                          style: TextStyle(color: muted, fontSize: 15, fontWeight: FontWeight.w500)),
+                      const SizedBox(height: 4),
+                      Text('Tarik ke bawah untuk memuat ulang',
+                          style: TextStyle(color: muted, fontSize: 12)),
+                    ],
+                  ),
+                ),
               )
             else
               SliverPadding(
@@ -149,7 +161,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               ],
                             ),
                           ),
-                          // Status badge
+                          // Status badge — Bahasa Indonesia
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
@@ -160,7 +172,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              s.isLowStock ? 'Low' : 'OK',
+                              s.isLowStock ? 'Rendah' : 'Aman',
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
@@ -172,7 +184,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           ),
                         ],
                       ),
-                    );
+                    )
+                        .animate()
+                        .fadeIn(duration: 300.ms, delay: Duration(milliseconds: i * 60))
+                        .slideX(begin: 0.05, end: 0, duration: 300.ms, delay: Duration(milliseconds: i * 60));
                   },
                 ),
               ),
