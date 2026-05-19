@@ -239,6 +239,9 @@ TOTAL: 36 tests | 36 passed | 0 failed
 ### Mobile (Flutter) — ✅ 8 Tests ALL PASS (by Hervin)
 - Widget tests updated: ThemeProvider, StatCard, GlassCard, ChatbotScreen, ChatbotProvider
 
+### API Testing (Postman) — ✅ ADDED
+- Ditambahkan `Stokku_API.postman_collection.json` untuk uji coba API backend secara mandiri (Auth, Products, Warehouses, Dashboard).
+
 ---
 
 ## 🔀 Branch Strategy
