@@ -1,160 +1,199 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { dashboardApi } from "@/lib/api";
-import type { DashboardStats, StockView } from "@/lib/api";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { dashboardApi, transactionApi } from "@/lib/api";
+import type { DashboardStats, StockView, TransactionView } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Package,
   TrendingUp,
   AlertTriangle,
-  Activity,
   ArrowUpRight,
   ArrowDownRight,
   RefreshCw,
   Building2,
+  Activity,
+  BarChart3,
+  ArrowRightLeft,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/auth";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatNumber, formatDate } from "@/lib/utils";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import {
   AreaChart,
   Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 
-const mockChartData = [
-  { name: "Mon", stockIn: 4000, stockOut: 2400 },
-  { name: "Tue", stockIn: 3000, stockOut: 1398 },
-  { name: "Wed", stockIn: 2000, stockOut: 9800 },
-  { name: "Thu", stockIn: 2780, stockOut: 3908 },
-  { name: "Fri", stockIn: 1890, stockOut: 4800 },
-  { name: "Sat", stockIn: 2390, stockOut: 3800 },
-  { name: "Sun", stockIn: 3490, stockOut: 4300 },
+// Mock chart data — replace with real API later
+const mockWeeklyData = [
+  { name: "Sen", stockIn: 4000, stockOut: 2400 },
+  { name: "Sel", stockIn: 3000, stockOut: 1398 },
+  { name: "Rab", stockIn: 2000, stockOut: 3800 },
+  { name: "Kam", stockIn: 2780, stockOut: 3908 },
+  { name: "Jum", stockIn: 1890, stockOut: 4800 },
+  { name: "Sab", stockIn: 2390, stockOut: 3800 },
+  { name: "Min", stockIn: 3490, stockOut: 4300 },
+];
+
+const mockCategoryData = [
+  { name: "Elektronik", value: 35, color: "hsl(198, 80%, 48%)" },
+  { name: "Material", value: 28, color: "hsl(152, 70%, 42%)" },
+  { name: "Makanan", value: 20, color: "hsl(38, 90%, 52%)" },
+  { name: "Lainnya", value: 17, color: "hsl(262, 60%, 55%)" },
 ];
 
 export default function DashboardOverview() {
   const user = useAuthStore((s) => s.user);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [lowStock, setLowStock] = useState<StockView[]>([]);
+  const [recentTx, setRecentTx] = useState<TransactionView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const [statsRes, lowStockRes] = await Promise.all([
+      const [statsRes, lowStockRes, txRes] = await Promise.all([
         dashboardApi.getStats(),
         dashboardApi.getLowStockAlerts(5),
+        transactionApi.getAll({ limit: 5 }),
       ]);
       setStats(statsRes.data);
       setLowStock(lowStockRes.data || []);
+      setRecentTx(txRes.data || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load dashboard data");
+      setError(err instanceof Error ? err.message : "Gagal memuat data dashboard");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 17) return "Good afternoon";
-    return "Good evening";
+    if (hour < 12) return "Selamat pagi";
+    if (hour < 17) return "Selamat siang";
+    return "Selamat malam";
   };
 
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div className="flex items-center justify-between">
-        <div>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4 }}
+        >
           <h1 className="text-2xl font-semibold text-foreground tracking-tight">
             {getGreeting()}, {user?.name?.split(" ")[0] || "Admin"}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Here&apos;s what&apos;s happening with your inventory today.
+            Ringkasan inventaris dan aktivitas hari ini.
           </p>
-        </div>
-        <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-          Refresh
-        </Button>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
+            <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+            Refresh
+          </Button>
+        </motion.div>
       </div>
 
       {error && (
-        <div className="bg-danger-bg border border-destructive/20 text-destructive text-sm p-4 rounded-lg flex items-center justify-between">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-danger-bg border border-destructive/20 text-destructive text-sm p-4 rounded-xl flex items-center justify-between"
+        >
           <p>{error}</p>
           <Button variant="ghost" size="sm" onClick={fetchData}>
-            Retry
+            Coba Lagi
           </Button>
-        </div>
+        </motion.div>
       )}
 
       {/* KPI cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <KpiCard
-          label="Inventory value"
-          value={loading ? null : formatCurrency(stats?.total_stock_value || 0)}
+          label="Nilai Inventaris"
+          value={stats?.total_stock_value || 0}
+          formatter={formatCurrency}
           delta="+12.5%"
           deltaUp
           icon={TrendingUp}
           loading={loading}
+          index={0}
         />
         <KpiCard
-          label="Active products"
-          value={loading ? null : String(stats?.total_products || 0)}
-          delta="+4 this week"
+          label="Produk Aktif"
+          value={stats?.total_products || 0}
+          delta="+4 minggu ini"
           deltaUp
           icon={Package}
           loading={loading}
+          index={1}
         />
         <KpiCard
-          label="Warehouses"
-          value={loading ? null : String(stats?.total_warehouses || 0)}
+          label="Gudang"
+          value={stats?.total_warehouses || 0}
           icon={Building2}
           loading={loading}
+          index={2}
         />
         <KpiCard
-          label="Low stock alerts"
-          value={loading ? null : String(stats?.low_stock_count || 0)}
-          delta={stats?.low_stock_count ? "Needs attention" : "All clear"}
+          label="Stok Rendah"
+          value={stats?.low_stock_count || 0}
+          delta={stats?.low_stock_count ? "Perlu perhatian" : "Semua aman"}
           deltaUp={!stats?.low_stock_count}
           icon={AlertTriangle}
           loading={loading}
+          index={3}
         />
       </div>
 
-      {/* Chart + sidebar */}
+      {/* Charts row */}
       <div className="grid gap-4 lg:grid-cols-7">
-        {/* Chart */}
-        <Card className="lg:col-span-5">
+        {/* Area Chart — Stock Activity */}
+        <Card className="lg:col-span-5 bg-card/50 backdrop-blur-sm border-border/50">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-medium">Stock activity</CardTitle>
+                <CardTitle className="text-sm font-medium">Aktivitas Stok</CardTitle>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Weekly stock-in vs stock-out volume
+                  Volume stok masuk vs keluar per minggu
                 </p>
               </div>
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-primary" />
-                  Stock in
+                  Masuk
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-chart-4" />
-                  Stock out
+                  Keluar
                 </span>
               </div>
             </div>
@@ -162,21 +201,21 @@ export default function DashboardOverview() {
           <CardContent className="pt-4">
             <div className="h-72 w-full min-h-[0] min-w-[0]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={mockChartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                <AreaChart data={mockWeeklyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="fillIn" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(198, 80%, 48%)" stopOpacity={0.15} />
+                      <stop offset="5%" stopColor="hsl(198, 80%, 48%)" stopOpacity={0.2} />
                       <stop offset="95%" stopColor="hsl(198, 80%, 48%)" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="fillOut" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(262, 60%, 55%)" stopOpacity={0.15} />
+                      <stop offset="5%" stopColor="hsl(262, 60%, 55%)" stopOpacity={0.2} />
                       <stop offset="95%" stopColor="hsl(262, 60%, 55%)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     stroke="hsl(var(--border-default))"
-                    strokeOpacity={0.5}
+                    strokeOpacity={0.4}
                     vertical={false}
                   />
                   <XAxis
@@ -190,22 +229,24 @@ export default function DashboardOverview() {
                     tick={{ fill: "hsl(var(--text-muted))", fontSize: 11 }}
                     axisLine={false}
                     tickLine={false}
+                    width={40}
                   />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "hsl(var(--bg-overlay))",
                       borderColor: "hsl(var(--border-default))",
-                      borderRadius: "8px",
-                      fontSize: "13px",
-                      boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+                      borderRadius: "10px",
+                      fontSize: "12px",
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+                      padding: "10px 14px",
                     }}
                     itemStyle={{ color: "hsl(var(--text-primary))" }}
-                    labelStyle={{ color: "hsl(var(--text-secondary))" }}
+                    labelStyle={{ color: "hsl(var(--text-secondary))", fontWeight: 600, marginBottom: 4 }}
                   />
                   <Area
                     type="monotone"
                     dataKey="stockIn"
-                    name="Stock In"
+                    name="Stok Masuk"
                     stroke="hsl(198, 80%, 48%)"
                     strokeWidth={2}
                     fillOpacity={1}
@@ -214,7 +255,7 @@ export default function DashboardOverview() {
                   <Area
                     type="monotone"
                     dataKey="stockOut"
-                    name="Stock Out"
+                    name="Stok Keluar"
                     stroke="hsl(262, 60%, 55%)"
                     strokeWidth={2}
                     fillOpacity={1}
@@ -226,173 +267,295 @@ export default function DashboardOverview() {
           </CardContent>
         </Card>
 
-        {/* Quick stats sidebar */}
-        <Card className="lg:col-span-2">
+        {/* Donut chart — Category distribution */}
+        <Card className="lg:col-span-2 bg-card/50 backdrop-blur-sm border-border/50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Quick insights</CardTitle>
+            <CardTitle className="text-sm font-medium">Distribusi Kategori</CardTitle>
+            <p className="text-xs text-muted-foreground mt-0.5">Berdasarkan jumlah produk</p>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="rounded-lg border border-border p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-foreground">Restock needed</span>
-                <Badge variant="warning">High</Badge>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                SKU-LAP-001 is projected to run out within 3 days based on current velocity.
-              </p>
+          <CardContent className="pt-2">
+            <div className="h-48 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={mockCategoryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={75}
+                    paddingAngle={3}
+                    dataKey="value"
+                    strokeWidth={0}
+                  >
+                    {mockCategoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--bg-overlay))",
+                      borderColor: "hsl(var(--border-default))",
+                      borderRadius: "8px",
+                      fontSize: "12px",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+                    }}
+                    itemStyle={{ color: "hsl(var(--text-primary))" }}
+                    formatter={(value) => [`${value}%`, ""]}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
-            <div className="rounded-lg border border-border p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-foreground">Demand trend</span>
-                <Badge>Monitor</Badge>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Electronics category demand is forecasted to increase 15% next week.
-              </p>
-            </div>
-            <div className="rounded-lg border border-border p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-foreground">Dead stock</span>
-                <Badge variant="secondary">Low</Badge>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {stats?.dead_stock_count || 0} items have not moved in 30+ days.
-              </p>
+            {/* Legend */}
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {mockCategoryData.map((cat) => (
+                <div key={cat.name} className="flex items-center gap-2 text-xs">
+                  <span
+                    className="h-2.5 w-2.5 rounded-sm shrink-0"
+                    style={{ backgroundColor: cat.color }}
+                  />
+                  <span className="text-muted-foreground truncate">{cat.name}</span>
+                  <span className="text-foreground font-medium ml-auto">{cat.value}%</span>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Low stock table */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-medium text-foreground tracking-tight">
-            Low stock alerts
-          </h2>
-          <Button variant="ghost" size="sm" asChild>
-            <a href="/dashboard/inventory">View all inventory →</a>
-          </Button>
-        </div>
+      {/* Bottom row: Recent transactions + Low stock */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Recent Transactions */}
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <CardHeader className="pb-3 border-b border-border/50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Activity size={14} className="text-primary" />
+                <CardTitle className="text-sm font-medium">Transaksi Terakhir</CardTitle>
+              </div>
+              <Button variant="ghost" size="sm" asChild>
+                <a href="/dashboard/transactions">Lihat semua →</a>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {loading ? (
+              <div className="space-y-0">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 px-6 py-3.5 border-b border-border/30">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-3.5 w-32" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                ))}
+              </div>
+            ) : recentTx.length === 0 ? (
+              <EmptyState
+                icon={ArrowRightLeft}
+                title="Belum ada transaksi"
+                description="Catat transaksi stok pertama Anda."
+                actionLabel="Buat Transaksi"
+                onAction={() => window.location.href = "/dashboard/transactions"}
+                className="py-16"
+              />
+            ) : (
+              <div>
+                {recentTx.map((tx, idx) => (
+                  <motion.div
+                    key={tx.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="flex items-center gap-3 px-6 py-3.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 transition-colors"
+                  >
+                    <div className={`p-1.5 rounded-full ${
+                      tx.type === "stock_in"
+                        ? "bg-success/10 text-success"
+                        : "bg-destructive/10 text-destructive"
+                    }`}>
+                      {tx.type === "stock_in" ? <ArrowDownRight size={14} /> : <ArrowUpRight size={14} />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{tx.product_name}</p>
+                      <p className="text-[10px] text-muted-foreground">{tx.warehouse_name}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className={`text-sm font-bold ${
+                        tx.type === "stock_in" ? "text-success" : "text-destructive"
+                      }`}>
+                        {tx.type === "stock_in" ? "+" : "-"}{formatNumber(tx.quantity)}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">{formatDate(tx.created_at)}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-secondary border-b border-border">
-                <tr>
-                  <th className="px-4 py-3 text-left text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
-                    Product
-                  </th>
-                  <th className="px-4 py-3 text-left text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
-                    Warehouse
-                  </th>
-                  <th className="px-4 py-3 text-left text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
-                    Stock
-                  </th>
-                  <th className="px-4 py-3 text-left text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 text-right text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  Array.from({ length: 3 }).map((_, i) => (
-                    <tr key={i} className="border-b border-border">
-                      <td className="px-4 py-3"><Skeleton className="h-4 w-40" /></td>
-                      <td className="px-4 py-3"><Skeleton className="h-4 w-24" /></td>
-                      <td className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
-                      <td className="px-4 py-3"><Skeleton className="h-5 w-16" /></td>
-                      <td className="px-4 py-3"><Skeleton className="h-7 w-20 ml-auto" /></td>
-                    </tr>
-                  ))
-                ) : lowStock.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-4 py-16 text-center">
-                      <div className="flex flex-col items-center gap-2">
-                        <Package size={32} className="text-muted-foreground" />
-                        <p className="text-sm text-foreground font-medium">No low stock items</p>
-                        <p className="text-xs text-muted-foreground">All inventory levels are healthy.</p>
+        {/* Low stock table */}
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <CardHeader className="pb-3 border-b border-border/50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertTriangle size={14} className="text-warning" />
+                <CardTitle className="text-sm font-medium">Stok Rendah</CardTitle>
+              </div>
+              <Button variant="ghost" size="sm" asChild>
+                <a href="/dashboard/inventory">Lihat inventaris →</a>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {loading ? (
+              <div className="space-y-0">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 px-6 py-3.5 border-b border-border/30">
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-3.5 w-40" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-7 w-16" />
+                  </div>
+                ))}
+              </div>
+            ) : lowStock.length === 0 ? (
+              <EmptyState
+                icon={Package}
+                title="Semua stok aman"
+                description="Tidak ada produk dengan level stok rendah saat ini."
+                className="py-16"
+              />
+            ) : (
+              <div>
+                {lowStock.map((item, idx) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="flex items-center gap-3 px-6 py-3.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 transition-colors"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{item.product_name}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] text-muted-foreground font-mono">{item.product_sku}</span>
+                        <span className="text-[10px] text-muted-foreground">•</span>
+                        <span className="text-[10px] text-muted-foreground">{item.warehouse_name}</span>
                       </div>
-                    </td>
-                  </tr>
-                ) : (
-                  lowStock.map((item) => (
-                    <tr key={item.id} className="border-b border-border hover:bg-secondary/50 transition-colors duration-100">
-                      <td className="px-4 py-3">
-                        <div>
-                          <p className="font-medium text-foreground">{item.product_name}</p>
-                          <p className="text-xs text-muted-foreground font-mono">{item.product_sku}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-muted-foreground">
-                        {item.warehouse_name}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="font-medium text-destructive">{item.quantity}</span>
-                        <span className="text-muted-foreground"> / {item.min_stock}</span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge variant="destructive">Critical</Badge>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <Button size="sm">Restock</Button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="text-right">
+                        <span className="text-sm font-bold text-destructive">{item.quantity}</span>
+                        <span className="text-xs text-muted-foreground"> / {item.min_stock}</span>
+                      </div>
+                      <Badge variant="destructive" className="rounded-full px-2 text-[9px]">Kritis</Badge>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </CardContent>
         </Card>
       </div>
     </div>
   );
 }
 
+/* ─── Counter-up KPI Card ──────────────────────────────────────────── */
+
+function AnimatedNumber({
+  value,
+  formatter,
+}: {
+  value: number;
+  formatter?: (v: number) => string;
+}) {
+  const nodeRef = useRef<HTMLSpanElement>(null);
+  const motionValue = useMotionValue(0);
+  const rounded = useTransform(motionValue, (latest) => {
+    if (formatter) return formatter(Math.round(latest));
+    return formatNumber(Math.round(latest));
+  });
+
+  useEffect(() => {
+    const controls = animate(motionValue, value, {
+      duration: 1.2,
+      ease: "easeOut",
+    });
+    return () => controls.stop();
+  }, [value, motionValue]);
+
+  useEffect(() => {
+    const unsubscribe = rounded.on("change", (v) => {
+      if (nodeRef.current) {
+        nodeRef.current.textContent = v;
+      }
+    });
+    return () => unsubscribe();
+  }, [rounded]);
+
+  return <span ref={nodeRef}>0</span>;
+}
+
 function KpiCard({
   label,
   value,
+  formatter,
   delta,
   deltaUp,
   icon: Icon,
   loading,
+  index = 0,
 }: {
   label: string;
-  value: string | null;
+  value: number;
+  formatter?: (v: number) => string;
   delta?: string;
   deltaUp?: boolean;
   icon: React.ComponentType<{ size?: number; className?: string }>;
   loading: boolean;
+  index?: number;
 }) {
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
-            {label}
-          </span>
-          <Icon size={16} className="text-muted-foreground" />
-        </div>
-        {loading || value === null ? (
-          <Skeleton className="h-8 w-28 mb-2" />
-        ) : (
-          <div className="text-2xl font-semibold text-foreground tracking-tight">
-            {value}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.08, duration: 0.4 }}
+    >
+      <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/20 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 group">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
+              {label}
+            </span>
+            <div className="p-2 rounded-lg bg-primary/5 text-primary group-hover:bg-primary/10 transition-colors">
+              <Icon size={16} />
+            </div>
           </div>
-        )}
-        {delta && (
-          <div className="flex items-center gap-1 mt-2">
-            {deltaUp !== undefined && (
-              deltaUp
-                ? <ArrowUpRight size={12} className="text-success" />
-                : <ArrowDownRight size={12} className="text-destructive" />
-            )}
-            <span className="text-xs text-muted-foreground">{delta}</span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          {loading ? (
+            <Skeleton className="h-8 w-28 mb-2" />
+          ) : (
+            <div className="text-2xl font-semibold text-foreground tracking-tight">
+              <AnimatedNumber value={value} formatter={formatter} />
+            </div>
+          )}
+          {delta && (
+            <div className="flex items-center gap-1 mt-2">
+              {deltaUp !== undefined && (
+                deltaUp
+                  ? <ArrowUpRight size={12} className="text-success" />
+                  : <ArrowDownRight size={12} className="text-destructive" />
+              )}
+              <span className="text-xs text-muted-foreground">{delta}</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

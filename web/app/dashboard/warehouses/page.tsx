@@ -4,8 +4,10 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { WarehouseCardSkeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 import { WarehouseFormModal } from "@/components/modals/warehouse-form-modal";
 import { DeleteConfirmDialog } from "@/components/modals/delete-confirm-dialog";
 import {
@@ -18,9 +20,11 @@ import {
   Package,
   ChevronDown,
   ChevronUp,
+  Search,
 } from "lucide-react";
 import { warehouseApi, inventoryApi } from "@/lib/api";
 import { formatNumber } from "@/lib/utils";
+import { useDebounce } from "@/hooks/use-debounce";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Warehouse, StockView } from "@/lib/api";
 
@@ -46,6 +50,8 @@ export default function WarehousesPage() {
   // Stock data per warehouse
   const [stockMap, setStockMap] = useState<Record<string, WarehouseStockSummary>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 400);
 
   const fetchWarehouses = useCallback(async () => {
     setLoading(true);
@@ -128,6 +134,21 @@ export default function WarehousesPage() {
         </motion.div>
       </div>
 
+      {/* Search */}
+      <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+        <CardContent className="p-4">
+          <div className="relative max-w-sm w-full group">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <Input
+              placeholder="Cari nama atau lokasi gudang..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-9 bg-background/50 border-border/50 focus-visible:ring-primary/20"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
       {loading && warehouses.length === 0 ? (
         <WarehouseCardSkeleton count={6} />
       ) : error ? (
@@ -139,22 +160,32 @@ export default function WarehousesPage() {
           </Button>
         </div>
       ) : warehouses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-32 bg-card/30 rounded-2xl border border-dashed border-border text-center">
-          <div className="p-5 rounded-full bg-secondary/50 mb-5">
-            <Building2 size={40} className="text-muted-foreground" />
-          </div>
-          <p className="text-sm font-medium text-foreground mb-2">Belum ada gudang terdaftar</p>
-          <p className="text-xs text-muted-foreground mb-8 max-w-[250px]">Daftarkan lokasi penyimpanan pertama Anda untuk mulai mengelola inventaris.</p>
-          <Button variant="outline" size="sm" onClick={() => setModalOpen(true)}>
-            <Plus size={14} className="mr-1.5" />
-            Tambah Gudang Baru
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            <AnimatePresence mode="popLayout">
-              {warehouses.map((wh, idx) => {
+        <EmptyState
+          icon={Building2}
+          title="Belum ada gudang terdaftar"
+          description="Daftarkan lokasi penyimpanan pertama Anda untuk mulai mengelola inventaris."
+          actionLabel="Tambah Gudang Baru"
+          onAction={() => setModalOpen(true)}
+        />
+      ) : (() => {
+          const filtered = warehouses.filter((wh) => {
+            if (!debouncedSearch) return true;
+            const q = debouncedSearch.toLowerCase();
+            return wh.name.toLowerCase().includes(q) || wh.location.toLowerCase().includes(q);
+          });
+          return filtered.length === 0 ? (
+            <EmptyState
+              icon={Search}
+              title="Gudang tidak ditemukan"
+              description={`Tidak ada gudang yang cocok dengan pencarian "${debouncedSearch}".`}
+              actionLabel="Reset Pencarian"
+              onAction={() => setSearchQuery("")}
+            />
+          ) : (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                <AnimatePresence mode="popLayout">
+                  {filtered.map((wh, idx) => {
                 const stock = stockMap[wh.id];
                 const isExpanded = expandedId === wh.id;
                 return (
@@ -281,13 +312,14 @@ export default function WarehousesPage() {
                   </motion.div>
                 );
               })}
-            </AnimatePresence>
+              </AnimatePresence>
+            </div>
+            <div className="pt-4 border-t border-border/50">
+              <Pagination total={total} limit={PAGE_SIZE} offset={offset} onPageChange={setOffset} />
+            </div>
           </div>
-          <div className="pt-4 border-t border-border/50">
-            <Pagination total={total} limit={PAGE_SIZE} offset={offset} onPageChange={setOffset} />
-          </div>
-        </div>
-      )}
+          );
+        })()}
 
       <WarehouseFormModal
         open={modalOpen}

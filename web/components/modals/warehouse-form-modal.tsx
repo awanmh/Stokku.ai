@@ -99,13 +99,13 @@ export function WarehouseFormModal({
           <div className="space-y-1.5">
             <Label htmlFor="wh-name">Nama Gudang *</Label>
             <Input id="wh-name" placeholder="Gudang Utama Jakarta" {...register("name")} />
-            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
+            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
           </div>
 
           <div className="space-y-1.5">
             <Label htmlFor="wh-location">Lokasi *</Label>
             <Input id="wh-location" placeholder="Jakarta Barat" {...register("location")} />
-            {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location.message}</p>}
+            {errors.location && <p className="text-xs text-destructive mt-1">{errors.location.message}</p>}
           </div>
 
           <div className="space-y-1.5">

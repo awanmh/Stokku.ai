@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { FloatingChatbot } from "@/components/chat/FloatingChatbot";
 import { Toaster } from "sonner";
 import { useAuthStore } from "@/lib/auth";
@@ -41,6 +42,7 @@ export default function DashboardLayout({
         <Header />
         <main className="flex-1 p-6 lg:p-8 overflow-x-hidden">
           <div className="max-w-7xl mx-auto">
+            <Breadcrumb />
             {children}
           </div>
         </main>
