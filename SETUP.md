@@ -93,6 +93,19 @@ If you prefer to run the components manually for development, follow these steps
 | `REDIS_HOST` | Redis host | `localhost` |
 | `REDIS_PORT` | Redis port | `6379` |
 | `JWT_SECRET` | Secret key for JWT signing | `change-me` |
+| `SMTP_HOST` | SMTP server host | `smtp.gmail.com` |
+| `SMTP_PORT` | SMTP server port | `587` |
+| `SMTP_EMAIL` | Email address for sending OTP | `your-email@gmail.com` |
+| `SMTP_PASSWORD` | App Password for the email | `your-app-password` |
+| `SMTP_FROM_NAME` | Sender name | `Stokku.ai` |
+
+**Notes on SMTP / Gmail App Password setup**
+To send OTP emails, you need to configure an SMTP server. If you are using Gmail, you cannot use your regular password. You must use an App Password:
+1. Go to your [Google Account Security settings](https://myaccount.google.com/security).
+2. Ensure **2-Step Verification** is turned ON.
+3. Search for **App passwords** (or go to `Security` > `2-Step Verification` > `App passwords` at the bottom).
+4. Create a new App Password (e.g., name it "Stokku App").
+5. Copy the generated 16-character password and set it as `SMTP_PASSWORD` in `backend/.env`.
 
 ### Frontend (`web/.env`)
 | Variable | Description | Default |

@@ -19,7 +19,7 @@ import {
 export function Header() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
-  const { theme, setTheme } = useTheme();
+  const { setTheme } = useTheme();
 
   const handleLogout = () => {
     logout();

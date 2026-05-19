@@ -326,3 +326,84 @@ func TestGetProfile_NotFound(t *testing.T) {
 	assert.Nil(t, result)
 	mockRepo.AssertExpectations(t)
 }
+
+func TestVerifyOTP_Success(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	mockOTP := new(MockOTPRepository)
+	mockMailer := new(MockOTPMailer)
+	uc := NewAuthUsecase(mockRepo, mockOTP, mockMailer, jwtConfig())
+	ctx := context.Background()
+
+	sessionID := "valid-session"
+	email := "admin@test.com"
+	otpCode := "123456"
+
+	user := &domain.User{
+		ID:       uuid.New(),
+		Email:    email,
+		Name:     "Admin",
+		Role:     domain.RoleAdmin,
+		IsActive: true,
+	}
+
+	mockOTP.On("GetOTP", ctx, sessionID).Return(email, otpCode, nil)
+	mockOTP.On("DeleteOTP", ctx, sessionID).Return(nil)
+	mockRepo.On("GetByEmail", ctx, email).Return(user, nil)
+
+	result, err := uc.VerifyOTP(ctx, domain.VerifyOTPRequest{
+		SessionID: sessionID,
+		OTPCode:   otpCode,
+	})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.NotEmpty(t, result.Token)
+	mockOTP.AssertExpectations(t)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestVerifyOTP_InvalidCode(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	mockOTP := new(MockOTPRepository)
+	mockMailer := new(MockOTPMailer)
+	uc := NewAuthUsecase(mockRepo, mockOTP, mockMailer, jwtConfig())
+	ctx := context.Background()
+
+	sessionID := "valid-session"
+	email := "admin@test.com"
+	otpCode := "123456"
+
+	mockOTP.On("GetOTP", ctx, sessionID).Return(email, otpCode, nil)
+
+	result, err := uc.VerifyOTP(ctx, domain.VerifyOTPRequest{
+		SessionID: sessionID,
+		OTPCode:   "000000",
+	})
+
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	assert.Equal(t, "invalid OTP code", err.Error())
+	mockOTP.AssertExpectations(t)
+}
+
+func TestVerifyOTP_SessionExpired(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	mockOTP := new(MockOTPRepository)
+	mockMailer := new(MockOTPMailer)
+	uc := NewAuthUsecase(mockRepo, mockOTP, mockMailer, jwtConfig())
+	ctx := context.Background()
+
+	sessionID := "expired-session"
+
+	mockOTP.On("GetOTP", ctx, sessionID).Return("", "", errors.New("not found"))
+
+	result, err := uc.VerifyOTP(ctx, domain.VerifyOTPRequest{
+		SessionID: sessionID,
+		OTPCode:   "123456",
+	})
+
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	assert.Equal(t, "OTP expired or invalid session", err.Error())
+	mockOTP.AssertExpectations(t)
+}
