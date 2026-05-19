@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { 
-  User as UserIcon, 
   Mail, 
   Shield, 
   Save, 
@@ -90,7 +89,7 @@ export default function ProfilePage() {
     }
   };
 
-  const onPasswordSubmit = async (data: PasswordFormValues) => {
+  const onPasswordSubmit = async (_data: PasswordFormValues) => {
     setIsSubmittingPassword(true);
     try {
       // Mock API call since backend doesn't support this yet

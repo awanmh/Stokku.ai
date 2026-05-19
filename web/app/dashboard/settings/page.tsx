@@ -22,7 +22,6 @@ import {
   Edit2,
   Trash2,
   RefreshCw,
-  Database,
   Sliders,
   AlertOctagon,
   Download,

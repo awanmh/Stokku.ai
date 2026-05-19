@@ -26,7 +26,6 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { TransactionFormModal } from "@/components/modals/transaction-form-modal";
 import {
   Package,
-  Plus,
   Search,
   RefreshCw,
   ArrowRightLeft,
@@ -108,7 +107,7 @@ export default function InventoryPage() {
     fetchFormData();
   }, [fetchFormData]);
 
-  const handleCreateTransaction = async (data: any) => {
+  const handleCreateTransaction = async (data: { warehouse_id: string; product_id: string; type: "stock_in" | "stock_out"; quantity: number; notes?: string }) => {
     await transactionApi.create(data);
     fetchInventory();
   };

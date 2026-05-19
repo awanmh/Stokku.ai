@@ -17,7 +17,6 @@ import {
   RefreshCw,
   Building2,
   Activity,
-  BarChart3,
   ArrowRightLeft,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/auth";
@@ -26,8 +25,6 @@ import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import {
   AreaChart,
   Area,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
