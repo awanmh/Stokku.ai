@@ -7,7 +7,7 @@
 
 ## 📋 Status Project — 19 Mei 2026
 
-### ✅ Yang Sudah Selesai (oleh Awan — Project Lead)
+### ✅ Yang Sudah Selesai (oleh Awan)
 
 #### Merge & Integrasi (19 Mei 2026)
 - **Merged `feature/chatbot` → `main`**: Integrasi Gemini AI chatbot API (`web/app/api/chat/route.ts`) dengan support multi-model (Gemini 2.5 Flash + Gemma 3 27B), intent detection, inventory context injection dari backend, dan fallback behavior.
