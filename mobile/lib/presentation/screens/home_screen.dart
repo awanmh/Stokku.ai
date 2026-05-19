@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/sync_provider.dart';
 import '../widgets/sync_indicator.dart';
+import '../widgets/chatbot_fab.dart';
 import 'dashboard_screen.dart';
 import 'scanner_screen.dart';
 import 'inventory_screen.dart';
@@ -41,8 +42,10 @@ class _HomeScreenState extends State<HomeScreen> {
             SafeArea(
               bottom: false,
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
                 child: SyncIndicator(
                   isOnline: sync.isOnline,
                   pendingCount: sync.pendingCount,
@@ -55,6 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(child: _pages[_currentIndex]),
         ],
       ),
+      floatingActionButton: const ChatbotFab(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           border: Border(

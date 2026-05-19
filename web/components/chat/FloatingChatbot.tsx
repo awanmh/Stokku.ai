@@ -44,6 +44,8 @@ const QUICK_REPLIES = [
   "Ringkas kondisi inventaris",
 ];
 
+const CHAT_REQUEST_TIMEOUT_MS = 30000;
+
 /* ──────────── Markdown-lite renderer ──────────── */
 function renderMessageText(text: string) {
   // Split by newlines, then handle bold (**text**)
@@ -110,12 +112,16 @@ export function FloatingChatbot() {
       setInput("");
       setIsTyping(true);
 
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), CHAT_REQUEST_TIMEOUT_MS);
+
       try {
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          signal: controller.signal,
           body: JSON.stringify({
             model: selectedModel,
             message: messageText,
@@ -133,6 +139,14 @@ export function FloatingChatbot() {
           | null;
 
         if (!response.ok || !payload?.success || !payload?.data?.reply) {
+          if (response.status === 429) {
+            throw new Error(payload?.message || "Terlalu banyak permintaan. Coba lagi sebentar.");
+          }
+
+          if (response.status >= 500) {
+            throw new Error(payload?.message || "Layanan AI sedang bermasalah. Coba lagi nanti.");
+          }
+
           throw new Error(payload?.message || "Gagal memproses jawaban dari Gemini.");
         }
 
@@ -145,7 +159,14 @@ export function FloatingChatbot() {
 
         setMessages((prev) => [...prev, botMsg]);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan tak terduga.";
+        const errorMessage =
+          error instanceof DOMException && error.name === "AbortError"
+            ? "Permintaan melebihi batas waktu. Coba lagi dalam beberapa saat."
+            : error instanceof TypeError
+              ? "Tidak bisa menjangkau server chatbot. Periksa koneksi atau status server."
+              : error instanceof Error
+                ? error.message
+                : "Terjadi kesalahan tak terduga.";
         setMessages((prev) => [
           ...prev,
           {
@@ -156,6 +177,7 @@ export function FloatingChatbot() {
           },
         ]);
       } finally {
+        window.clearTimeout(timeoutId);
         setIsTyping(false);
       }
     },
@@ -211,8 +233,8 @@ export function FloatingChatbot() {
                         type="button"
                         onClick={() => setSelectedModel(option.id)}
                         className={`rounded-full px-2.5 py-1 transition-colors ${isActive
-                            ? "bg-primary text-primary-foreground shadow-sm"
-                            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                           }`}
                         aria-pressed={isActive}
                         aria-label={`Pilih model ${option.label}`}
@@ -249,8 +271,8 @@ export function FloatingChatbot() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2 }}
                     className={`flex gap-2 ${msg.sender === "user"
-                        ? "ml-auto flex-row-reverse max-w-[85%]"
-                        : "mr-auto max-w-[85%]"
+                      ? "ml-auto flex-row-reverse max-w-[85%]"
+                      : "mr-auto max-w-[85%]"
                       }`}
                   >
                     <Avatar className="h-6 w-6 shrink-0 border border-border">
@@ -275,8 +297,8 @@ export function FloatingChatbot() {
                     >
                       <div
                         className={`px-3 py-2 rounded-xl text-[13px] leading-relaxed ${msg.sender === "user"
-                            ? "bg-primary text-primary-foreground rounded-tr-sm"
-                            : "bg-secondary text-secondary-foreground rounded-tl-sm border border-border"
+                          ? "bg-primary text-primary-foreground rounded-tr-sm"
+                          : "bg-secondary text-secondary-foreground rounded-tl-sm border border-border"
                           }`}
                       >
                         {renderMessageText(msg.text)}

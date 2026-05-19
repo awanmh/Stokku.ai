@@ -16,6 +16,8 @@ const GEMINI_DEFAULT_MODEL =
     DEFAULT_CHAT_MODEL;
 const BACKEND_INTERNAL_URL =
     (process.env.BACKEND_INTERNAL_URL || "http://127.0.0.1:8080").replace(/\/$/, "");
+const USE_AI_MOCKS = process.env.USE_AI_MOCKS === "1";
+const ALLOW_ORIGIN = process.env.ALLOW_ORIGIN || "*";
 
 type BackendResponse<T> = {
     success: boolean;
@@ -87,6 +89,25 @@ type GeminiResponse = {
             parts?: Array<{ text?: string }>;
         };
     }>;
+};
+
+type GeminiPart = { text?: string };
+
+type GeminiMessage = {
+    role: string;
+    parts: GeminiPart[];
+};
+
+type GeminiRequest = {
+    contents: GeminiMessage[];
+    generationConfig: {
+        temperature?: number;
+        topP?: number;
+        maxOutputTokens?: number;
+        [key: string]: unknown;
+    };
+    systemInstruction?: { parts: GeminiPart[] };
+    [key: string]: unknown;
 };
 
 type ChatIntent =
@@ -369,6 +390,50 @@ function extractGeminiText(payload: GeminiResponse): string {
     return candidate?.content?.parts?.map((part) => part.text || "").join("").trim() || "";
 }
 
+function jsonWithCors(body: unknown, status = 200) {
+    return NextResponse.json(body, {
+        status,
+        headers: {
+            "Access-Control-Allow-Origin": ALLOW_ORIGIN,
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
+    });
+}
+
+function buildMockReply(intent: ChatIntent, context: string, message: string): string {
+    const firstContextLines = context
+        .split("\n")
+        .filter((line) => line.trim().length > 0)
+        .slice(0, 6)
+        .join("\n");
+
+    if (intent === "forecast") {
+        return [
+            "[MOCK] Berikut ringkasan forecast sementara:",
+            firstContextLines || "Forecast mock belum memiliki konteks tambahan.",
+            "Gunakan endpoint backend AI saat service forecasting siap.",
+        ].join("\n");
+    }
+
+    if (intent === "replenishment") {
+        return [
+            "[MOCK] Berikut saran replenishment sementara:",
+            firstContextLines || "Replenishment mock belum memiliki konteks tambahan.",
+            "Validasi hasil ini dengan endpoint backend AI sebelum dipakai operasional.",
+        ].join("\n");
+    }
+
+    return [
+        "[MOCK] Chatbot sedang berjalan dalam mode dev.",
+        `Intent terdeteksi: ${intent}`,
+        message ? `Pesan Anda: ${message}` : null,
+        firstContextLines || "Konteks inventaris belum tersedia.",
+    ]
+        .filter(Boolean)
+        .join("\n");
+}
+
 export async function POST(request: NextRequest) {
     const body = (await request.json().catch(() => null)) as ChatRequestBody | null;
     const message = body?.message?.trim() || "";
@@ -377,27 +442,42 @@ export async function POST(request: NextRequest) {
     const token = request.cookies.get("token")?.value;
 
 
-
     if (!message && messages.length === 0) {
-        return NextResponse.json(
-            { success: false, message: "Pesan chatbot tidak boleh kosong." },
-            { status: 400 }
+        return jsonWithCors({ success: false, message: "Pesan chatbot tidak boleh kosong." }, 400);
+    }
+
+    if (USE_AI_MOCKS) {
+        const safeMessages =
+            messages.length > 0 ? messages : [{ role: "user", content: message }];
+        const activeMessage = message || safeMessages[safeMessages.length - 1]?.content || "";
+        const intent = detectIntent(activeMessage);
+        const context = await getInventoryContext(token, intent, activeMessage);
+        const reply = buildMockReply(intent, context, activeMessage);
+
+        return jsonWithCors(
+            {
+                success: true,
+                data: {
+                    reply,
+                    model: "mock" as const,
+                },
+            },
+            200
         );
     }
 
     if (!GEMINI_API_KEY) {
-        return NextResponse.json(
+        return jsonWithCors(
             {
                 success: false,
                 message:
                     "GEMINI_API_KEY belum diatur. Tambahkan variabel environment untuk mengaktifkan chatbot.",
             },
-            { status: 500 }
+            500
         );
     }
 
-    const safeMessages =
-        messages.length > 0 ? messages : [{ role: "user", content: message }];
+    const safeMessages = messages.length > 0 ? messages : [{ role: "user", content: message }];
     const intent = detectIntent(message || safeMessages[safeMessages.length - 1]?.content || "");
     const context = await getInventoryContext(token, intent, message || safeMessages[safeMessages.length - 1]?.content || "");
     const systemPrompt = buildSystemPrompt(context, intent);
@@ -409,7 +489,7 @@ export async function POST(request: NextRequest) {
         ? [{ role: "MODEL", parts: [{ text: systemPrompt }] }, ...buildConversation(safeMessages)]
         : buildConversation(safeMessages);
 
-    const requestBody: any = {
+    const requestBody: GeminiRequest = {
         contents,
         generationConfig: {
             temperature: 0.4,
@@ -436,18 +516,25 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    let geminiResponse = await callGemini(model);
+    const geminiResponse = await callGemini(model);
 
-    // If Gemma rejects developer instruction, try fallback to default Gemini model
+    // If a non-default model fails, try fallback to the default Gemini model.
+    // This covers unsupported model features, permission issues, and transient API failures.
     if (!geminiResponse.ok) {
         const errorText = await geminiResponse.text().catch(() => "");
+        const shouldFallback =
+            model !== GEMINI_DEFAULT_MODEL &&
+            (
+                geminiResponse.status === 400 ||
+                geminiResponse.status === 403 ||
+                geminiResponse.status === 404 ||
+                geminiResponse.status === 429 ||
+                geminiResponse.status >= 500 ||
+                /developer instruction is not enabled|role 'system' is not supported|permission|quota|not found|unsupported/i.test(errorText)
+            );
 
-        if (
-            geminiResponse.status === 400 &&
-            /developer instruction is not enabled/i.test(errorText) &&
-            model !== GEMINI_DEFAULT_MODEL
-        ) {
-            // Retry with default model (e.g., gemini-2.5-flash) and include systemInstruction there
+        if (shouldFallback) {
+            // Retry with default model (e.g., gemini-2.5-flash) and include systemInstruction there.
             const fallbackModel = GEMINI_DEFAULT_MODEL;
             const fallbackRequestBody = { ...requestBody };
             // ensure systemInstruction present for fallback
@@ -467,32 +554,29 @@ export async function POST(request: NextRequest) {
                 const reply = extractGeminiText(payload);
 
                 if (!reply) {
-                    return NextResponse.json(
-                        { success: false, message: "Gemini tidak mengembalikan teks jawaban." },
-                        { status: 502 }
-                    );
+                    return jsonWithCors({ success: false, message: "Gemini tidak mengembalikan teks jawaban." }, 502);
                 }
 
-                return NextResponse.json({ success: true, data: { reply, model: fallbackModel } });
+                return jsonWithCors({ success: true, data: { reply, model: fallbackModel } }, 200);
             }
 
             // fallback also failed — return its error
             const fallbackError = await fallbackResp.text().catch(() => "");
-            return NextResponse.json(
+            return jsonWithCors(
                 {
                     success: false,
                     message: `Gagal memanggil Gemini API (${fallbackResp.status}). ${fallbackError || "Coba lagi nanti."}`,
                 },
-                { status: 502 }
+                502
             );
         }
 
-        return NextResponse.json(
+        return jsonWithCors(
             {
                 success: false,
                 message: `Gagal memanggil Gemini API (${geminiResponse.status}). ${errorText || "Coba lagi nanti."}`,
             },
-            { status: 502 }
+            502
         );
     }
 
@@ -500,20 +584,19 @@ export async function POST(request: NextRequest) {
     const reply = extractGeminiText(payload);
 
     if (!reply) {
-        return NextResponse.json(
-            {
-                success: false,
-                message: "Gemini tidak mengembalikan teks jawaban.",
-            },
-            { status: 502 }
-        );
+        return jsonWithCors({ success: false, message: "Gemini tidak mengembalikan teks jawaban." }, 502);
     }
 
-    return NextResponse.json({
-        success: true,
-        data: {
-            reply,
-            model,
+    return jsonWithCors({ success: true, data: { reply, model } }, 200);
+}
+
+export async function OPTIONS() {
+    return new NextResponse(null, {
+        status: 204,
+        headers: {
+            "Access-Control-Allow-Origin": ALLOW_ORIGIN,
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
         },
     });
 }
