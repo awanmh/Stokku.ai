@@ -5,7 +5,7 @@ class ApiConstants {
   // ── Base URL ──────────────────────────────────────────────
   // Change this to your machine's LAN IP when testing on a
   // physical device (e.g. 'http://192.168.1.100:8080').
-  static const String baseUrl = 'http://10.0.2.2:8080'; // Android emulator → host
+  static const String baseUrl = 'http://192.168.142.58:8080'; // Physical device -> host machine IP
   static const String apiPrefix = '/api/v1';
 
   // ── Auth ──────────────────────────────────────────────────
