@@ -75,27 +75,27 @@ web/components/theme-provider.tsx   → no-unused-vars, setState-in-effect
 
 ---
 
-### 👤 Felix Yohanes Sangapta Simamora
-**Branch**: `feature/felix-tasks`
+### 👤 Felix Yohanes Sangapta Simamora ✅ ALL TASKS COMPLETE
+**Branch**: `feature/felix-tasks` — **PUSHED & READY FOR PR**
 
 #### Task 1: Setup & Dokumentasi OTP Email
-- [ ] Buat `.env.shared.example` file yang berisi semua env variables yang dibutuhkan tim (SMTP + Gemini) dengan instruksi jelas
-- [ ] Dokumentasikan cara setup Gmail App Password untuk SMTP di `SETUP.md`
-- [ ] Pastikan fitur OTP login berfungsi end-to-end (register → kirim OTP → verify → login)
+- [x] Buat `.env.shared.example` file yang berisi semua env variables yang dibutuhkan tim (SMTP + Gemini) dengan instruksi jelas
+- [x] Dokumentasikan cara setup Gmail App Password untuk SMTP di `SETUP.md`
+- [x] Pastikan fitur OTP login berfungsi end-to-end (register → kirim OTP → verify → login)
 
 #### Task 2: Fix ESLint Errors — Login & Theme
-- [ ] Fix `web/app/login/page.tsx` line 361 — `setState-in-effect` (gunakan `useSyncExternalStore` atau lazy initial state)
-- [ ] Fix `web/components/theme-provider.tsx` line 31 — `setState-in-effect` (pindahkan ke initializer atau `useSyncExternalStore`)
-- [ ] Fix `web/components/layout/header.tsx` — unused `theme` variable
+- [x] Fix `web/app/login/page.tsx` line 361 — `setState-in-effect` (gunakan `useSyncExternalStore` atau lazy initial state)
+- [x] Fix `web/components/theme-provider.tsx` line 31 — `setState-in-effect` (pindahkan ke initializer atau `useSyncExternalStore`)
+- [x] Fix `web/components/layout/header.tsx` — unused `theme` variable
 
 #### Task 3: Testing — Backend OTP Flow
-- [ ] Tambahkan unit test untuk OTP usecase di `backend/internal/usecase/` (minimal: send OTP, verify OTP success, verify OTP expired, verify OTP wrong code)
-- [ ] Jalankan `go test ./... -v` dan pastikan semua PASS
+- [x] Tambahkan unit test untuk OTP usecase di `backend/internal/usecase/` (minimal: send OTP, verify OTP success, verify OTP expired, verify OTP wrong code)
+- [x] Jalankan `go test ./... -v` dan pastikan semua PASS
 
 #### Task 4: UI/UX Polish — Login Page
-- [ ] Redesign login page agar tidak terlihat "AI-generated" — tambahkan ilustrasi/branding Stokku, animasi yang halus
-- [ ] Pastikan form validation user-friendly (inline errors, loading states)
-- [ ] Test responsive di mobile viewport (375px, 414px)
+- [x] Redesign login page agar tidak terlihat "AI-generated" — tambahkan ilustrasi/branding Stokku, animasi yang halus
+- [x] Pastikan form validation user-friendly (inline errors, loading states)
+- [x] Test responsive di mobile viewport (375px, 414px)
 
 ---
 
@@ -134,30 +134,30 @@ web/components/theme-provider.tsx   → no-unused-vars, setState-in-effect
 
 ---
 
-### 👤 Neisyah Nurul Alyazara
-**Branch**: `feature/neisyah-tasks`
+### 👤 Neisyah Nurul Alyazara ✅ ALL TASKS COMPLETE
+**Branch**: `feature/neisyah-tasks` — **PUSHED & READY FOR PR**
 
 #### Task 1: Web UI/UX — Dashboard & Tables
-- [ ] Redesign Dashboard Overview page — tambahkan chart yang lebih informatif, animasi counter-up untuk stats
-- [ ] Perbaiki tabel di semua halaman (Products, Inventory, Transactions, Warehouses) — pastikan sorting, pagination, dan search konsisten
-- [ ] Tambahkan empty states yang menarik (ilustrasi + CTA) saat data kosong
-- [ ] Review semua modal forms — pastikan validasi inline, loading state, dan success feedback ada
+- [x] Redesign Dashboard Overview page — tambahkan chart yang lebih informatif, animasi counter-up untuk stats
+- [x] Perbaiki tabel di semua halaman (Products, Inventory, Transactions, Warehouses) — pastikan sorting, pagination, dan search konsisten
+- [x] Tambahkan empty states yang menarik (ilustrasi + CTA) saat data kosong
+- [x] Review semua modal forms — pastikan validasi inline, loading state, dan success feedback ada
 
 #### Task 2: Web UI/UX — Profile & Settings
-- [ ] Polish halaman Profile — fix `<img>` element (ganti ke `next/image`), tambahkan avatar upload preview
-- [ ] Polish halaman Settings — fix unused imports, tambahkan konfirmasi saat delete/deactivate user
-- [ ] Tambahkan breadcrumb navigation di semua halaman dashboard
+- [x] Polish halaman Profile — fix `<img>` element (ganti ke `next/image`), tambahkan avatar upload preview
+- [x] Polish halaman Settings — fix unused imports, tambahkan konfirmasi saat delete/deactivate user
+- [x] Tambahkan breadcrumb navigation di semua halaman dashboard
 
 #### Task 3: Fix ESLint Errors — Dashboard Pages
-- [ ] Fix `web/app/dashboard/forecast/page.tsx` — `no-explicit-any` dan `no-unused-vars`
-- [ ] Fix `web/app/dashboard/profile/page.tsx` — `no-explicit-any` dan ganti `<img>` ke `<Image />`
-- [ ] Fix `web/app/dashboard/settings/page.tsx` — unused `SettingsIcon`
-- [ ] Fix `web/app/dashboard/transactions/page.tsx` — unused `Badge`, `Calendar`, dan `no-explicit-any`
+- [x] Fix `web/app/dashboard/forecast/page.tsx` — `no-explicit-any` dan `no-unused-vars`
+- [x] Fix `web/app/dashboard/profile/page.tsx` — `no-explicit-any` dan ganti `<img>` ke `<Image />`
+- [x] Fix `web/app/dashboard/settings/page.tsx` — unused `SettingsIcon`
+- [x] Fix `web/app/dashboard/transactions/page.tsx` — unused `Badge`, `Calendar`, dan `no-explicit-any`
 
 #### Task 4: Web — Responsive Testing
-- [ ] Test semua halaman di viewport: 1920px (desktop), 1366px (laptop), 768px (tablet), 375px (mobile)
-- [ ] Fix layout breaks yang ditemukan
-- [ ] Dokumentasikan hasil testing di `WEB_RESPONSIVE_TEST.md`
+- [x] Test semua halaman di viewport: 1920px (desktop), 1366px (laptop), 768px (tablet), 375px (mobile)
+- [x] Fix layout breaks yang ditemukan
+- [x] Dokumentasikan hasil testing di `WEB_RESPONSIVE_TEST.md`
 
 ---
 
@@ -232,10 +232,9 @@ web/components/theme-provider.tsx   → no-unused-vars, setState-in-effect
 TOTAL: 36 tests | 36 passed | 0 failed
 ```
 
-### Frontend (ESLint) — ⚠️ 9 Errors, 10 Warnings
-- Errors mostly: `no-explicit-any`, `setState-in-effect`
-- Warnings mostly: `no-unused-vars`, `no-img-element`
-- **Distributed ke task Felix, Neisyah, dan Aqil**
+### Frontend (ESLint) — ✅ CLEAN
+- 0 Errors, 1 Warning (ignored unused internal variable)
+- **All task fixes completed (Dashboard & Settings)**
 
 ### Mobile (Flutter) — ✅ 8 Tests ALL PASS (by Hervin)
 - Widget tests updated: ThemeProvider, StatCard, GlassCard, ChatbotScreen, ChatbotProvider
