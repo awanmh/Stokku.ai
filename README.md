@@ -270,5 +270,4 @@ main ──────────────────────── (s
 
 ---
 
-> **Note**: Jika ada pertanyaan atau blocker, langsung hubungi Awan (Project Lead).
 > Pastikan commit message mengikuti format: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`
