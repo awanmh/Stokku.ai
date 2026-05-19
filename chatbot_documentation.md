@@ -13,6 +13,11 @@ Stokku AI berfungsi sebagai **asisten pintar (virtual assistant)** yang membantu
 - Melihat **ringkasan inventaris** secara instan.
 - Mengambil keputusan bisnis dengan lebih cepat dan efisien.
 
+### Integrasi API Saat Ini
+- **Web chatbot route:** `POST /api/chat` di Next.js web app.
+- **Backend AI placeholder:** `GET /api/v1/ai/forecast` dan `GET /api/v1/ai/replenishment` di backend Go.
+- **Mode mock dev:** aktifkan `USE_AI_MOCKS=1` untuk membalas chatbot tanpa Gemini key, cocok untuk smoke test dan demo lokal.
+
 ## 3. Desain dan Pendekatan UI/UX
 ### Prinsip Desain
 - **Non-intrusive:** Panel chat tidak menutupi seluruh layar; pengguna tetap bisa melihat konten di belakangnya.
@@ -89,6 +94,10 @@ Stokku AI berfungsi sebagai **asisten pintar (virtual assistant)** yang membantu
 | `terima kasih`, `makasih`, `thanks` | Respons terima kasih |
 | Lainnya | Pesan fallback dengan panduan kata kunci |
 
+### Contoh Mode Mock Dev
+- Request ke `POST /api/chat` dengan `USE_AI_MOCKS=1` akan mengembalikan jawaban deterministik berbasis intent.
+- Mode ini tetap mengambil konteks inventaris dari backend, sehingga cocok untuk testing alur UI tanpa dependency Gemini.
+
 ## 6. Hasil Pengujian (QA Testing)
 
 ### Pengujian Fungsional
@@ -126,8 +135,34 @@ Stokku AI berfungsi sebagai **asisten pintar (virtual assistant)** yang membantu
 | Backend AI belum tersedia untuk chatbot | Implementasi mock response dengan keyword matching |
 | Markdown rendering di chat bubble | Membuat fungsi `renderMessageText()` untuk bold text (`**text**`) |
 | FAB bisa tertutup oleh elemen lain | Menggunakan `z-50` fixed positioning |
+| Mobile butuh akses chat API | Tambahkan CORS di `POST /api/chat` dan preflight `OPTIONS` |
 
-## 8. Evaluasi & Saran Pengembangan Lanjutan
+## 8. Kontrak Response Chatbot
+
+### Success Response
+```json
+{
+     "success": true,
+     "data": {
+          "reply": "Ringkasan jawaban chatbot",
+          "model": "gemini-2.5-flash"
+     }
+}
+```
+
+### Error Response
+```json
+{
+     "success": false,
+     "message": "Pesan error yang bisa ditampilkan ke user"
+}
+```
+
+### Catatan Error Handling
+- Gunakan pesan ramah untuk network error, timeout, atau rate limit.
+- Jika Gemini tidak tersedia, aktifkan `USE_AI_MOCKS=1` untuk demo/testing lokal.
+
+## 9. Evaluasi & Saran Pengembangan Lanjutan
 
 ### Prioritas Tinggi
 1. **Chat History (Riwayat Percakapan):** Simpan percakapan ke database/localStorage agar pengguna bisa melanjutkan sesi chat yang terputus.
@@ -144,7 +179,7 @@ Stokku AI berfungsi sebagai **asisten pintar (virtual assistant)** yang membantu
 8. **Export Chat:** Kemampuan mengunduh riwayat percakapan dalam format PDF/CSV.
 9. **Multi-language Support:** Dukungan bahasa Inggris selain Bahasa Indonesia.
 
-## 9. Struktur File
+## 10. Struktur File
 
 ```
 web/

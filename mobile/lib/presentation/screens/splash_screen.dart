@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 import '../../../core/theme/app_colors.dart';
 import '../providers/auth_provider.dart';
 
@@ -16,6 +17,7 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _fadeAnim;
   late Animation<double> _scaleAnim;
+  Timer? _authTimer;
 
   @override
   void initState() {
@@ -35,22 +37,25 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _checkAuth() async {
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
+    _authTimer?.cancel();
+    _authTimer = Timer(const Duration(seconds: 2), () async {
+      if (!mounted) return;
 
-    final auth = context.read<AuthProvider>();
-    final isLoggedIn = await auth.tryAutoLogin();
+      final auth = context.read<AuthProvider>();
+      final isLoggedIn = await auth.tryAutoLogin();
 
-    if (!mounted) return;
-    if (isLoggedIn) {
-      Navigator.of(context).pushReplacementNamed('/home');
-    } else {
-      Navigator.of(context).pushReplacementNamed('/login');
-    }
+      if (!mounted) return;
+      if (isLoggedIn) {
+        Navigator.of(context).pushReplacementNamed('/home');
+      } else {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
+    });
   }
 
   @override
   void dispose() {
+    _authTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }

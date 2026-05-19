@@ -159,25 +159,25 @@ web/components/theme-provider.tsx   → no-unused-vars, setState-in-effect
 **Branch**: `feature/aqil-tasks`
 
 #### Task 1: Chatbot AI Enhancement
-- [ ] Share `GEMINI_API_KEY` ke tim (buat key baru via Google AI Studio jika perlu, jangan share personal key)
-- [ ] Test chatbot end-to-end: semua intent (inventory-summary, low-stock, dead-stock, replenishment, forecast, product-search, warehouse-search, general)
-- [ ] Fix `no-explicit-any` di `web/app/api/chat/route.ts` line 412 — ganti `any` ke proper type
-- [ ] Tambahkan error handling yang lebih user-friendly di chatbot UI (network error, timeout, rate limit)
+- [x] Share `GEMINI_API_KEY` ke tim (buat key baru via Google AI Studio jika perlu, jangan share personal key)
+- [x] Test chatbot end-to-end: semua intent (inventory-summary, low-stock, dead-stock, replenishment, forecast, product-search, warehouse-search, general)
+- [x] Fix `no-explicit-any` di `web/app/api/chat/route.ts` line 412 — ganti `any` ke proper type
+- [x] Tambahkan error handling yang lebih user-friendly di chatbot UI (network error, timeout, rate limit)
 
 #### Task 2: Chatbot — Mobile API Support
-- [ ] Pastikan endpoint `/api/chat` accessible dari mobile (CORS handling jika perlu)
-- [ ] Buat dokumentasi API chatbot di `CHATBOT_API.md` — request/response format, supported models, rate limits
-- [ ] Coordinate dengan Hervin untuk integrasi chatbot di mobile
+- [x] Pastikan endpoint `/api/chat` accessible dari mobile (CORS handling jika perlu)
+- [x] Buat dokumentasi API chatbot di `CHATBOT_API.md` — request/response format, supported models, rate limits
+- [x] Coordinate dengan Hervin untuk integrasi chatbot di mobile
 
 #### Task 3: AI Forecast Integration
-- [ ] Review dan test halaman AI Forecast (`web/app/dashboard/forecast/page.tsx`)
-- [ ] Jika Python AI service belum ready, buat mock response di backend untuk `/api/v1/ai/forecast` dan `/api/v1/ai/replenishment`
-- [ ] Pastikan chatbot bisa menjawab pertanyaan forecast dengan data yang akurat
+- [x] Review dan test halaman AI Forecast (`web/app/dashboard/forecast/page.tsx`)
+- [x] Jika Python AI service belum ready, buat mock response di backend untuk `/api/v1/ai/forecast` dan `/api/v1/ai/replenishment`
+- [x] Pastikan chatbot bisa menjawab pertanyaan forecast dengan data yang akurat
 
 #### Task 4: Testing & Documentation
-- [ ] Jalankan full integration test: Web chatbot → Backend API → Database
-- [ ] Update `chatbot_documentation.md` dengan hasil testing terbaru
-- [ ] Test model switching (Gemini Flash ↔ Gemma 3 27B) dan pastikan fallback behavior bekerja
+- [x] Jalankan full integration test: Web chatbot → Backend API → Database
+- [x] Update `chatbot_documentation.md` dengan hasil testing terbaru
+- [x] Test model switching (Gemini Flash ↔ Gemma 3 27B) dan pastikan fallback behavior bekerja
 
 ---
 
