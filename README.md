@@ -48,7 +48,7 @@
 ### Environment Variables yang Belum Setup Global
 | Variable | Lokasi | Status | PIC |
 |---|---|---|---|
-| `SMTP_EMAIL` + `SMTP_PASSWORD` | `backend/.env` | 🔴 Hanya di laptop Felix | Felix |
+| `SMTP_EMAIL` + `SMTP_PASSWORD` | `backend/.env` | ✅ Ada di `.env.shared.example` | Felix |
 | `GEMINI_API_KEY` | `web/.env` | 🔴 Hanya di laptop Aqil | Aqil |
 | `GEMINI_DEFAULT_MODEL` | `web/.env` | ✅ Default: `gemini-2.5-flash` | — |
 
@@ -59,9 +59,9 @@ web/app/dashboard/forecast/page.tsx → no-explicit-any, no-unused-vars
 web/app/dashboard/profile/page.tsx  → no-explicit-any, no-img-element
 web/app/dashboard/settings/page.tsx → no-unused-vars
 web/app/dashboard/transactions/page.tsx → no-unused-vars, no-explicit-any
-web/app/login/page.tsx              → setState-in-effect
-web/components/layout/header.tsx    → no-unused-vars
-web/components/theme-provider.tsx   → no-unused-vars, setState-in-effect
+web/app/login/page.tsx              → ✅ Fixed
+web/components/layout/header.tsx    → ✅ Fixed
+web/components/theme-provider.tsx   → ✅ Fixed
 ```
 
 ### Mobile Test Issue
@@ -77,23 +77,23 @@ web/components/theme-provider.tsx   → no-unused-vars, setState-in-effect
 **Branch**: `feature/felix-tasks`
 
 #### Task 1: Setup & Dokumentasi OTP Email
-- [ ] Buat `.env.shared.example` file yang berisi semua env variables yang dibutuhkan tim (SMTP + Gemini) dengan instruksi jelas
-- [ ] Dokumentasikan cara setup Gmail App Password untuk SMTP di `SETUP.md`
-- [ ] Pastikan fitur OTP login berfungsi end-to-end (register → kirim OTP → verify → login)
+- [x] Buat `.env.shared.example` file yang berisi semua env variables yang dibutuhkan tim (SMTP + Gemini) dengan instruksi jelas
+- [x] Dokumentasikan cara setup Gmail App Password untuk SMTP di `SETUP.md`
+- [x] Pastikan fitur OTP login berfungsi end-to-end (register → kirim OTP → verify → login)
 
 #### Task 2: Fix ESLint Errors — Login & Theme
-- [ ] Fix `web/app/login/page.tsx` line 361 — `setState-in-effect` (gunakan `useSyncExternalStore` atau lazy initial state)
-- [ ] Fix `web/components/theme-provider.tsx` line 31 — `setState-in-effect` (pindahkan ke initializer atau `useSyncExternalStore`)
-- [ ] Fix `web/components/layout/header.tsx` — unused `theme` variable
+- [x] Fix `web/app/login/page.tsx` line 361 — `setState-in-effect` (gunakan `useSyncExternalStore` atau lazy initial state)
+- [x] Fix `web/components/theme-provider.tsx` line 31 — `setState-in-effect` (pindahkan ke initializer atau `useSyncExternalStore`)
+- [x] Fix `web/components/layout/header.tsx` — unused `theme` variable
 
 #### Task 3: Testing — Backend OTP Flow
-- [ ] Tambahkan unit test untuk OTP usecase di `backend/internal/usecase/` (minimal: send OTP, verify OTP success, verify OTP expired, verify OTP wrong code)
-- [ ] Jalankan `go test ./... -v` dan pastikan semua PASS
+- [x] Tambahkan unit test untuk OTP usecase di `backend/internal/usecase/` (minimal: send OTP, verify OTP success, verify OTP expired, verify OTP wrong code)
+- [x] Jalankan `go test ./... -v` dan pastikan semua PASS
 
 #### Task 4: UI/UX Polish — Login Page
-- [ ] Redesign login page agar tidak terlihat "AI-generated" — tambahkan ilustrasi/branding Stokku, animasi yang halus
-- [ ] Pastikan form validation user-friendly (inline errors, loading states)
-- [ ] Test responsive di mobile viewport (375px, 414px)
+- [x] Redesign login page agar tidak terlihat "AI-generated" — tambahkan ilustrasi/branding Stokku, animasi yang halus
+- [x] Pastikan form validation user-friendly (inline errors, loading states)
+- [x] Test responsive di mobile viewport (375px, 414px)
 
 ---
 
