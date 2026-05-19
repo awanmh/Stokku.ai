@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
@@ -43,12 +44,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Greeting
+              // Greeting — animated
               Text('Halo, ${auth.user?.name ?? 'User'} 👋',
-                  style: Theme.of(context).textTheme.headlineMedium),
+                  style: Theme.of(context).textTheme.headlineMedium)
+                  .animate()
+                  .fadeIn(duration: 400.ms)
+                  .slideX(begin: -0.05, end: 0, duration: 400.ms),
               const SizedBox(height: 4),
               Text(DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(DateTime.now()),
-                  style: Theme.of(context).textTheme.bodySmall),
+                  style: Theme.of(context).textTheme.bodySmall)
+                  .animate()
+                  .fadeIn(duration: 400.ms, delay: 100.ms),
               const SizedBox(height: 24),
 
               // Section label
@@ -68,16 +74,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.3,
                   children: [
                     StatCard(title: 'TOTAL PRODUK', value: '${d.stats!.totalProducts}',
-                        icon: Icons.category_rounded, iconColor: AppColors.cyan),
+                        icon: Icons.category_rounded, iconColor: AppColors.cyan)
+                        .animate().fadeIn(duration: 400.ms, delay: 100.ms)
+                        .slideY(begin: 0.1, end: 0, duration: 400.ms, delay: 100.ms),
                     StatCard(title: 'GUDANG AKTIF', value: '${d.stats!.totalWarehouses}',
                         icon: Icons.warehouse_rounded, iconColor: AppColors.indigo,
-                        iconBgColor: AppColors.indigo.withOpacity(0.1)),
+                        iconBgColor: AppColors.indigo.withOpacity(0.1))
+                        .animate().fadeIn(duration: 400.ms, delay: 200.ms)
+                        .slideY(begin: 0.1, end: 0, duration: 400.ms, delay: 200.ms),
                     StatCard(title: 'NILAI ASET', value: _fmt(d.stats!.totalStockValue),
                         icon: Icons.account_balance_wallet_rounded,
-                        iconColor: AppColors.success, iconBgColor: AppColors.successBg),
+                        iconColor: AppColors.success, iconBgColor: AppColors.successBg)
+                        .animate().fadeIn(duration: 400.ms, delay: 300.ms)
+                        .slideY(begin: 0.1, end: 0, duration: 400.ms, delay: 300.ms),
                     StatCard(title: 'TRANSAKSI HARI INI', value: '${d.stats!.todayTxCount}',
                         icon: Icons.swap_horiz_rounded, iconColor: AppColors.primary,
-                        iconBgColor: AppColors.infoBg),
+                        iconBgColor: AppColors.infoBg)
+                        .animate().fadeIn(duration: 400.ms, delay: 400.ms)
+                        .slideY(begin: 0.1, end: 0, duration: 400.ms, delay: 400.ms),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -85,10 +99,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Alerts
                 if (d.stats!.lowStockCount > 0) _alertCard(
                   'Stok Rendah', '${d.stats!.lowStockCount} produk perlu restock',
-                  Icons.warning_amber_rounded, AppColors.warning, AppColors.warningBg, dark),
+                  Icons.warning_amber_rounded, AppColors.warning, AppColors.warningBg, dark)
+                    .animate().fadeIn(duration: 400.ms, delay: 500.ms)
+                    .slideX(begin: -0.05, end: 0, duration: 400.ms, delay: 500.ms),
                 if (d.stats!.deadStockCount > 0) _alertCard(
                   'Dead Stock', '${d.stats!.deadStockCount} produk tidak bergerak',
-                  Icons.dangerous_outlined, AppColors.error, AppColors.errorBg, dark),
+                  Icons.dangerous_outlined, AppColors.error, AppColors.errorBg, dark)
+                    .animate().fadeIn(duration: 400.ms, delay: 600.ms)
+                    .slideX(begin: -0.05, end: 0, duration: 400.ms, delay: 600.ms),
 
                 // Low stock list
                 if (d.lowStockAlerts.isNotEmpty) ...[
@@ -96,29 +114,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Text('PRODUK STOK RENDAH', style: TextStyle(fontSize: 10,
                       fontWeight: FontWeight.w700, letterSpacing: 1.5, color: muted)),
                   const SizedBox(height: 12),
-                  ...d.lowStockAlerts.take(5).map((s) => GlassCard(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(children: [
-                      Container(width: 40, height: 40,
-                        decoration: BoxDecoration(color: AppColors.warningBg,
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Center(child: Text('${s.quantity}',
-                            style: const TextStyle(color: AppColors.warning,
-                                fontWeight: FontWeight.w700, fontSize: 14)))),
-                      const SizedBox(width: 12),
-                      Expanded(child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(s.productName, style: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 13)),
-                          Text('${s.productSku} • ${s.warehouseName}',
-                              style: TextStyle(fontSize: 11, color: muted)),
-                        ])),
-                      Text('Min: ${s.minStock}', style: const TextStyle(
-                          fontSize: 11, color: AppColors.warning, fontWeight: FontWeight.w600)),
-                    ]),
-                  )),
+                  ...d.lowStockAlerts.take(5).toList().asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final s = entry.value;
+                    return GlassCard(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(children: [
+                        Container(width: 40, height: 40,
+                          decoration: BoxDecoration(color: AppColors.warningBg,
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Center(child: Text('${s.quantity}',
+                              style: const TextStyle(color: AppColors.warning,
+                                  fontWeight: FontWeight.w700, fontSize: 14)))),
+                        const SizedBox(width: 12),
+                        Expanded(child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(s.productName, style: const TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 13)),
+                            Text('${s.productSku} • ${s.warehouseName}',
+                                style: TextStyle(fontSize: 11, color: muted)),
+                          ])),
+                        Text('Min: ${s.minStock}', style: const TextStyle(
+                            fontSize: 11, color: AppColors.warning, fontWeight: FontWeight.w600)),
+                      ]),
+                    ).animate()
+                        .fadeIn(duration: 300.ms, delay: Duration(milliseconds: 700 + idx * 80))
+                        .slideX(begin: 0.05, end: 0, duration: 300.ms, delay: Duration(milliseconds: 700 + idx * 80));
+                  }),
                 ],
+              ] else ...[
+                // Empty state
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(40),
+                    child: Column(
+                      children: [
+                        Icon(Icons.dashboard_outlined, size: 48, color: muted),
+                        const SizedBox(height: 12),
+                        Text('Belum ada data dasbor',
+                            style: TextStyle(color: muted, fontSize: 14)),
+                        const SizedBox(height: 4),
+                        Text('Tarik ke bawah untuk memuat ulang',
+                            style: TextStyle(color: muted, fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ],
           ),

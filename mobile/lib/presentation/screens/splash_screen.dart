@@ -96,7 +96,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                'Intelligent Inventory Management',
+                'Manajemen Inventaris Cerdas',
                 style: TextStyle(
                   fontSize: 13,
                   color: AppColors.textMuted,

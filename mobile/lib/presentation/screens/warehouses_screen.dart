@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/warehouse_provider.dart';
@@ -47,8 +48,19 @@ class _WarehousesScreenState extends State<WarehousesScreen> {
                             CircularProgressIndicator(color: AppColors.cyan))
                     : wh.warehouses.isEmpty
                         ? Center(
-                            child: Text('Tidak ada gudang',
-                                style: TextStyle(color: muted)))
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.warehouse_outlined, size: 56, color: muted),
+                                const SizedBox(height: 12),
+                                Text('Tidak ada gudang',
+                                    style: TextStyle(color: muted, fontSize: 15, fontWeight: FontWeight.w500)),
+                                const SizedBox(height: 4),
+                                Text('Tarik ke bawah untuk memuat ulang',
+                                    style: TextStyle(color: muted, fontSize: 12)),
+                              ],
+                            ),
+                          )
                         : ListView.builder(
                             itemCount: wh.warehouses.length,
                             itemBuilder: (ctx, i) {
@@ -119,7 +131,10 @@ class _WarehousesScreenState extends State<WarehousesScreen> {
                                     ),
                                   ],
                                 ),
-                              );
+                              )
+                                  .animate()
+                                  .fadeIn(duration: 300.ms, delay: Duration(milliseconds: i * 60))
+                                  .slideX(begin: 0.05, end: 0, duration: 300.ms, delay: Duration(milliseconds: i * 60));
                             },
                           ),
               ),

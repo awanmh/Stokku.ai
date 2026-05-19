@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
@@ -82,8 +83,19 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             else if (tx.transactions.isEmpty)
               SliverFillRemaining(
                 child: Center(
-                    child: Text('Belum ada transaksi',
-                        style: TextStyle(color: muted))),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.swap_horiz_rounded, size: 56, color: muted),
+                      const SizedBox(height: 12),
+                      Text('Belum ada transaksi',
+                          style: TextStyle(color: muted, fontSize: 15, fontWeight: FontWeight.w500)),
+                      const SizedBox(height: 4),
+                      Text('Transaksi akan muncul setelah scan produk',
+                          style: TextStyle(color: muted, fontSize: 12)),
+                    ],
+                  ),
+                ),
               )
             else
               SliverPadding(
@@ -120,7 +132,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  t.productName ?? 'Unknown Product',
+                                  t.productName ?? 'Produk Tidak Diketahui',
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13),
@@ -132,7 +144,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                       TextStyle(fontSize: 11, color: muted),
                                 ),
                                 if (!t.synced)
-                                  const Text('⏳ Menunggu sync',
+                                  const Text('⏳ Menunggu sinkronisasi',
                                       style: TextStyle(
                                           fontSize: 10,
                                           color: AppColors.warning)),
@@ -153,14 +165,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                 ),
                               ),
                               Text(
-                                isIn ? 'Stock In' : 'Stock Out',
+                                isIn ? 'Stok Masuk' : 'Stok Keluar',
                                 style: TextStyle(fontSize: 10, color: muted),
                               ),
                             ],
                           ),
                         ],
                       ),
-                    );
+                    )
+                        .animate()
+                        .fadeIn(duration: 300.ms, delay: Duration(milliseconds: i * 60))
+                        .slideX(begin: 0.05, end: 0, duration: 300.ms, delay: Duration(milliseconds: i * 60));
                   },
                 ),
               ),
