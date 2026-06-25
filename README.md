@@ -1,281 +1,147 @@
-# stokku.ai — Intelligent Supply Chain & Inventory Ecosystem (Develop Branch)
+<div align="center">
+  <h1>🚀 Stokku.ai</h1>
+  <p><b>Intelligent Supply Chain & Inventory Ecosystem</b></p>
+  <p>Sistem manajemen inventaris tingkat <i>enterprise</i> yang memadukan keandalan arsitektur modern dengan kecerdasan buatan (Generative AI), dirancang untuk efisiensi, skalabilitas, dan pengalaman pengguna premium tanpa kompromi.</p>
 
-> **Branch ini berisi progress terbaru dan task assignment untuk setiap anggota tim.**
-> Branch `main` tetap berisi README asli project.
-
----
-
-## 📋 Status Project — 19 Mei 2026
-
-### ✅ Yang Sudah Selesai (oleh Awan)
-
-#### Merge & Integrasi (19 Mei 2026)
-- **Merged `feature/chatbot` → `main`**: Integrasi Gemini AI chatbot API (`web/app/api/chat/route.ts`) dengan support multi-model (Gemini 2.5 Flash + Gemma 3 27B), intent detection, inventory context injection dari backend, dan fallback behavior.
-- **Merged `mobile-building` → `main`**: Update mobile integration dengan local IP configuration dan pubspec.lock sync.
-- **Conflict Resolution**: README.md (keep main original) dan FloatingChatbot.tsx (ambil versi chatbot baru dengan AI integration).
-
-#### Backend (Golang Fiber)
-- ✅ Clean Architecture (domain → repository → usecase → delivery)
-- ✅ REST API lengkap: Auth (JWT + RBAC), Products, Warehouses, Inventory, Transactions, Dashboard Stats
-- ✅ **36 unit tests — ALL PASS** (auth, product, transaction, warehouse usecases)
-- ✅ OTP Authentication via Email (branch `feature/otp-login` — by Felix)
-- ✅ Redis Distributed Lock untuk transaction safety
-- ✅ PostgreSQL + migrations
-- ✅ Docker setup
-
-#### Frontend Web (Next.js 15 + Tailwind CSS v4)
-- ✅ Enterprise-grade dashboard UI (Stripe/Linear inspired)
-- ✅ Dark/Light mode theming dengan CSS Variables
-- ✅ Pages: Dashboard Overview, Products, Warehouses, Inventory, Transactions, Settings, Profile
-- ✅ AI Forecast page (placeholder — needs Python service)
-- ✅ **Floating Chatbot (Stokku AI)** — sekarang terhubung ke Gemini API secara real-time
-- ✅ Profile picture upload & change password UI
-- ⚠️ ESLint: 9 errors (mostly `no-explicit-any` dan `setState-in-effect`), 10 warnings — **perlu diperbaiki**
-
-#### Mobile (Flutter)
-- ✅ Full app structure: Splash → Login → Home → Dashboard → Products → Warehouses → Inventory → Transactions → Scanner → Profile
-- ✅ Provider state management
-- ✅ Offline-first architecture (Hive + connectivity service)
-- ✅ Barcode scanner integration
-- ✅ Glassmorphism theme (enhanced dengan glow shadows + press feedback)
-- ✅ **Widget tests — 8 tests ALL PASS** (ThemeProvider, StatCard, GlassCard, ChatbotScreen, ChatbotProvider) — by Hervin
-- ✅ **Chatbot Stokku AI di mobile** — FAB global + full chat screen terhubung Gemini API — by Hervin
-- ✅ **UI/UX Overhaul** — micro-animations (flutter_animate), Bahasa Indonesia konsisten, empty states — by Hervin
-- ✅ **MOBILE_ISSUES.md** — dokumentasi integration testing lengkap — by Hervin
+  [![Golang](https://img.shields.io/badge/Go-1.24-00ADD8?style=flat-square&logo=go)](https://go.dev/)
+  [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
+  [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=flat-square&logo=flutter)](https://flutter.dev/)
+  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql)](https://postgresql.org/)
+  [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://docker.com/)
+  [![Gemini](https://img.shields.io/badge/AI-Google_Gemini-8E75B2?style=flat-square&logo=google)](https://ai.google.dev/)
+</div>
 
 ---
 
-## ⚠️ Known Issues & Catatan Penting
+## 🌟 Memperkenalkan Stokku.ai
 
-### Environment Variables yang Belum Setup Global
-| Variable | Lokasi | Status | PIC |
-|---|---|---|---|
-| `SMTP_EMAIL` + `SMTP_PASSWORD` | `backend/.env` | 🔴 Hanya di laptop Felix | Felix |
-| `GEMINI_API_KEY` | `web/.env` | 🔴 Hanya di laptop Aqil | Aqil |
-| `GEMINI_DEFAULT_MODEL` | `web/.env` | ✅ Default: `gemini-2.5-flash` | — |
+**Stokku.ai** bukanlah sekadar aplikasi pencatatan stok biasa. Ini adalah sebuah ekosistem holistik yang dirancang untuk memberikan kendali penuh atas rantai pasok Anda dengan antarmuka yang elegan dan asisten AI terintegrasi. 
 
-### ESLint Errors yang Harus Diperbaiki
-```
-web/app/api/chat/route.ts         → no-explicit-any (line 412)
-web/app/dashboard/forecast/page.tsx → no-explicit-any, no-unused-vars
-web/app/dashboard/profile/page.tsx  → no-explicit-any, no-img-element
-web/app/dashboard/settings/page.tsx → no-unused-vars
-web/app/dashboard/transactions/page.tsx → no-unused-vars, no-explicit-any
-web/app/login/page.tsx              → setState-in-effect
-web/components/layout/header.tsx    → no-unused-vars
-web/components/theme-provider.tsx   → no-unused-vars, setState-in-effect
-```
+Dibangun dengan filosofi bahwa *"setiap piksel harus memiliki makna"*, Stokku.ai menawarkan pengalaman yang responsif, visualisasi data yang mewah, serta keandalan performa *backend* yang mampu menangani transaksi tingkat tinggi dengan mekanisme *Distributed Locking*.
 
-### ~~Mobile Test Issue~~ ✅ FIXED by Hervin
-- ~~`mobile/test/widget_test.dart` masih menggunakan default Flutter counter test~~ → **Sudah diganti dengan 8 widget tests yang relevan (ALL PASS)**.
+### ✨ Fitur Utama
+
+- 🧠 **Asisten Stokku AI (Real-time Generative AI)**  
+  Mengintegrasikan Google Gemini 2.5 Flash / Gemma 3. Berinteraksi dengan inventaris Anda melalui bahasa natural. Tanyakan *“Berapa stok produk yang menipis?”* atau *“Beri saya ringkasan transaksi hari ini”*, dan AI akan menjawab berdasarkan konteks data langsung dari *database* Anda.
+  
+- 📱 **Ekosistem Lintas Platform (Web & Mobile)**  
+  Kelola gudang Anda melalui *Dashboard Web* yang elegan terinspirasi dari standar desain Arc dan Linear, atau pantau operasional dari lapangan menggunakan *Aplikasi Mobile* berkinerja tinggi yang dilengkapi *Barcode Scanner* dan arsitektur *Offline-first*.
+
+- 📊 **Visualisasi Data Premium & Laporan Otomatis**  
+  Analisis pergerakan produk dengan grafik metrik yang interaktif. Cetak laporan operasional secara instan dalam format PDF yang rapi atau lembar kerja Excel langsung dari perangkat Anda.
+
+- 🛡️ **Keamanan Kelas Enterprise (RBAC & OTP)**  
+  Dilengkapi autentikasi melalui surel OTP (One-Time Password) dan *Role-Based Access Control* (RBAC). Hak akses sistem (Admin, Manajer, Staf) direstriksi secara ketat mulai dari level *middleware routing API* hingga perenderan *UI Frontend*.
 
 ---
 
-## 🎯 Task Assignment Per Anggota
+## 🏗️ Arsitektur Sistem
 
----
+Stokku.ai memanfaatkan **Clean Architecture** pada *backend* untuk memastikan skalabilitas dan isolasi bisnis logik.
 
-### 👤 Felix Yohanes Sangapta Simamora ✅ ALL TASKS COMPLETE
-**Branch**: `feature/felix-tasks` — **PUSHED & READY FOR PR**
+```mermaid
+graph TD
+    %% Styling
+    classDef client fill:#000,stroke:#333,stroke-width:2px,color:#fff,rx:5px,ry:5px;
+    classDef proxy fill:#2496ED,stroke:#fff,stroke-width:2px,color:#fff,rx:5px,ry:5px;
+    classDef backend fill:#00ADD8,stroke:#fff,stroke-width:2px,color:#fff,rx:5px,ry:5px;
+    classDef db fill:#4169E1,stroke:#fff,stroke-width:2px,color:#fff,rx:5px,ry:5px;
+    classDef cache fill:#DC382D,stroke:#fff,stroke-width:2px,color:#fff,rx:5px,ry:5px;
+    classDef ai fill:#8E75B2,stroke:#fff,stroke-width:2px,color:#fff,rx:5px,ry:5px;
 
-#### Task 1: Setup & Dokumentasi OTP Email
-- [x] Buat `.env.shared.example` file yang berisi semua env variables yang dibutuhkan tim (SMTP + Gemini) dengan instruksi jelas
-- [x] Dokumentasikan cara setup Gmail App Password untuk SMTP di `SETUP.md`
-- [x] Pastikan fitur OTP login berfungsi end-to-end (register → kirim OTP → verify → login)
+    %% Nodes
+    Mobile[📱 Flutter Mobile App<br><i>(Offline-First Hive)</i>]:::client
+    Web[💻 Next.js Web Dashboard<br><i>(React 19, Tailwind v4)</i>]:::client
+    Proxy[🌐 Next.js API Proxy / SSR]:::proxy
+    Backend[⚙️ Golang Fiber API<br><i>(Clean Architecture)</i>]:::backend
+    Postgres[(🗄️ PostgreSQL 16<br><i>Primary DB</i>)]:::db
+    Redis[(⚡ Redis 7<br><i>Cache & Mutex Lock</i>)]:::cache
+    Gemini{🤖 Google Gemini API}:::ai
 
-#### Task 2: Fix ESLint Errors — Login & Theme
-- [x] Fix `web/app/login/page.tsx` line 361 — `setState-in-effect` (gunakan `useSyncExternalStore` atau lazy initial state)
-- [x] Fix `web/components/theme-provider.tsx` line 31 — `setState-in-effect` (pindahkan ke initializer atau `useSyncExternalStore`)
-- [x] Fix `web/components/layout/header.tsx` — unused `theme` variable
-
-#### Task 3: Testing — Backend OTP Flow
-- [x] Tambahkan unit test untuk OTP usecase di `backend/internal/usecase/` (minimal: send OTP, verify OTP success, verify OTP expired, verify OTP wrong code)
-- [x] Jalankan `go test ./... -v` dan pastikan semua PASS
-
-#### Task 4: UI/UX Polish — Login Page
-- [x] Redesign login page agar tidak terlihat "AI-generated" — tambahkan ilustrasi/branding Stokku, animasi yang halus
-- [x] Pastikan form validation user-friendly (inline errors, loading states)
-- [x] Test responsive di mobile viewport (375px, 414px)
-
----
-
-### 👤 Hervin Dwicahya Kusuma ✅ ALL TASKS COMPLETE
-**Branch**: `feature/hervin-tasks` — **PUSHED & READY FOR PR**
-
-#### Task 1: Mobile — Chatbot Integration ✅
-- [x] Buat `mobile/lib/presentation/screens/chatbot_screen.dart` — full chat UI dengan glassmorphism bubbles
-- [x] Buat `mobile/lib/presentation/providers/chatbot_provider.dart` — Dio HTTP ke Gemini API via web proxy
-- [x] Connect ke endpoint `POST /api/chat` (melalui web proxy Next.js)
-- [x] Implementasi UI: bubble chat, typing indicator (bouncing dots), quick replies, model selector (Flash/Gemma)
-- [x] Pastikan chatbot bisa diakses dari semua screen (global gradient FAB di `HomeScreen`)
-
-#### Task 2: Mobile — UI/UX Overhaul ✅
-- [x] Review semua screen mobile — enhanced dengan micro-animations dan empty states
-- [x] Perbaiki glassmorphism — GlassCard dengan glow shadows + press feedback, StatCard dengan gradient accent
-- [x] Tambahkan micro-animations — flutter_animate stagger pada semua list, AnimatedSwitcher tab transitions, login form slideUp
-- [x] Pastikan semua text Bahasa Indonesia konsisten — Dasbor, Pemindai, Stok Masuk/Keluar, Rendah/Aman, Kata Sandi, Manajemen Inventaris Cerdas
-
-#### Task 3: Mobile — Widget Tests ✅ (8 tests ALL PASS)
-- [x] Update `mobile/test/widget_test.dart` — ganti dari counter test ke tests relevan
-- [x] 8 widget tests:
-  - ThemeProvider defaults to dark mode
-  - ThemeProvider toggles between dark and light
-  - StatCard displays title, value, and icon
-  - StatCard shows subtitle when provided
-  - GlassCard renders its child widget
-  - GlassCard fires onTap callback
-  - ChatbotScreen shows quick replies and input field
-  - ChatbotProvider manages chat state correctly
-
-#### Task 4: Mobile — Backend Integration Testing ✅
-- [x] Test semua endpoint dari mobile app — dokumentasi lengkap di `MOBILE_ISSUES.md`
-- [x] Verifikasi: Login → Dashboard → Products → Warehouses → Inventory → Transactions → Scanner → Chatbot
-- [x] Dokumentasikan 5 known issues dengan severity, workarounds, dan solusi jangka panjang
-
----
-
-### 👤 Neisyah Nurul Alyazara ✅ ALL TASKS COMPLETE
-**Branch**: `feature/neisyah-tasks` — **PUSHED & READY FOR PR**
-
-#### Task 1: Web UI/UX — Dashboard & Tables
-- [x] Redesign Dashboard Overview page — tambahkan chart yang lebih informatif, animasi counter-up untuk stats
-- [x] Perbaiki tabel di semua halaman (Products, Inventory, Transactions, Warehouses) — pastikan sorting, pagination, dan search konsisten
-- [x] Tambahkan empty states yang menarik (ilustrasi + CTA) saat data kosong
-- [x] Review semua modal forms — pastikan validasi inline, loading state, dan success feedback ada
-
-#### Task 2: Web UI/UX — Profile & Settings
-- [x] Polish halaman Profile — fix `<img>` element (ganti ke `next/image`), tambahkan avatar upload preview
-- [x] Polish halaman Settings — fix unused imports, tambahkan konfirmasi saat delete/deactivate user
-- [x] Tambahkan breadcrumb navigation di semua halaman dashboard
-
-#### Task 3: Fix ESLint Errors — Dashboard Pages
-- [x] Fix `web/app/dashboard/forecast/page.tsx` — `no-explicit-any` dan `no-unused-vars`
-- [x] Fix `web/app/dashboard/profile/page.tsx` — `no-explicit-any` dan ganti `<img>` ke `<Image />`
-- [x] Fix `web/app/dashboard/settings/page.tsx` — unused `SettingsIcon`
-- [x] Fix `web/app/dashboard/transactions/page.tsx` — unused `Badge`, `Calendar`, dan `no-explicit-any`
-
-#### Task 4: Web — Responsive Testing
-- [x] Test semua halaman di viewport: 1920px (desktop), 1366px (laptop), 768px (tablet), 375px (mobile)
-- [x] Fix layout breaks yang ditemukan
-- [x] Dokumentasikan hasil testing di `WEB_RESPONSIVE_TEST.md`
-
----
-
-### 👤 Muhammad Aqil Mahdi Syarif ✅ ALL TASKS COMPLETE
-**Branch**: `feature/aqil-tasks`
-
-#### Task 1: Chatbot AI Enhancement
-- [x] Share `GEMINI_API_KEY` ke tim (buat key baru via Google AI Studio jika perlu, jangan share personal key)
-- [x] Test chatbot end-to-end: semua intent (inventory-summary, low-stock, dead-stock, replenishment, forecast, product-search, warehouse-search, general)
-- [x] Fix `no-explicit-any` di `web/app/api/chat/route.ts` line 412 — ganti `any` ke proper type
-- [x] Tambahkan error handling yang lebih user-friendly di chatbot UI (network error, timeout, rate limit)
-
-#### Task 2: Chatbot — Mobile API Support
-- [x] Pastikan endpoint `/api/chat` accessible dari mobile (CORS handling jika perlu)
-- [x] Buat dokumentasi API chatbot di `CHATBOT_API.md` — request/response format, supported models, rate limits
-- [x] Coordinate dengan Hervin untuk integrasi chatbot di mobile
-
-#### Task 3: AI Forecast Integration
-- [x] Review dan test halaman AI Forecast (`web/app/dashboard/forecast/page.tsx`)
-- [x] Jika Python AI service belum ready, buat mock response di backend untuk `/api/v1/ai/forecast` dan `/api/v1/ai/replenishment`
-- [x] Pastikan chatbot bisa menjawab pertanyaan forecast dengan data yang akurat
-
-#### Task 4: Testing & Documentation
-- [x] Jalankan full integration test: Web chatbot → Backend API → Database
-- [x] Update `chatbot_documentation.md` dengan hasil testing terbaru
-- [x] Test model switching (Gemini Flash ↔ Gemma 3 27B) dan pastikan fallback behavior bekerja
-
----
-
-## 📊 Test Results Summary (19 Mei 2026)
-
-### Backend (Go) — ✅ ALL PASS
-```
-=== RUN   TestLogin_Success                --- PASS
-=== RUN   TestLogin_WrongPassword           --- PASS
-=== RUN   TestLogin_UserNotFound            --- PASS
-=== RUN   TestLogin_DeactivatedUser         --- PASS
-=== RUN   TestRegister_Success              --- PASS
-=== RUN   TestRegister_DuplicateEmail       --- PASS
-=== RUN   TestRegister_DefaultRole          --- PASS
-=== RUN   TestGetProfile_Success            --- PASS
-=== RUN   TestGetProfile_NotFound           --- PASS
-=== RUN   TestCreateProduct_Success         --- PASS
-=== RUN   TestCreateProduct_DuplicateSKU    --- PASS
-=== RUN   TestCreateProduct_RepoError       --- PASS
-=== RUN   TestGetProductByID_Success        --- PASS
-=== RUN   TestGetProductByID_NotFound       --- PASS
-=== RUN   TestGetAllProducts_Success        --- PASS
-=== RUN   TestGetAllProducts_DefaultLimit   --- PASS
-=== RUN   TestUpdateProduct_Success         --- PASS
-=== RUN   TestUpdateProduct_NotFound        --- PASS
-=== RUN   TestUpdateProduct_PartialUpdate   --- PASS
-=== RUN   TestDeleteProduct_Success         --- PASS
-=== RUN   TestDeleteProduct_NotFound        --- PASS
-=== RUN   TestStockIn_Success               --- PASS
-=== RUN   TestStockOut_Success              --- PASS
-=== RUN   TestStockOut_InsufficientStock    --- PASS
-=== RUN   TestStockOut_LockConflict         --- PASS
-=== RUN   TestStockIn_LockError             --- PASS
-=== RUN   TestCreateWarehouse_Success       --- PASS
-=== RUN   TestCreateWarehouse_RepoError     --- PASS
-=== RUN   TestGetWarehouseByID_Success      --- PASS
-=== RUN   TestGetWarehouseByID_NotFound     --- PASS
-=== RUN   TestGetAllWarehouses_Success      --- PASS
-=== RUN   TestGetAllWarehouses_DefaultLimit --- PASS
-=== RUN   TestUpdateWarehouse_Success       --- PASS
-=== RUN   TestUpdateWarehouse_NotFound      --- PASS
-=== RUN   TestUpdateWarehouse_DeactivateWarehouse --- PASS
-=== RUN   TestDeleteWarehouse_Success       --- PASS
-=== RUN   TestDeleteWarehouse_NotFound      --- PASS
-
-TOTAL: 36 tests | 36 passed | 0 failed
+    %% Connections
+    Mobile -->|REST API| Backend
+    Mobile -->|REST API| Proxy
+    Web -->|Internal Calls| Proxy
+    Proxy -->|Rewrites /api/chat| Gemini
+    Proxy -->|Rewrites /api/v1/*| Backend
+    Backend -->|Read/Write| Postgres
+    Backend -->|Distributed Lock / OTP| Redis
 ```
 
-### Frontend (ESLint) — ✅ CLEAN
-- 0 Errors, 1 Warning (ignored unused internal variable)
-- **All task fixes completed (Dashboard & Settings)**
+### 🧩 Tech Stack
 
-### Mobile (Flutter) — ✅ 8 Tests ALL PASS (by Hervin)
-- Widget tests updated: ThemeProvider, StatCard, GlassCard, ChatbotScreen, ChatbotProvider
-
-### API Testing (Postman) — ✅ ADDED
-- Ditambahkan `Stokku_API.postman_collection.json` untuk uji coba API backend secara mandiri (Auth, Products, Warehouses, Dashboard).
-
----
-
-## 🔀 Branch Strategy
-
-```
-main ──────────────────────── (stable, README asli)
-  └── develop ─────────────── (branch ini, task tracking)
-       ├── feature/felix-tasks
-       ├── feature/hervin-tasks
-       ├── feature/neisyah-tasks
-       └── feature/aqil-tasks
-```
-
-### Workflow
-1. Setiap anggota **checkout dari `develop`** → buat branch masing-masing
-2. Kerjakan task, commit dengan message yang jelas
-3. Push ke branch masing-masing
-4. Buat **Pull Request ke `develop`**
-5. Setelah semua task selesai dan di-review, **merge `develop` → `main`**
-
----
-
-## 🕐 Timeline
-
-| Milestone | Target | PIC |
+| Domain | Teknologi | Deskripsi |
 |---|---|---|
-| Environment setup & key sharing | 20 Mei 2026 | Felix, Aqil |
-| ESLint fixes complete | 21 Mei 2026 | Felix, Neisyah, Aqil |
-| Mobile chatbot MVP | 23 Mei 2026 | Hervin, Aqil |
-| UI/UX polish complete | 25 Mei 2026 | Neisyah, Hervin |
-| Mobile integration tested | 25 Mei 2026 | Hervin |
-| All tests passing | 26 Mei 2026 | ALL |
-| Final merge to main | 26 Mei 2026 | Awan |
+| **Backend** | Go 1.24, Fiber v2, pgx | Menggunakan *Clean Architecture* (Domain/Repo/Usecase/Delivery). Cepat, memori efisien. |
+| **Frontend** | Next.js 15, Tailwind v4, Recharts | Arsitektur *App Router*, UI/UX premium *glassmorphism*, responsif. |
+| **Mobile** | Flutter, Provider, Hive, Dio | Performa *native-like*, *Barcode Scanner*, manajemen state *Provider*. |
+| **Database** | PostgreSQL 16 | Relasional, kuat, menjamin integritas referensial. |
+| **Cache/Lock** | Redis 7 | Mengunci transaksi (*mutex*) untuk mencegah manipulasi stok ganda (*race condition*). |
+| **AI** | Google Gemini API | Menginjeksi konteks gudang secara dinamis (*Prompt Engineering*) untuk chat cerdas. |
+| **DevOps** | Docker, GitHub Actions | Orkestrasi 4-*container* dengan `docker-compose`, pengujian CI otomatis via GitHub Actions. |
 
 ---
 
-> Pastikan commit message mengikuti format: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`
+## 🚦 Alur Kerja Operasional (Flow)
+
+1. **Autentikasi (OTP & Roles)**
+   Pengguna mendaftar dan memverifikasi identitas melalui kode OTP yang dikirim via surel. Setelah masuk, token JWT memuat peran (*Role*) pengguna (Mis: `Admin` dapat menghapus produk, `Staff` hanya dapat menyesuaikan stok masuk/keluar).
+2. **Manajemen Produk & Gudang**
+   Inventaris diregistrasikan berdasarkan SKU yang unik ke dalam gudang-gudang fisik maupun digital. Sistem melacak ambang batas persediaan minimum (*Low Stock Threshold*).
+3. **Transaksi Barang (In/Out)**
+   Saat persediaan masuk atau keluar, sistem mengunci baris produk via Redis (*Distributed Lock*) memastikannya tidak mengalami kebocoran stok atau *race condition* walau diakses bersamaan oleh 1000 kurir di *mobile app*.
+4. **Analitik & Intervensi AI**
+   Di Dasbor, metrik vital dipantau via grafik (*Recharts*). Pengguna dapat memanggil *Stokku AI* yang melayang di pojok layar, yang secara dinamis telah disuntik (*injected*) dengan kondisi data inventaris saat itu juga untuk memberi saran dan laporan lisan.
+
+---
+
+## 🚀 Panduan Memulai (Quick Start)
+
+Kami telah membungkus (Dockerized) keseluruhan ekosistem sehingga Anda dapat meluncurkannya dengan satu langkah sederhana.
+
+### Prasyarat
+- Docker Engine & Docker Compose (v2.x)
+- Port `3000` (Web), `8080` (API), `5432` (DB), `6379` (Redis) harus tersedia/bebas.
+
+### Langkah Instalasi
+
+1. **Kloning Repositori**
+   ```bash
+   git clone https://github.com/awanmh/Stokku.ai.git
+   cd Stokku.ai
+   ```
+
+2. **Atur Variabel Lingkungan**
+   Sistem telah memiliki nilai konfigurasi *default* di `docker/docker-compose.yml`, namun untuk fitur AI dan Surel beroperasi penuh, salin *template* `.env.shared.example` ke dalam repositori sesuai kebutuhan layanan (*Backend* dan *Web*).
+   *Pastikan Anda menempatkan `GEMINI_API_KEY` pada folder Web.*
+
+3. **Jalankan Peladen (Docker Compose)**
+   ```bash
+   cd docker
+   docker compose up --build -d
+   ```
+   > 💡 *Perintah ini akan secara otomatis menarik citra dasar, melakukan proses kompilasi kode Go dan Next.js, membuat basis data, serta meluncurkan 4 kontainer yang saling terhubung dalam hitungan menit.*
+
+4. **Akses Ekosistem**
+   - 🌐 **Web Dashboard**: Buka browser ke `http://localhost:3000`
+   - ⚙️ **Backend API**: Berjalan di `http://localhost:8080`
+
+### 📱 Mengompilasi Mobile App (Opsional)
+Jika Anda ingin meluncurkan versi aplikasinya di piranti Android/iOS, pastikan Anda telah memasang SDK Flutter.
+```bash
+cd mobile
+flutter pub get
+flutter run
+```
+> *(Atur API Host Address ke `10.0.2.2:8080` jika menggunakan Android Emulator, atau alamat IP lokal komputer peladen Anda jika menggunakan perangkat fisik).*
+
+---
+
+## 🤝 Berkontribusi
+Lihat [CONTRIBUTING.md](./CONTRIBUTING.md) untuk panduan standar penulisan kode, konvensi *commit*, dan kerangka kerja *Pull Request*. Repositori memprioritaskan metode *Branching*: Semua fitur diimplementasikan di cabangnya masing-masing sebelum dilebur (Merge) ke `develop` dan akhirnya dirilis ke `main`.
+
+---
+<div align="center">
+<i>Crafted with precision for modern enterprises.</i><br>
+<b>Stokku.ai Team © 2026</b>
+</div>
