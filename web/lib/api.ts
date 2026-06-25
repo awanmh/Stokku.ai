@@ -199,6 +199,36 @@ export const dashboardApi = {
     api.get<StockView[]>(`/dashboard/alerts/dead-stock?limit=${limit}`),
 };
 
+// Reports
+export const reportApi = {
+  downloadInventoryExcel: async () => {
+    const token = Cookies.get("token");
+    const res = await fetch(`${API_BASE}/reports/inventory/excel`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Gagal mengunduh laporan");
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Laporan_Inventaris.xlsx";
+    a.click();
+  },
+  downloadTransactionsPdf: async () => {
+    const token = Cookies.get("token");
+    const res = await fetch(`${API_BASE}/reports/transactions/pdf`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Gagal mengunduh laporan");
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Laporan_Transaksi.pdf";
+    a.click();
+  },
+};
+
 // AI / Forecast
 export const forecastApi = {
   getForecast: (productId?: string, warehouseId?: string) => {

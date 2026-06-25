@@ -20,6 +20,7 @@ import { useTranslation } from "@/lib/i18n";
 export function Sidebar() {
   const pathname = usePathname();
   const logout = useAuthStore((s) => s.logout);
+  const user = useAuthStore((s) => s.user);
   const { t } = useTranslation();
 
   const navSections = [
@@ -34,12 +35,16 @@ export function Sidebar() {
       ],
     },
 
-    {
-      label: t("system"),
-      items: [
-        { title: t("settings"), href: "/dashboard/settings", icon: Settings },
-      ],
-    },
+    ...(user?.role === "admin"
+      ? [
+          {
+            label: t("system"),
+            items: [
+              { title: t("settings"), href: "/dashboard/settings", icon: Settings },
+            ],
+          },
+        ]
+      : []),
   ];
 
   return (

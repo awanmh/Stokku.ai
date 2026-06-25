@@ -14,6 +14,7 @@ type Handlers struct {
 	Transaction *handler.TransactionHandler
 	Dashboard   *handler.DashboardHandler
 	Forecast    *handler.ForecastHandler
+	Report      *handler.ReportHandler
 }
 
 func SetupRouter(app *fiber.App, h Handlers, jwtSecret string) {
@@ -81,6 +82,11 @@ func SetupRouter(app *fiber.App, h Handlers, jwtSecret string) {
 
 	// Inventory
 	protected.Get("/inventory", h.Transaction.GetInventory)
+
+	// Reports
+	reports := protected.Group("/reports", middleware.RoleGuard(domain.RoleAdmin, domain.RoleWarehouseStaff))
+	reports.Get("/inventory/excel", h.Report.GenerateInventoryExcel)
+	reports.Get("/transactions/pdf", h.Report.GenerateTransactionsPDF)
 
 	// Dashboard
 	dashboard := protected.Group("/dashboard")

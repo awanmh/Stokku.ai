@@ -69,6 +69,7 @@ func main() {
 		Transaction: handler.NewTransactionHandler(txUC),
 		Dashboard:   handler.NewDashboardHandler(dashboardUC),
 		Forecast:    handler.NewForecastHandler(),
+		Report:      handler.NewReportHandler(txUC),
 	}
 
 	// Fiber app

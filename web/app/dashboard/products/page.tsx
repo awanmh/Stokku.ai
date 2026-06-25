@@ -35,12 +35,17 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Product, CreateProductRequest } from "@/lib/api";
 
+import { useAuthStore } from "@/lib/auth";
+
 const PAGE_SIZE = 15;
 
 type SortKey = "name" | "category" | "price" | "min_stock";
 type SortDir = "asc" | "desc";
 
 export default function ProductsPage() {
+  const user = useAuthStore((s) => s.user);
+  const canEdit = user?.role === "admin" || user?.role === "warehouse_staff";
+
   const [products, setProducts] = useState<Product[]>([]);
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
@@ -140,15 +145,17 @@ export default function ProductsPage() {
           <h1 className="text-2xl font-semibold text-foreground tracking-tight">Produk</h1>
           <p className="text-sm text-muted-foreground mt-1">Kelola master data produk Anda secara terpusat.</p>
         </motion.div>
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-        >
-          <Button size="sm" onClick={() => { setEditProduct(null); setModalOpen(true); }} className="shadow-lg shadow-primary/20">
-            <Plus size={14} className="mr-1.5" />
-            Tambah Produk
-          </Button>
-        </motion.div>
+        {canEdit && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <Button size="sm" onClick={() => { setEditProduct(null); setModalOpen(true); }} className="shadow-lg shadow-primary/20">
+              <Plus size={14} className="mr-1.5" />
+              Tambah Produk
+            </Button>
+          </motion.div>
+        )}
       </div>
 
       <Card className="bg-card/50 backdrop-blur-sm border-border/50">
@@ -253,24 +260,28 @@ export default function ProductsPage() {
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
-                                onClick={() => { setEditProduct(p); setModalOpen(true); }}
-                              >
-                                <Edit2 size={12} />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors"
-                                onClick={() => { setDeleteProduct(p); setDeleteDialogOpen(true); }}
-                              >
-                                <Trash2 size={12} />
-                              </Button>
-                            </div>
+                            {canEdit && (
+                              <div className="flex items-center justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
+                                  onClick={() => { setEditProduct(p); setModalOpen(true); }}
+                                >
+                                  <Edit2 size={12} />
+                                </Button>
+                                {user?.role === "admin" && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                    onClick={() => { setDeleteProduct(p); setDeleteDialogOpen(true); }}
+                                  >
+                                    <Trash2 size={12} />
+                                  </Button>
+                                )}
+                              </div>
+                            )}
                           </TableCell>
                         </motion.tr>
                       ))}

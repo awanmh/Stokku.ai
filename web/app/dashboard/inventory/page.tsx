@@ -34,10 +34,11 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
-import { inventoryApi, productApi, warehouseApi, transactionApi } from "@/lib/api";
+import { inventoryApi, productApi, warehouseApi, transactionApi, reportApi } from "@/lib/api";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import type { StockView, Product, Warehouse } from "@/lib/api";
 
 const PAGE_SIZE = 15;
@@ -56,6 +57,7 @@ export default function InventoryPage() {
   const [error, setError] = useState("");
   const [sortKey, setSortKey] = useState<InvSortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [downloading, setDownloading] = useState(false);
 
   // Modal state for stock transaction
   const [modalOpen, setModalOpen] = useState(false);
@@ -112,6 +114,18 @@ export default function InventoryPage() {
     fetchInventory();
   };
 
+  const handleDownload = async () => {
+    try {
+      setDownloading(true);
+      await reportApi.downloadInventoryExcel();
+      toast.success("Laporan berhasil diunduh");
+    } catch (e: any) {
+      toast.error(e.message || "Gagal mengunduh laporan");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const openRestockModal = (item: StockView) => {
     setPrefillData({
       warehouse_id: item.warehouse_id,
@@ -160,6 +174,10 @@ export default function InventoryPage() {
           </p>
         </motion.div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleDownload} disabled={downloading} className="hidden sm:flex border-primary/20 text-primary hover:bg-primary/10">
+            {downloading ? <RefreshCw size={14} className="animate-spin mr-1.5" /> : null}
+            Unduh Excel
+          </Button>
           <Button variant="outline" size="sm" onClick={fetchInventory} disabled={loading} className="hidden sm:flex">
             <RefreshCw size={14} className={loading ? "animate-spin mr-1.5" : "mr-1.5"} />
             Refresh

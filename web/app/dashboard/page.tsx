@@ -33,6 +33,8 @@ import {
   PieChart,
   Pie,
   Cell,
+  BarChart,
+  Bar,
 } from "recharts";
 import { useTranslation } from "@/lib/i18n";
 
@@ -52,6 +54,14 @@ const mockCategoryData = [
   { name: "Material", value: 28, color: "hsl(152, 70%, 42%)" },
   { name: "Makanan", value: 20, color: "hsl(38, 90%, 52%)" },
   { name: "Lainnya", value: 17, color: "hsl(262, 60%, 55%)" },
+];
+
+const mockTopProducts = [
+  { name: "Semen Portland", value: 120 },
+  { name: "Besi Beton", value: 98 },
+  { name: "Pipa PVC", value: 86 },
+  { name: "Cat Tembok", value: 75 },
+  { name: "Kabel Listrik", value: 65 },
 ];
 
 export default function DashboardOverview() {
@@ -266,38 +276,27 @@ export default function DashboardOverview() {
           </CardContent>
         </Card>
 
-        {/* Donut chart — Category distribution */}
+        {/* Bar chart — Top Products */}
         <Card className="lg:col-span-2 bg-transparent">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">{t("quick_insights")}</CardTitle>
+            <CardTitle className="text-sm font-medium">Top 5 Products</CardTitle>
+            <p className="text-xs text-muted-foreground mt-0.5">By outgoing volume</p>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="rounded-lg border border-border p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-foreground">{t("restock_needed")}</span>
-                <Badge variant="warning">High</Badge>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t("projected_run_out")}
-              </p>
-            </div>
-            <div className="rounded-lg border border-border p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-foreground">{t("demand_trend")}</span>
-                <Badge>Monitor</Badge>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t("forecasted_increase")}
-              </p>
-            </div>
-            <div className="rounded-lg border border-border p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-foreground">{t("dead_stock_card")}</span>
-                <Badge variant="secondary">Low</Badge>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t("not_moved_days", { count: stats?.dead_stock_count || 0 })}
-              </p>
+          <CardContent className="pt-4">
+            <div className="h-72 w-full min-h-[0] min-w-[0]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={mockTopProducts} layout="vertical" margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border-default))" strokeOpacity={0.4} horizontal={false} />
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--text-muted))", fontSize: 10 }} width={80} />
+                  <Tooltip
+                    cursor={{ fill: "hsl(var(--secondary))", opacity: 0.4 }}
+                    contentStyle={{ backgroundColor: "hsl(var(--bg-overlay))", borderColor: "hsl(var(--border-default))", borderRadius: "10px", fontSize: "12px" }}
+                    itemStyle={{ color: "hsl(var(--primary))" }}
+                  />
+                  <Bar dataKey="value" fill="hsl(198, 80%, 48%)" radius={[0, 4, 4, 0]} barSize={20} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
@@ -442,7 +441,7 @@ function KpiCard({
   formatter?: (v: number) => string;
   delta?: string;
   deltaUp?: boolean;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
   loading: boolean;
   index?: number;
 }) {

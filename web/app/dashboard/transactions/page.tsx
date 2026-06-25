@@ -29,8 +29,9 @@ import {
   ArrowDown,
 } from "lucide-react";
 import { formatNumber, formatDate } from "@/lib/utils";
-import { transactionApi, productApi, warehouseApi } from "@/lib/api";
+import { transactionApi, productApi, warehouseApi, reportApi } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import type { TransactionView, Product, Warehouse } from "@/lib/api";
 
 const PAGE_SIZE = 15;
@@ -51,6 +52,7 @@ export default function TransactionsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [downloading, setDownloading] = useState(false);
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
@@ -106,6 +108,18 @@ export default function TransactionsPage() {
     fetchTransactions();
   };
 
+  const handleDownload = async () => {
+    try {
+      setDownloading(true);
+      await reportApi.downloadTransactionsPdf();
+      toast.success("Laporan berhasil diunduh");
+    } catch (e: any) {
+      toast.error(e.message || "Gagal mengunduh laporan");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const toggleSort = (key: TxSortKey) => {
     if (sortKey === key) {
       setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -144,7 +158,12 @@ export default function TransactionsPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
+          className="flex gap-2"
         >
+          <Button variant="outline" size="sm" onClick={handleDownload} disabled={downloading} className="hidden sm:flex border-primary/20 text-primary hover:bg-primary/10">
+            {downloading ? <RefreshCw size={14} className="animate-spin mr-1.5" /> : null}
+            Unduh PDF
+          </Button>
           <Button size="sm" onClick={() => setModalOpen(true)} className="shadow-lg shadow-primary/20">
             <Plus size={14} className="mr-1.5" />
             Transaksi Baru
