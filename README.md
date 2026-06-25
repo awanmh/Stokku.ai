@@ -22,15 +22,20 @@
 - ✅ Redis Distributed Lock untuk transaction safety
 - ✅ PostgreSQL + migrations
 - ✅ Docker setup
+- ✅ **Automated Reports API**: PDF (`gofpdf`) dan Excel (`excelize/v2`) untuk Transactions & Inventory
+- ✅ **RBAC Middleware (RoleGuard)**: Pembatasan rute API secara dinamis berdasarkan peran (Admin/Manager/Staff)
 
 #### Frontend Web (Next.js 15 + Tailwind CSS v4)
 - ✅ Enterprise-grade dashboard UI (Stripe/Linear inspired)
 - ✅ Dark/Light mode theming dengan CSS Variables
 - ✅ Pages: Dashboard Overview, Products, Warehouses, Inventory, Transactions, Settings, Profile
-- ✅ AI Forecast page (placeholder — needs Python service)
+- ❌ ~~AI Forecast page~~ (Dihapus: Fokus diubah ke integrasi AI Chatbot sepenuhnya)
 - ✅ **Floating Chatbot (Stokku AI)** — sekarang terhubung ke Gemini API secara real-time
 - ✅ Profile picture upload & change password UI
-- ⚠️ ESLint: 9 errors (mostly `no-explicit-any` dan `setState-in-effect`), 10 warnings — **perlu diperbaiki**
+- ✅ **Laporan Unduhan UI**: Tombol *Download Excel* (Inventory) & *Download PDF* (Transactions)
+- ✅ **Visualisasi Data Premium**: Recharts Bar Chart ("Top 5 Products") menggantikan metrik statis dengan warna "Action Blue"
+- ✅ **Frontend RBAC**: Restriksi UI di Sidebar, Settings, dan aksi destruktif berdasarkan peran aktif
+- ✅ ESLint Warnings diselesaikan secara komprehensif
 
 #### Mobile (Flutter)
 - ✅ Full app structure: Splash → Login → Home → Dashboard → Products → Warehouses → Inventory → Transactions → Scanner → Profile
@@ -41,7 +46,12 @@
 - ✅ **Widget tests — 8 tests ALL PASS** (ThemeProvider, StatCard, GlassCard, ChatbotScreen, ChatbotProvider) — by Hervin
 - ✅ **Chatbot Stokku AI di mobile** — FAB global + full chat screen terhubung Gemini API — by Hervin
 - ✅ **UI/UX Overhaul** — micro-animations (flutter_animate), Bahasa Indonesia konsisten, empty states — by Hervin
+- ✅ **Pembersihan Dependency**: Dihapusnya import `dart:ui` yang usang pada widget GlassCard untuk menjaga status *clean build analyzer*.
 - ✅ **MOBILE_ISSUES.md** — dokumentasi integration testing lengkap — by Hervin
+
+#### DevOps & CI/CD
+- ✅ **GitHub Actions** (`.github/workflows/ci.yml`): Pipeline CI/CD otomatis untuk tes paralel Golang, Next.js build test, dan Flutter analyzer setiap Push/PR ke main/develop.
+- ✅ **Full Dockerization**: `docker-compose.yml` final, mengorkestrasi PostgreSQL 16, Redis 7, Golang 1.24 Backend API, dan Next.js Web secara mulus dalam satu jaringan internal.
 
 ---
 
@@ -54,17 +64,7 @@
 | `GEMINI_API_KEY` | `web/.env` | 🔴 Hanya di laptop Aqil | Aqil |
 | `GEMINI_DEFAULT_MODEL` | `web/.env` | ✅ Default: `gemini-2.5-flash` | — |
 
-### ESLint Errors yang Harus Diperbaiki
-```
-web/app/api/chat/route.ts         → no-explicit-any (line 412)
-web/app/dashboard/forecast/page.tsx → no-explicit-any, no-unused-vars
-web/app/dashboard/profile/page.tsx  → no-explicit-any, no-img-element
-web/app/dashboard/settings/page.tsx → no-unused-vars
-web/app/dashboard/transactions/page.tsx → no-unused-vars, no-explicit-any
-web/app/login/page.tsx              → setState-in-effect
-web/components/layout/header.tsx    → no-unused-vars
-web/components/theme-provider.tsx   → no-unused-vars, setState-in-effect
-```
+
 
 ### ~~Mobile Test Issue~~ ✅ FIXED by Hervin
 - ~~`mobile/test/widget_test.dart` masih menggunakan default Flutter counter test~~ → **Sudah diganti dengan 8 widget tests yang relevan (ALL PASS)**.
