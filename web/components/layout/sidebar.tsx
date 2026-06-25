@@ -15,35 +15,37 @@ import {
   LogOut,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/auth";
-
-const navSections = [
-  {
-    label: "Dashboard",
-    items: [
-      { title: "Overview", href: "/dashboard", icon: LayoutDashboard },
-      { title: "Produk", href: "/dashboard/products", icon: PackageSearch },
-      { title: "Gudang", href: "/dashboard/warehouses", icon: Building2 },
-      { title: "Inventaris", href: "/dashboard/inventory", icon: Package },
-      { title: "Transaksi", href: "/dashboard/transactions", icon: ArrowRightLeft },
-    ],
-  },
-  {
-    label: "Intelligence",
-    items: [
-      { title: "AI Forecast", href: "/dashboard/forecast", icon: Lightbulb },
-    ],
-  },
-  {
-    label: "System",
-    items: [
-      { title: "Settings", href: "/dashboard/settings", icon: Settings },
-    ],
-  },
-];
+import { useTranslation } from "@/lib/i18n";
 
 export function Sidebar() {
   const pathname = usePathname();
   const logout = useAuthStore((s) => s.logout);
+  const { t } = useTranslation();
+
+  const navSections = [
+    {
+      label: "Dashboard",
+      items: [
+        { title: t("overview"), href: "/dashboard", icon: LayoutDashboard },
+        { title: t("products"), href: "/dashboard/products", icon: PackageSearch },
+        { title: t("warehouses"), href: "/dashboard/warehouses", icon: Building2 },
+        { title: t("inventory"), href: "/dashboard/inventory", icon: Package },
+        { title: t("transactions"), href: "/dashboard/transactions", icon: ArrowRightLeft },
+      ],
+    },
+    {
+      label: t("intelligence"),
+      items: [
+        { title: t("ai_forecast"), href: "/dashboard/forecast", icon: Lightbulb },
+      ],
+    },
+    {
+      label: t("system"),
+      items: [
+        { title: t("settings"), href: "/dashboard/settings", icon: Settings },
+      ],
+    },
+  ];
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-60 border-r border-border bg-sidebar-bg hidden lg:flex flex-col">
@@ -107,7 +109,7 @@ export function Sidebar() {
           className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors duration-150 hover:bg-danger-bg hover:text-destructive"
         >
           <LogOut size={16} />
-          Keluar
+          {t("logout")}
         </button>
       </div>
     </aside>

@@ -116,7 +116,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           Container(
                             width: 44, height: 44,
                             decoration: BoxDecoration(
-                              color: AppColors.cyan.withOpacity(0.1),
+                              color: AppColors.cyan.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(Icons.category_rounded,

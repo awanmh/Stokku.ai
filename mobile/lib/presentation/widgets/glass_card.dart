@@ -32,14 +32,14 @@ class GlassCard extends StatelessWidget {
         boxShadow: isDark
             ? [
                 BoxShadow(
-                  color: AppColors.cyan.withOpacity(0.03),
+                  color: AppColors.cyan.withValues(alpha: 0.03),
                   blurRadius: 16,
                   offset: const Offset(0, 4),
                 ),
               ]
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 12,
                   offset: const Offset(0, 2),
                 ),
@@ -50,8 +50,8 @@ class GlassCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(borderRadius),
-          splashColor: AppColors.cyan.withOpacity(0.05),
-          highlightColor: AppColors.cyan.withOpacity(0.02),
+          splashColor: AppColors.cyan.withValues(alpha: 0.05),
+          highlightColor: AppColors.cyan.withValues(alpha: 0.02),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(borderRadius),
             child: BackdropFilter(
@@ -61,8 +61,8 @@ class GlassCard extends StatelessWidget {
                     const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.white.withOpacity(0.04)
-                      : Colors.white.withOpacity(0.75),
+                      ? Colors.white.withValues(alpha: 0.03)
+                      : Colors.white.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(borderRadius),
                   border: Border.all(
                     color: isDark

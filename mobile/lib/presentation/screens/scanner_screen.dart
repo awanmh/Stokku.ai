@@ -162,7 +162,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
               Row(children: [
                 Container(width: 48, height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.cyan.withOpacity(0.1),
+                    color: AppColors.cyan.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12)),
                   child: const Icon(Icons.inventory_2, color: AppColors.cyan)),
                 const SizedBox(width: 14),
@@ -178,12 +178,12 @@ class _ScannerScreenState extends State<ScannerScreen> {
               const SizedBox(height: 20),
 
               // Warehouse picker
-              Text('GUDANG', style: TextStyle(fontSize: 10,
+              const Text('GUDANG', style: TextStyle(fontSize: 10,
                   fontWeight: FontWeight.w700, letterSpacing: 1.5,
                   color: AppColors.textMuted)),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: selectedWarehouseId,
+                initialValue: selectedWarehouseId,
                 dropdownColor: AppColors.darkCard,
                 style: const TextStyle(color: AppColors.textPrimary),
                 items: warehouses.map((w) => DropdownMenuItem(
@@ -194,7 +194,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
               const SizedBox(height: 16),
 
               // Quantity
-              Text('JUMLAH', style: TextStyle(fontSize: 10,
+              const Text('JUMLAH', style: TextStyle(fontSize: 10,
                   fontWeight: FontWeight.w700, letterSpacing: 1.5,
                   color: AppColors.textMuted)),
               const SizedBox(height: 8),
@@ -252,14 +252,14 @@ class _ScannerScreenState extends State<ScannerScreen> {
       quantity: qty,
       reference: 'SCAN-${DateTime.now().millisecondsSinceEpoch}',
     );
+    if (!mounted) return;
+    
     context.read<SyncProvider>().refreshPendingCount();
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('${type == 'stock_in' ? 'Stock In' : 'Stock Out'}'
-            ' ${_scannedProduct!.name} x$qty berhasil'),
-        backgroundColor: AppColors.success,
-      ));
-      _resetScanner();
-    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('${type == 'stock_in' ? 'Stock In' : 'Stock Out'}'
+          ' ${_scannedProduct!.name} x$qty berhasil'),
+      backgroundColor: AppColors.success,
+    ));
+    _resetScanner();
   }
 }

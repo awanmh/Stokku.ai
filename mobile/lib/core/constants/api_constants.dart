@@ -45,4 +45,5 @@ class ApiConstants {
   // Change this IP to match the machine running `npm run dev` for the web.
   static const String chatBaseUrl = 'http://localhost:3000';
   static const String chatEndpoint = '/api/chat';
+  static String get chatbotUrl => '$chatBaseUrl$chatEndpoint';
 }

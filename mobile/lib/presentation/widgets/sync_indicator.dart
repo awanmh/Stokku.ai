@@ -31,8 +31,8 @@ class SyncIndicator extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isOnline
-                ? AppColors.warning.withOpacity(0.3)
-                : AppColors.error.withOpacity(0.3),
+                ? AppColors.warning.withValues(alpha: 0.3)
+                : AppColors.error.withValues(alpha: 0.3),
           ),
         ),
         child: Row(

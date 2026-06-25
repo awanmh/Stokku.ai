@@ -46,6 +46,9 @@ type DashboardStatsData = {
 };
 
 type StockItem = {
+    id?: string;
+    product_id?: string;
+    warehouse_id?: string;
     product_name?: string;
     product_sku?: string;
     warehouse_name?: string;
@@ -477,117 +480,138 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const safeMessages = messages.length > 0 ? messages : [{ role: "user", content: message }];
+    const safeMessages: ChatMessage[] = messages.length > 0 ? messages : [{ role: "user", content: message || "" }];
     const intent = detectIntent(message || safeMessages[safeMessages.length - 1]?.content || "");
     const context = await getInventoryContext(token, intent, message || safeMessages[safeMessages.length - 1]?.content || "");
     const systemPrompt = buildSystemPrompt(context, intent);
 
-    const isGemma = model.startsWith("gemma-");
+    const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    // Build contents; for Gemma we inject system prompt as the first message
-    const contents = isGemma
-        ? [{ role: "MODEL", parts: [{ text: systemPrompt }] }, ...buildConversation(safeMessages)]
-        : buildConversation(safeMessages);
+    async function fetchWithRetry(modelId: string, currentRequestBody: any, maxRetries = 2) {
+        let attempt = 0;
+        let delayMs = 600;
+        let lastResponse: Response | null = null;
+        let lastErrorText = "";
 
-    const requestBody: GeminiRequest = {
-        contents,
-        generationConfig: {
-            temperature: 0.4,
-            topP: 0.95,
-            maxOutputTokens: 900,
-        },
-    };
-
-    if (!isGemma) {
-        // only include systemInstruction when supported (Gemini flash, etc.)
-        requestBody.systemInstruction = { parts: [{ text: systemPrompt }] };
-    }
-
-    async function callGemini(modelId: string) {
-        return fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${GEMINI_API_KEY}`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(requestBody),
-            }
-        );
-    }
-
-    const geminiResponse = await callGemini(model);
-
-    // If a non-default model fails, try fallback to the default Gemini model.
-    // This covers unsupported model features, permission issues, and transient API failures.
-    if (!geminiResponse.ok) {
-        const errorText = await geminiResponse.text().catch(() => "");
-        const shouldFallback =
-            model !== GEMINI_DEFAULT_MODEL &&
-            (
-                geminiResponse.status === 400 ||
-                geminiResponse.status === 403 ||
-                geminiResponse.status === 404 ||
-                geminiResponse.status === 429 ||
-                geminiResponse.status >= 500 ||
-                /developer instruction is not enabled|role 'system' is not supported|permission|quota|not found|unsupported/i.test(errorText)
-            );
-
-        if (shouldFallback) {
-            // Retry with default model (e.g., gemini-2.5-flash) and include systemInstruction there.
-            const fallbackModel = GEMINI_DEFAULT_MODEL;
-            const fallbackRequestBody = { ...requestBody };
-            // ensure systemInstruction present for fallback
-            fallbackRequestBody.systemInstruction = { parts: [{ text: systemPrompt }] };
-
-            const fallbackResp = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/${fallbackModel}:generateContent?key=${GEMINI_API_KEY}`,
-                {
+        while (attempt < maxRetries) {
+            attempt++;
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${GEMINI_API_KEY}`;
+                const response = await fetch(url, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(fallbackRequestBody),
-                }
-            );
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(currentRequestBody),
+                });
 
-            if (fallbackResp.ok) {
-                const payload = (await fallbackResp.json()) as GeminiResponse;
-                const reply = extractGeminiText(payload);
-
-                if (!reply) {
-                    return jsonWithCors({ success: false, message: "Gemini tidak mengembalikan teks jawaban." }, 502);
+                if (response.ok) {
+                    return { ok: true, response, modelUsed: modelId };
                 }
 
-                return jsonWithCors({ success: true, data: { reply, model: fallbackModel } }, 200);
+                lastResponse = response;
+                lastErrorText = await response.text().catch(() => "");
+                
+                const isTransient = [429, 500, 502, 503, 504].includes(response.status);
+                if (!isTransient) {
+                    break;
+                }
+            } catch (err) {
+                lastErrorText = err instanceof Error ? err.message : String(err);
             }
 
-            // fallback also failed — return its error
-            const fallbackError = await fallbackResp.text().catch(() => "");
-            return jsonWithCors(
-                {
-                    success: false,
-                    message: `Gagal memanggil Gemini API (${fallbackResp.status}). ${fallbackError || "Coba lagi nanti."}`,
-                },
-                502
-            );
+            if (attempt < maxRetries) {
+                await delay(delayMs);
+                delayMs *= 2;
+            }
+        }
+
+        return { ok: false, response: lastResponse, errorText: lastErrorText, modelUsed: modelId };
+    }
+
+    const fallbackModelList = [
+        "gemini-3.1-flash-lite",
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-flash",
+        "gemini-3.5-flash"
+    ];
+
+    const uniqueFallbacks = fallbackModelList.filter((m) => m !== model);
+    const modelsToTry = [model, ...uniqueFallbacks];
+
+    let successResult: { response: Response; modelUsed: string } | null = null;
+    let finalErrorDetails = "";
+    let finalStatus = 502;
+
+    for (let i = 0; i < modelsToTry.length; i++) {
+        const currentModel = modelsToTry[i];
+        const currentIsGemma = currentModel.startsWith("gemma-");
+        
+        const currentRequestBody: any = {
+            contents: currentIsGemma
+                ? [{ role: "MODEL", parts: [{ text: systemPrompt }] }, ...buildConversation(safeMessages)]
+                : buildConversation(safeMessages),
+            generationConfig: {
+                temperature: 0.4,
+                topP: 0.95,
+                maxOutputTokens: 900,
+            },
+        };
+
+        if (!currentIsGemma) {
+            currentRequestBody.systemInstruction = { parts: [{ text: systemPrompt }] };
+        }
+
+        const result = await fetchWithRetry(currentModel, currentRequestBody, 2);
+
+        if (result.ok && result.response) {
+            successResult = { response: result.response, modelUsed: result.modelUsed };
+            break;
+        }
+
+        if (i === 0) {
+            finalStatus = result.response?.status || 502;
+            finalErrorDetails = result.errorText || "Gagal memproses permintaan.";
+        }
+    }
+
+    if (!successResult) {
+        let errorMsg = finalErrorDetails;
+        try {
+            const parsed = JSON.parse(finalErrorDetails);
+            if (parsed?.error?.message) {
+                errorMsg = parsed.error.message;
+            }
+        } catch {
+            // Keep original string if not JSON
         }
 
         return jsonWithCors(
             {
                 success: false,
-                message: `Gagal memanggil Gemini API (${geminiResponse.status}). ${errorText || "Coba lagi nanti."}`,
+                message: `Gagal memanggil Gemini API (${finalStatus}). ${errorMsg || "Coba lagi nanti."}`,
             },
             502
         );
     }
 
-    const payload = (await geminiResponse.json()) as GeminiResponse;
+    const payload = (await successResult.response.json()) as GeminiResponse;
     const reply = extractGeminiText(payload);
 
     if (!reply) {
         return jsonWithCors({ success: false, message: "Gemini tidak mengembalikan teks jawaban." }, 502);
     }
 
-    return jsonWithCors({ success: true, data: { reply, model } }, 200);
+    return jsonWithCors(
+        {
+            success: true,
+            data: {
+                reply,
+                model: successResult.modelUsed,
+            },
+        },
+        200
+    );
 }
 
 export async function OPTIONS() {

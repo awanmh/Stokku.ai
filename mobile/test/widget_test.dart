@@ -21,6 +21,7 @@ import 'package:stokku_mobile/presentation/screens/chatbot_screen.dart';
 import 'package:stokku_mobile/presentation/widgets/stat_card.dart';
 import 'package:stokku_mobile/presentation/widgets/glass_card.dart';
 import 'package:stokku_mobile/core/theme/app_theme.dart';
+import 'package:stokku_mobile/app.dart';
 
 /// Helper: wraps a widget in MaterialApp with all necessary providers.
 Widget buildTestApp(Widget child) {
@@ -179,5 +180,14 @@ void main() {
     provider.clearHistory();
     expect(provider.messages.length, equals(1));
     expect(provider.hasMessages, isFalse);
+  });
+
+  // ── Test 9: Smoke test ──────────────
+  testWidgets('App compiles and runs smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const StokkuApp());
+
+    // Verify that the app starts without throwing.
+    expect(find.byType(MaterialApp), findsOneWidget);
   });
 }

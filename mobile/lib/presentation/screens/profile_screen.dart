@@ -70,7 +70,7 @@ class ProfileScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: AppColors.cyan.withOpacity(0.1),
+                            color: AppColors.cyan.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -118,7 +118,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   Switch.adaptive(
                     value: theme.isDark,
-                    activeColor: AppColors.cyan,
+                    activeTrackColor: AppColors.cyan,
                     onChanged: (_) => theme.toggle(),
                   ),
                 ],
@@ -184,13 +184,13 @@ class ProfileScreen extends StatelessWidget {
                 icon: const Icon(Icons.logout_rounded, size: 18),
                 label: const Text('Keluar'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.error.withOpacity(0.1),
+                  backgroundColor: AppColors.error.withValues(alpha: 0.1),
                   foregroundColor: AppColors.error,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
-                        color: AppColors.error.withOpacity(0.2)),
+                        color: AppColors.error.withValues(alpha: 0.2)),
                   ),
                 ),
                 onPressed: () async {

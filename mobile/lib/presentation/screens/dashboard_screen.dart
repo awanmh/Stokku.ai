@@ -79,7 +79,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         .slideY(begin: 0.1, end: 0, duration: 400.ms, delay: 100.ms),
                     StatCard(title: 'GUDANG AKTIF', value: '${d.stats!.totalWarehouses}',
                         icon: Icons.warehouse_rounded, iconColor: AppColors.indigo,
-                        iconBgColor: AppColors.indigo.withOpacity(0.1))
+                        iconBgColor: AppColors.indigo.withValues(alpha: 0.1))
                         .animate().fadeIn(duration: 400.ms, delay: 200.ms)
                         .slideY(begin: 0.1, end: 0, duration: 400.ms, delay: 200.ms),
                     StatCard(title: 'NILAI ASET', value: _fmt(d.stats!.totalStockValue),

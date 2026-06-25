@@ -25,14 +25,14 @@ class StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final effectiveIconColor = iconColor ?? AppColors.cyan;
-    final effectiveIconBg = iconBgColor ?? effectiveIconColor.withOpacity(0.1);
+    final effectiveIconBg = iconBgColor ?? effectiveIconColor.withValues(alpha: 0.1);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        splashColor: effectiveIconColor.withOpacity(0.05),
-        highlightColor: effectiveIconColor.withOpacity(0.02),
+        splashColor: effectiveIconColor.withValues(alpha: 0.05),
+        highlightColor: effectiveIconColor.withValues(alpha: 0.02),
         onTap: () {},
         child: Container(
           padding: const EdgeInsets.all(16),
@@ -45,14 +45,14 @@ class StatCard extends StatelessWidget {
             boxShadow: isDark
                 ? [
                     BoxShadow(
-                      color: effectiveIconColor.withOpacity(0.04),
+                      color: effectiveIconColor.withValues(alpha: 0.04),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
                   ]
                 : [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
+                      color: Colors.black.withValues(alpha: 0.03),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -81,7 +81,7 @@ class StatCard extends StatelessWidget {
                       gradient: LinearGradient(
                         colors: [
                           effectiveIconColor,
-                          effectiveIconColor.withOpacity(0.3),
+                          effectiveIconColor.withValues(alpha: 0.3),
                         ],
                       ),
                     ),

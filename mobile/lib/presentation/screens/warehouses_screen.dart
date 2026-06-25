@@ -73,7 +73,7 @@ class _WarehousesScreenState extends State<WarehousesScreen> {
                                       width: 44, height: 44,
                                       decoration: BoxDecoration(
                                         color:
-                                            AppColors.indigo.withOpacity(0.1),
+                                            AppColors.indigo.withValues(alpha: 0.1),
                                         borderRadius:
                                             BorderRadius.circular(12),
                                       ),
