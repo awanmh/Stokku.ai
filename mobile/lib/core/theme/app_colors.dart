@@ -11,43 +11,44 @@ class AppColors {
   AppColors._();
 
   // ── Brand ─────────────────────────────────────────────────
-  static const Color primary = Color(0xFF1570EF);       // hsl(215 80% 48%)
-  static const Color primaryLight = Color(0xFF53B1FD);
-  static const Color cyan = Color(0xFF22D3EE);
-  static const Color cyanDark = Color(0xFF06B6D4);
-  static const Color indigo = Color(0xFF6366F1);
+  static const Color primary = Color(0xFF0066CC);       // Action Blue
+  static const Color primaryLight = Color(0xFF3385D6);
+  static const Color cyan = Color(0xFF0066CC); // Redirected to Action Blue
+  static const Color cyanDark = Color(0xFF004C99);
+  static const Color indigo = Color(0xFF0066CC);
 
   // ── Gradients ─────────────────────────────────────────────
-  static const Color gradientStart = Color(0xFF22D3EE);  // cyan-400
-  static const Color gradientEnd = Color(0xFF818CF8);    // indigo-400
+  // Removed gradients per luxury design rules. Replaced with solid Action Blue.
+  static const Color gradientStart = Color(0xFF0066CC);  
+  static const Color gradientEnd = Color(0xFF0066CC);    
 
   // ── Dark Theme ────────────────────────────────────────────
-  static const Color darkBg = Color(0xFF03060D);
-  static const Color darkSurface = Color(0xFF0A0F1C);
-  static const Color darkCard = Color(0xFF0F1629);
-  static const Color darkBorder = Color(0x1AFFFFFF);     // white/10
-  static const Color darkBorderSubtle = Color(0x0DFFFFFF); // white/5
+  static const Color darkBg = Color(0xFF0A0A0A); // Near Black
+  static const Color darkSurface = Color(0xFF141414); // Deep Charcoal
+  static const Color darkCard = Color(0xFF141414); 
+  static const Color darkBorder = Color(0xFF262626); // Minimal contrast
+  static const Color darkBorderSubtle = Color(0xFF1A1A1A); 
 
   // ── Light Theme ───────────────────────────────────────────
-  static const Color lightBg = Color(0xFFF8FAFC);
-  static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightCard = Color(0xFFF1F5F9);
-  static const Color lightBorder = Color(0xFFE2E8F0);
+  static const Color lightBg = Color(0xFFFFFFFF); // Pure White
+  static const Color lightSurface = Color(0xFFF5F5F5); // Soft Parchment equivalent
+  static const Color lightCard = Color(0xFFF5F5F5);
+  static const Color lightBorder = Color(0xFFE5E5E5);
 
   // ── Text ──────────────────────────────────────────────────
-  static const Color textPrimary = Color(0xFFF8FAFC);
-  static const Color textSecondary = Color(0xFF94A3B8);
-  static const Color textMuted = Color(0xFF64748B);
-  static const Color textDark = Color(0xFF0F172A);
-  static const Color textDarkSecondary = Color(0xFF475569);
+  static const Color textPrimary = Color(0xFFFFFFFF); // For dark mode
+  static const Color textSecondary = Color(0xFF999999);
+  static const Color textMuted = Color(0xFF666666);
+  static const Color textDark = Color(0xFF000000); // For light mode
+  static const Color textDarkSecondary = Color(0xFF666666);
 
-  // ── Status ────────────────────────────────────────────────
-  static const Color success = Color(0xFF22C55E);
-  static const Color successBg = Color(0x1A22C55E);
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color warningBg = Color(0x1AF59E0B);
-  static const Color error = Color(0xFFEF4444);
-  static const Color errorBg = Color(0x1AEF4444);
-  static const Color info = Color(0xFF3B82F6);
-  static const Color infoBg = Color(0x1A3B82F6);
+  // ── Status (muted / monochrome where possible) ────────────
+  static const Color success = Color(0xFFFFFFFF);
+  static const Color successBg = Color(0xFF262626);
+  static const Color warning = Color(0xFFFFFFFF);
+  static const Color warningBg = Color(0xFF262626);
+  static const Color error = Color(0xFFFFFFFF);
+  static const Color errorBg = Color(0xFF262626);
+  static const Color info = Color(0xFF0066CC);
+  static const Color infoBg = Color(0xFF0A0A0A);
 }

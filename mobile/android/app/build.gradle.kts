@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "ai.stokku.stokku_mobile"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -24,7 +24,7 @@ android {
         applicationId = "ai.stokku.stokku_mobile"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -41,4 +41,15 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    constraints {
+        implementation("androidx.core:core-ktx:1.15.0") {
+            because("core-ktx 1.16+ requires compileSdk 36 and AGP 8.9+")
+        }
+        implementation("androidx.core:core:1.15.0") {
+            because("core 1.16+ requires compileSdk 36 and AGP 8.9+")
+        }
+    }
 }

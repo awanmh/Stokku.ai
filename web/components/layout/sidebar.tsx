@@ -33,12 +33,7 @@ export function Sidebar() {
         { title: t("transactions"), href: "/dashboard/transactions", icon: ArrowRightLeft },
       ],
     },
-    {
-      label: t("intelligence"),
-      items: [
-        { title: t("ai_forecast"), href: "/dashboard/forecast", icon: Lightbulb },
-      ],
-    },
+
     {
       label: t("system"),
       items: [

@@ -3,38 +3,39 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * ━━━━ STOKKU.AI ENTERPRISE DESIGN TOKENS ━━━━
- * Stripe × Linear aesthetic. No gaming. No neon. Business trust.
+ * ━━━━ STOKKU.AI LUXURY DESIGN TOKENS ━━━━
+ * Product-centric storytelling. Restraint. Whitespace.
+ * Action Blue. Pure Monochrome.
  */
 
 :root {
   /* Backgrounds */
-  --bg-base: 220 20% 97%;
-  --bg-surface: 0 0% 100%;
-  --bg-subtle: 220 14% 96%;
-  --bg-overlay: 220 13% 91%;
+  --bg-base: 0 0% 100%; /* Pure White */
+  --bg-surface: 0 0% 98%; /* Soft Parchment */
+  --bg-subtle: 0 0% 95%;
+  --bg-overlay: 0 0% 100%;
 
-  /* Borders */
-  --border-default: 220 13% 91%;
-  --border-subtle: 220 14% 94%;
-  --border-focus: 198 80% 50%;
+  /* Borders - practically invisible */
+  --border-default: 0 0% 90%;
+  --border-subtle: 0 0% 95%;
+  --border-focus: 210 100% 40%; /* Action Blue */
 
-  /* Text */
-  --text-primary: 222 47% 11%;
-  --text-secondary: 215 16% 47%;
-  --text-muted: 215 14% 64%;
+  /* Text - High contrast */
+  --text-primary: 0 0% 0%; /* Pure Black */
+  --text-secondary: 0 0% 40%; /* Deep Gray */
+  --text-muted: 0 0% 60%;
 
-  /* Brand accent — cyan, used sparingly */
-  --accent: 198 80% 46%;
-  --accent-hover: 198 80% 40%;
+  /* Brand accent — Action Blue (#0066cc) */
+  --accent: 210 100% 40%;
+  --accent-hover: 210 100% 30%;
 
-  /* Semantic */
-  --success: 152 70% 42%;
-  --warning: 38 90% 52%;
-  --danger: 4 74% 54%;
-  --success-bg: 152 40% 96%;
-  --warning-bg: 38 40% 96%;
-  --danger-bg: 4 40% 96%;
+  /* Semantic - Reduced to subtle monochrome unless absolutely critical */
+  --success: 0 0% 0%;
+  --warning: 0 0% 0%;
+  --danger: 0 0% 0%;
+  --success-bg: 0 0% 95%;
+  --warning-bg: 0 0% 95%;
+  --danger-bg: 0 0% 95%;
 
   /* Legacy compat */
   --background: var(--bg-base);
@@ -50,19 +51,21 @@
   --muted: var(--bg-subtle);
   --muted-foreground: var(--text-muted);
   --accent-foreground: 0 0% 100%;
-  --destructive: var(--danger);
+  --destructive: var(--text-primary);
   --destructive-foreground: 0 0% 100%;
   --border: var(--border-default);
   --input: var(--border-default);
   --ring: var(--border-focus);
-  --radius: 0.5rem;
+  
+  /* Hard corners */
+  --radius: 0rem; 
 
-  /* Chart palette */
+  /* Chart palette - Monochrome & Action Blue */
   --chart-1: var(--accent);
-  --chart-2: var(--success);
-  --chart-3: var(--warning);
-  --chart-4: 262 60% 55%;
-  --chart-5: var(--danger);
+  --chart-2: 0 0% 0%;
+  --chart-3: 0 0% 40%;
+  --chart-4: 0 0% 60%;
+  --chart-5: 0 0% 80%;
 
   /* Sidebar */
   --sidebar-bg: var(--bg-base);
@@ -73,32 +76,32 @@
 
 .dark {
   /* Backgrounds */
-  --bg-base: 220 20% 5%;
-  --bg-surface: 222 18% 8%;
-  --bg-subtle: 224 16% 11%;
-  --bg-overlay: 226 14% 14%;
+  --bg-base: 0 0% 4%; /* Near Black */
+  --bg-surface: 0 0% 8%; /* Deep Charcoal */
+  --bg-subtle: 0 0% 12%;
+  --bg-overlay: 0 0% 8%;
 
   /* Borders */
-  --border-default: 224 12% 18%;
-  --border-subtle: 224 12% 14%;
-  --border-focus: 198 80% 50%;
+  --border-default: 0 0% 15%;
+  --border-subtle: 0 0% 10%;
+  --border-focus: 210 100% 40%;
 
   /* Text */
-  --text-primary: 210 20% 94%;
-  --text-secondary: 214 16% 64%;
-  --text-muted: 216 12% 40%;
+  --text-primary: 0 0% 100%; /* Pure White */
+  --text-secondary: 0 0% 60%;
+  --text-muted: 0 0% 40%;
 
   /* Brand accent */
-  --accent: 196 80% 48%;
-  --accent-hover: 196 80% 56%;
+  --accent: 210 100% 40%; /* Action Blue */
+  --accent-hover: 210 100% 50%;
 
   /* Semantic */
-  --success: 152 70% 42%;
-  --warning: 38 90% 52%;
-  --danger: 4 74% 54%;
-  --success-bg: 152 40% 10%;
-  --warning-bg: 38 40% 10%;
-  --danger-bg: 4 40% 10%;
+  --success: 0 0% 100%;
+  --warning: 0 0% 100%;
+  --danger: 0 0% 100%;
+  --success-bg: 0 0% 15%;
+  --warning-bg: 0 0% 15%;
+  --danger-bg: 0 0% 15%;
 
   /* Legacy compat */
   --background: var(--bg-base);
@@ -108,27 +111,27 @@
   --popover: var(--bg-overlay);
   --popover-foreground: var(--text-primary);
   --primary: var(--accent);
-  --primary-foreground: 220 20% 5%;
+  --primary-foreground: 0 0% 100%;
   --secondary: var(--bg-subtle);
   --secondary-foreground: var(--text-primary);
   --muted: var(--bg-subtle);
   --muted-foreground: var(--text-muted);
-  --accent-foreground: 220 20% 5%;
-  --destructive: var(--danger);
-  --destructive-foreground: 210 20% 94%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: var(--text-primary);
+  --destructive-foreground: 0 0% 0%;
   --border: var(--border-default);
   --input: var(--border-default);
   --ring: var(--border-focus);
 
   /* Chart palette */
   --chart-1: var(--accent);
-  --chart-2: var(--success);
-  --chart-3: var(--warning);
-  --chart-4: 262 60% 55%;
-  --chart-5: var(--danger);
+  --chart-2: 0 0% 100%;
+  --chart-3: 0 0% 60%;
+  --chart-4: 0 0% 40%;
+  --chart-5: 0 0% 20%;
 
   /* Sidebar */
-  --sidebar-bg: 220 20% 4%;
+  --sidebar-bg: var(--bg-base);
   --sidebar-fg: var(--text-primary);
   --sidebar-border: var(--border-default);
   --sidebar-hover: var(--bg-subtle);
@@ -151,7 +154,7 @@
   --color-accent-foreground: hsl(var(--accent-foreground));
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
+  --color-border: transparent; /* No borders */
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
   --color-success: hsl(var(--success));
@@ -166,54 +169,73 @@
   --color-chart-5: hsl(var(--chart-5));
   --color-sidebar-bg: hsl(var(--sidebar-bg));
   --color-sidebar-fg: hsl(var(--sidebar-fg));
-  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-border: transparent;
   --color-sidebar-hover: hsl(var(--sidebar-hover));
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --font-outfit: var(--font-outfit);
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --font-outfit: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-transparent; /* Ensure borders are invisible globally unless explicitly overridden */
   }
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: var(--font-outfit);
     font-feature-settings: "rlig" 1, "calt" 1;
+    letter-spacing: -0.01em; /* Tighter typography for luxury feel */
+  }
+
+  h1 {
+    font-size: 3.5rem; /* 56px */
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  
+  h2 {
+    font-size: 2.5rem; /* 40px */
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  
+  p, span, div {
+    font-size: 1.0625rem; /* 17px Body */
+    font-weight: 400;
+    line-height: 1.5;
   }
 }
 
-/* Scrollbar — minimal, not distracting */
+/* Micro-interactions */
+button:active, a:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease-out;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible {
+  outline: 2px solid hsl(var(--accent));
+  outline-offset: 2px;
+}
+
+/* Scrollbar — minimal */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: hsl(var(--text-muted) / 0.2);
-  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--text-muted) / 0.4);
 }
 
-/* Mobile responsive: dialog full-screen */
-@media (max-width: 640px) {
-  [data-slot="dialog-content"] {
-    max-width: 100vw !important;
-    max-height: 100vh !important;
-    width: 100vw;
-    height: 100vh;
-    border-radius: 0;
-    margin: 0;
-  }
-}
-
-/* Tables scroll horizontally on mobile */
 .overflow-x-auto table {
   min-width: 700px;
 }

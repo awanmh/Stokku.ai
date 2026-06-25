@@ -5,7 +5,7 @@ class ApiConstants {
   // ── Base URL ──────────────────────────────────────────────
   // Change this to your machine's LAN IP when testing on a
   // physical device (e.g. 'http://192.168.1.100:8080').
-  static const String baseUrl = 'http://127.0.0.1:8080'; // Android emulator to host loopback
+  static const String baseUrl = 'http://10.0.2.2:8080'; // Android emulator to host loopback
   static const String apiPrefix = '/api/v1';
 
   // ── Auth ──────────────────────────────────────────────────
@@ -43,7 +43,7 @@ class ApiConstants {
   // ── Chatbot (via Next.js web proxy → Gemini AI) ─────────
   // The chatbot API lives on the Next.js web server, not the Go backend.
   // Change this IP to match the machine running `npm run dev` for the web.
-  static const String chatBaseUrl = 'http://localhost:3000';
+  static const String chatBaseUrl = 'http://10.0.2.2:3000';
   static const String chatEndpoint = '/api/chat';
   static String get chatbotUrl => '$chatBaseUrl$chatEndpoint';
 }

@@ -183,7 +183,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   color: AppColors.textMuted)),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                initialValue: selectedWarehouseId,
+                value: selectedWarehouseId,
                 dropdownColor: AppColors.darkCard,
                 style: const TextStyle(color: AppColors.textPrimary),
                 items: warehouses.map((w) => DropdownMenuItem(

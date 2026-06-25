@@ -198,35 +198,35 @@ class AppTheme {
         isDark ? AppColors.textSecondary : AppColors.textDarkSecondary;
 
     return TextTheme(
-      displayLarge: GoogleFonts.outfit(
-          fontSize: 32, fontWeight: FontWeight.w700, color: primary),
-      displayMedium: GoogleFonts.outfit(
-          fontSize: 28, fontWeight: FontWeight.w700, color: primary),
-      displaySmall: GoogleFonts.outfit(
+      displayLarge: GoogleFonts.inter(
+          fontSize: 56, fontWeight: FontWeight.w600, color: primary, letterSpacing: -1.0),
+      displayMedium: GoogleFonts.inter(
+          fontSize: 48, fontWeight: FontWeight.w600, color: primary, letterSpacing: -0.5),
+      displaySmall: GoogleFonts.inter(
+          fontSize: 40, fontWeight: FontWeight.w600, color: primary, letterSpacing: -0.5),
+      headlineMedium: GoogleFonts.inter(
           fontSize: 24, fontWeight: FontWeight.w600, color: primary),
-      headlineMedium: GoogleFonts.outfit(
+      headlineSmall: GoogleFonts.inter(
           fontSize: 20, fontWeight: FontWeight.w600, color: primary),
-      headlineSmall: GoogleFonts.outfit(
-          fontSize: 18, fontWeight: FontWeight.w600, color: primary),
       titleLarge: GoogleFonts.inter(
-          fontSize: 16, fontWeight: FontWeight.w600, color: primary),
+          fontSize: 17, fontWeight: FontWeight.w600, color: primary),
       titleMedium: GoogleFonts.inter(
-          fontSize: 14, fontWeight: FontWeight.w600, color: primary),
+          fontSize: 15, fontWeight: FontWeight.w600, color: primary),
       titleSmall: GoogleFonts.inter(
-          fontSize: 12, fontWeight: FontWeight.w500, color: secondary),
+          fontSize: 13, fontWeight: FontWeight.w500, color: secondary),
       bodyLarge: GoogleFonts.inter(
-          fontSize: 16, fontWeight: FontWeight.w400, color: primary),
+          fontSize: 17, fontWeight: FontWeight.w400, color: primary),
       bodyMedium: GoogleFonts.inter(
-          fontSize: 14, fontWeight: FontWeight.w400, color: primary),
+          fontSize: 15, fontWeight: FontWeight.w400, color: primary),
       bodySmall: GoogleFonts.inter(
-          fontSize: 12, fontWeight: FontWeight.w400, color: secondary),
+          fontSize: 13, fontWeight: FontWeight.w400, color: secondary),
       labelLarge: GoogleFonts.inter(
-          fontSize: 14, fontWeight: FontWeight.w600, color: primary),
+          fontSize: 15, fontWeight: FontWeight.w600, color: primary),
       labelSmall: GoogleFonts.inter(
-          fontSize: 10,
-          fontWeight: FontWeight.w700,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
           color: secondary,
-          letterSpacing: 1.5),
+          letterSpacing: 1.0),
     );
   }
 }

@@ -102,11 +102,11 @@ export default function DashboardOverview() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <h1 className="text-2xl font-semibold text-foreground tracking-tight">
-            {getGreeting()}, {user?.name?.split(" ")[0] || "Admin"}
+          <h1 className="text-5xl font-semibold text-foreground tracking-tight mb-2">
+            Stokku.ai
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t("happening_today")}
+          <p className="text-lg text-muted-foreground mt-1 max-w-xl">
+            Inventory. Perfected.
           </p>
         </motion.div>
         <motion.div
@@ -176,7 +176,7 @@ export default function DashboardOverview() {
       {/* Charts row */}
       <div className="grid gap-4 lg:grid-cols-7">
         {/* Area Chart — Stock Activity */}
-        <Card className="lg:col-span-5 bg-card/50 backdrop-blur-sm border-border/50">
+        <Card className="lg:col-span-5 bg-transparent">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <div>
@@ -199,7 +199,7 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent className="pt-4">
             <div className="h-72 w-full min-h-[0] min-w-[0]">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                 <AreaChart data={mockWeeklyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="fillIn" x1="0" y1="0" x2="0" y2="1">
@@ -267,7 +267,7 @@ export default function DashboardOverview() {
         </Card>
 
         {/* Donut chart — Category distribution */}
-        <Card className="lg:col-span-2 bg-card/50 backdrop-blur-sm border-border/50">
+        <Card className="lg:col-span-2 bg-transparent">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">{t("quick_insights")}</CardTitle>
           </CardHeader>
@@ -452,20 +452,20 @@ function KpiCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, duration: 0.4 }}
     >
-      <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/20 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 group">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
+      <Card className="bg-transparent border-0 group py-4">
+        <CardContent className="p-0">
+          <div className="flex items-center justify-between mb-6">
+            <span className="text-xs uppercase tracking-widest font-medium text-muted-foreground">
               {label}
             </span>
-            <div className="p-2 rounded-lg bg-primary/5 text-primary group-hover:bg-primary/10 transition-colors">
-              <Icon size={16} />
+            <div className="text-foreground">
+              <Icon size={20} strokeWidth={1.5} />
             </div>
           </div>
           {loading ? (
             <Skeleton className="h-8 w-28 mb-2" />
           ) : (
-            <div className="text-2xl font-semibold text-foreground tracking-tight">
+            <div className="text-5xl font-semibold text-foreground tracking-tighter">
               <AnimatedNumber value={value} formatter={formatter} />
             </div>
           )}
