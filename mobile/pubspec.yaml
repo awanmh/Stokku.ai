@@ -22,7 +22,7 @@ dependencies:
   flutter_secure_storage: ^9.2.2
 
   # Connectivity
-  connectivity_plus: ^6.0.5
+  flutter_dotenv: ^5.1.0
 
   # Barcode Scanner
   mobile_scanner: ^5.2.3
@@ -40,6 +40,7 @@ dependencies:
 
   # Cupertino Icons
   cupertino_icons: ^1.0.8
+  connectivity_plus: ^7.1.1
 
 dev_dependencies:
   flutter_test:

@@ -59,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.cyan.withOpacity(0.15),
+                    AppColors.cyan.withValues(alpha: 0.15),
                     Colors.transparent,
                   ],
                 ),
@@ -76,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.indigo.withOpacity(0.1),
+                    AppColors.indigo.withValues(alpha: 0.1),
                     Colors.transparent,
                   ],
                 ),
@@ -143,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.04),
+                            color: Colors.white.withValues(alpha: 0.04),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: AppColors.darkBorderSubtle,
@@ -162,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       color: AppColors.errorBg,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: AppColors.error.withOpacity(0.3),
+                                        color: AppColors.error.withValues(alpha: 0.3),
                                       ),
                                     ),
                                     child: Row(
@@ -189,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ],
 
                                 // Email
-                                Text(
+                                const Text(
                                   'EMAIL',
                                   style: TextStyle(
                                     fontSize: 10,
@@ -214,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 const SizedBox(height: 20),
 
                                 // Password
-                                Text(
+                                const Text(
                                   'KATA SANDI',
                                   style: TextStyle(
                                     fontSize: 10,

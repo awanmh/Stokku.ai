@@ -100,7 +100,7 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
+              const Text(
                 'Manajemen Inventaris Cerdas',
                 style: TextStyle(
                   fontSize: 13,
@@ -114,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen>
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: AppColors.cyan.withOpacity(0.5),
+                  color: AppColors.cyan.withValues(alpha: 0.5),
                 ),
               ),
             ],

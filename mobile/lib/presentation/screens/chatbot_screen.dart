@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
@@ -175,8 +174,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           color: dark ? AppColors.darkBorder : AppColors.lightBorder,
         ),
         color: dark
-            ? Colors.white.withOpacity(0.03)
-            : Colors.black.withOpacity(0.03),
+            ? Colors.white.withValues(alpha: 0.03)
+            : Colors.black.withValues(alpha: 0.03),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -247,7 +246,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                     color: isUser
                         ? AppColors.primary
                         : (dark
-                            ? Colors.white.withOpacity(0.05)
+                            ? Colors.white.withValues(alpha: 0.05)
                             : Colors.white),
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(16),
@@ -288,7 +287,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.15),
+                color: AppColors.primary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(Icons.person, size: 14, color: AppColors.primary),
@@ -321,7 +320,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: dark ? Colors.white.withOpacity(0.05) : Colors.white,
+              color: dark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -387,7 +386,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                   color: dark ? AppColors.darkBorder : AppColors.lightBorder,
                 ),
                 color: dark
-                    ? Colors.white.withOpacity(0.03)
+                    ? Colors.white.withValues(alpha: 0.03)
                     : Colors.white,
               ),
               child: Text(
@@ -437,14 +436,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                         fontSize: 13,
                         color: dark ? AppColors.textPrimary : AppColors.textDark,
                       ),
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Tanya soal stok, restock, atau forecast...',
                         hintStyle: TextStyle(
                           fontSize: 13,
                           color: AppColors.textMuted,
                         ),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
+                        contentPadding: EdgeInsets.symmetric(
                           horizontal: 14,
                           vertical: 10,
                         ),
@@ -487,7 +486,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
             const SizedBox(height: 6),
             Text(
               'Model: ${chat.selectedModel == 'gemini-2.5-flash' ? 'Gemini 2.5 Flash' : 'Gemma 3 27B'}. Stokku AI dapat membuat kesalahan.',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 9,
                 color: AppColors.textMuted,
               ),

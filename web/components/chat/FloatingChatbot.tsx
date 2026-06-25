@@ -21,6 +21,7 @@ import {
   type ChatMessage,
   type ChatModelId,
 } from "@/lib/chatbot";
+import { useTranslation } from "@/lib/i18n";
 
 /* ──────────── Types ──────────── */
 type Message = {
@@ -30,22 +31,7 @@ type Message = {
   timestamp: Date;
 };
 
-const INITIAL_MESSAGE: Message = {
-  id: "initial",
-  text: "Halo! 👋 Saya **Stokku AI**, asisten inventaris untuk Stokku.ai. Tanyakan soal stok, restock, dead-stock, atau forecast kapan saja.",
-  sender: "bot",
-  timestamp: new Date(),
-};
-
-const QUICK_REPLIES = [
-  "Apa stok kritis hari ini?",
-  "Berikan rekomendasi restock",
-  "Deteksi dead-stock",
-  "Ringkas kondisi inventaris",
-];
-
 const CHAT_REQUEST_TIMEOUT_MS = 30000;
-
 /* ──────────── Markdown-lite renderer ──────────── */
 function renderMessageText(text: string) {
   // Split by newlines, then handle bold (**text**)
@@ -72,7 +58,38 @@ function renderMessageText(text: string) {
 /* ──────────── Component ──────────── */
 export function FloatingChatbot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
+  const { t, language } = useTranslation();
+
+  const QUICK_REPLIES = [
+    t("quick_reply_1"),
+    t("quick_reply_2"),
+    t("quick_reply_3"),
+    t("quick_reply_4"),
+  ];
+
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length === 0) {
+        return [
+          {
+            id: "initial",
+            text: t("bot_greeting"),
+            sender: "bot" as const,
+            timestamp: new Date(),
+          },
+        ];
+      }
+      return prev.map((msg) =>
+        msg.id === "initial"
+          ? { ...msg, text: t("bot_greeting") }
+          : msg
+      );
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
+
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [selectedModel, setSelectedModel] = useState<ChatModelId>(DEFAULT_CHAT_MODEL);
@@ -140,14 +157,14 @@ export function FloatingChatbot() {
 
         if (!response.ok || !payload?.success || !payload?.data?.reply) {
           if (response.status === 429) {
-            throw new Error(payload?.message || "Terlalu banyak permintaan. Coba lagi sebentar.");
+            throw new Error(payload?.message || (language === "en" ? "Too many requests. Try again later." : "Terlalu banyak permintaan. Coba lagi sebentar."));
           }
 
           if (response.status >= 500) {
-            throw new Error(payload?.message || "Layanan AI sedang bermasalah. Coba lagi nanti.");
+            throw new Error(payload?.message || (language === "en" ? "AI service is currently experiencing issues. Try again later." : "Layanan AI sedang bermasalah. Coba lagi nanti."));
           }
 
-          throw new Error(payload?.message || "Gagal memproses jawaban dari Gemini.");
+          throw new Error(payload?.message || (language === "en" ? "Failed to process reply from Gemini." : "Gagal memproses jawaban dari Gemini."));
         }
 
         const botMsg: Message = {
@@ -161,17 +178,17 @@ export function FloatingChatbot() {
       } catch (error) {
         const errorMessage =
           error instanceof DOMException && error.name === "AbortError"
-            ? "Permintaan melebihi batas waktu. Coba lagi dalam beberapa saat."
+            ? (language === "en" ? "Request timed out. Try again in a moment." : "Permintaan melebihi batas waktu. Coba lagi dalam beberapa saat.")
             : error instanceof TypeError
-              ? "Tidak bisa menjangkau server chatbot. Periksa koneksi atau status server."
+              ? (language === "en" ? "Cannot reach chatbot server. Check your connection." : "Tidak bisa menjangkau server chatbot. Periksa koneksi atau status server.")
               : error instanceof Error
                 ? error.message
-                : "Terjadi kesalahan tak terduga.";
+                : (language === "en" ? "An unexpected error occurred." : "Terjadi kesalahan tak terduga.");
         setMessages((prev) => [
           ...prev,
           {
             id: (Date.now() + 1).toString(),
-            text: `Maaf, chatbot sedang tidak tersedia. ${errorMessage}`,
+            text: t("chatbot_error_retry", { error: errorMessage }),
             sender: "bot",
             timestamp: new Date(),
           },
@@ -181,7 +198,7 @@ export function FloatingChatbot() {
         setIsTyping(false);
       }
     },
-    [input, isTyping, messages, selectedModel]
+    [input, isTyping, messages, selectedModel, t, language]
   );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -239,7 +256,7 @@ export function FloatingChatbot() {
                         aria-pressed={isActive}
                         aria-label={`Pilih model ${option.label}`}
                       >
-                        {option.id === "gemini-2.5-flash" ? "Flash" : "Gemma"}
+                        {option.shortLabel || option.label}
                       </button>
                     );
                   })}
@@ -385,7 +402,7 @@ export function FloatingChatbot() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Tanya soal stok, restock, atau forecast..."
+                  placeholder={t("chatbot_input_placeholder")}
                   disabled={isTyping}
                   className="flex-1 bg-secondary border border-border rounded-lg px-3 py-2 text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 transition-colors"
                 />
@@ -403,7 +420,7 @@ export function FloatingChatbot() {
                 </Button>
               </div>
               <p className="text-[9px] text-muted-foreground text-center mt-1.5">
-                Model aktif: {selectedModel === "gemini-2.5-flash" ? "Gemini 2.5 Flash" : "Gemma 3 27B"}. Stokku AI dapat membuat kesalahan. Periksa kembali informasi penting.
+                {t("disclaimer", { model: CHAT_MODEL_OPTIONS.find((o) => o.id === selectedModel)?.label || selectedModel })}
               </p>
             </div>
           </motion.div>

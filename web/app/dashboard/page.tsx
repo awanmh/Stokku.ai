@@ -34,6 +34,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { useTranslation } from "@/lib/i18n";
 
 // Mock chart data — replace with real API later
 const mockWeeklyData = [
@@ -60,6 +61,7 @@ export default function DashboardOverview() {
   const [recentTx, setRecentTx] = useState<TransactionView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { t } = useTranslation();
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -86,9 +88,9 @@ export default function DashboardOverview() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Selamat pagi";
-    if (hour < 17) return "Selamat siang";
-    return "Selamat malam";
+    if (hour < 12) return t("greeting_morning");
+    if (hour < 17) return t("greeting_afternoon");
+    return t("greeting_evening");
   };
 
   return (
@@ -104,7 +106,7 @@ export default function DashboardOverview() {
             {getGreeting()}, {user?.name?.split(" ")[0] || "Admin"}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Ringkasan inventaris dan aktivitas hari ini.
+            {t("happening_today")}
           </p>
         </motion.div>
         <motion.div
@@ -114,7 +116,7 @@ export default function DashboardOverview() {
         >
           <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-            Refresh
+            {t("refresh")}
           </Button>
         </motion.div>
       </div>
@@ -127,7 +129,7 @@ export default function DashboardOverview() {
         >
           <p>{error}</p>
           <Button variant="ghost" size="sm" onClick={fetchData}>
-            Coba Lagi
+            {t("retry")}
           </Button>
         </motion.div>
       )}
@@ -135,7 +137,7 @@ export default function DashboardOverview() {
       {/* KPI cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <KpiCard
-          label="Nilai Inventaris"
+          label={t("inv_value")}
           value={stats?.total_stock_value || 0}
           formatter={formatCurrency}
           delta="+12.5%"
@@ -145,25 +147,25 @@ export default function DashboardOverview() {
           index={0}
         />
         <KpiCard
-          label="Produk Aktif"
+          label={t("active_products")}
           value={stats?.total_products || 0}
-          delta="+4 minggu ini"
+          delta="+4 this week"
           deltaUp
           icon={Package}
           loading={loading}
           index={1}
         />
         <KpiCard
-          label="Gudang"
+          label={t("warehouses")}
           value={stats?.total_warehouses || 0}
           icon={Building2}
           loading={loading}
           index={2}
         />
         <KpiCard
-          label="Stok Rendah"
+          label={t("low_stock_alerts_count")}
           value={stats?.low_stock_count || 0}
-          delta={stats?.low_stock_count ? "Perlu perhatian" : "Semua aman"}
+          delta={stats?.low_stock_count ? t("needs_attention") : t("all_clear_status")}
           deltaUp={!stats?.low_stock_count}
           icon={AlertTriangle}
           loading={loading}
@@ -178,19 +180,19 @@ export default function DashboardOverview() {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-medium">Aktivitas Stok</CardTitle>
+                <CardTitle className="text-sm font-medium">{t("stock_activity")}</CardTitle>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Volume stok masuk vs keluar per minggu
+                  {t("weekly_vol")}
                 </p>
               </div>
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-primary" />
-                  Masuk
+                  {t("stock_in")}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-chart-4" />
-                  Keluar
+                  {t("stock_out")}
                 </span>
               </div>
             </div>
@@ -243,7 +245,7 @@ export default function DashboardOverview() {
                   <Area
                     type="monotone"
                     dataKey="stockIn"
-                    name="Stok Masuk"
+                    name={t("stock_in")}
                     stroke="hsl(198, 80%, 48%)"
                     strokeWidth={2}
                     fillOpacity={1}
@@ -252,7 +254,7 @@ export default function DashboardOverview() {
                   <Area
                     type="monotone"
                     dataKey="stockOut"
-                    name="Stok Keluar"
+                    name={t("stock_out")}
                     stroke="hsl(262, 60%, 55%)"
                     strokeWidth={2}
                     fillOpacity={1}
@@ -267,196 +269,122 @@ export default function DashboardOverview() {
         {/* Donut chart — Category distribution */}
         <Card className="lg:col-span-2 bg-card/50 backdrop-blur-sm border-border/50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Distribusi Kategori</CardTitle>
-            <p className="text-xs text-muted-foreground mt-0.5">Berdasarkan jumlah produk</p>
+            <CardTitle className="text-sm font-medium">{t("quick_insights")}</CardTitle>
           </CardHeader>
-          <CardContent className="pt-2">
-            <div className="h-48 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={mockCategoryData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={75}
-                    paddingAngle={3}
-                    dataKey="value"
-                    strokeWidth={0}
-                  >
-                    {mockCategoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--bg-overlay))",
-                      borderColor: "hsl(var(--border-default))",
-                      borderRadius: "8px",
-                      fontSize: "12px",
-                      boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-                    }}
-                    itemStyle={{ color: "hsl(var(--text-primary))" }}
-                    formatter={(value) => [`${value}%`, ""]}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-foreground">{t("restock_needed")}</span>
+                <Badge variant="warning">High</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t("projected_run_out")}
+              </p>
             </div>
-            {/* Legend */}
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {mockCategoryData.map((cat) => (
-                <div key={cat.name} className="flex items-center gap-2 text-xs">
-                  <span
-                    className="h-2.5 w-2.5 rounded-sm shrink-0"
-                    style={{ backgroundColor: cat.color }}
-                  />
-                  <span className="text-muted-foreground truncate">{cat.name}</span>
-                  <span className="text-foreground font-medium ml-auto">{cat.value}%</span>
-                </div>
-              ))}
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-foreground">{t("demand_trend")}</span>
+                <Badge>Monitor</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t("forecasted_increase")}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-foreground">{t("dead_stock_card")}</span>
+                <Badge variant="secondary">Low</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t("not_moved_days", { count: stats?.dead_stock_count || 0 })}
+              </p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Bottom row: Recent transactions + Low stock */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        {/* Recent Transactions */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-          <CardHeader className="pb-3 border-b border-border/50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Activity size={14} className="text-primary" />
-                <CardTitle className="text-sm font-medium">Transaksi Terakhir</CardTitle>
-              </div>
-              <Button variant="ghost" size="sm" asChild>
-                <a href="/dashboard/transactions">Lihat semua →</a>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            {loading ? (
-              <div className="space-y-0">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 px-6 py-3.5 border-b border-border/30">
-                    <Skeleton className="h-8 w-8 rounded-full" />
-                    <div className="flex-1 space-y-1.5">
-                      <Skeleton className="h-3.5 w-32" />
-                      <Skeleton className="h-3 w-20" />
-                    </div>
-                    <Skeleton className="h-4 w-16" />
-                  </div>
-                ))}
-              </div>
-            ) : recentTx.length === 0 ? (
-              <EmptyState
-                icon={ArrowRightLeft}
-                title="Belum ada transaksi"
-                description="Catat transaksi stok pertama Anda."
-                actionLabel="Buat Transaksi"
-                onAction={() => window.location.href = "/dashboard/transactions"}
-                className="py-16"
-              />
-            ) : (
-              <div>
-                {recentTx.map((tx, idx) => (
-                  <motion.div
-                    key={tx.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="flex items-center gap-3 px-6 py-3.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 transition-colors"
-                  >
-                    <div className={`p-1.5 rounded-full ${
-                      tx.type === "stock_in"
-                        ? "bg-success/10 text-success"
-                        : "bg-destructive/10 text-destructive"
-                    }`}>
-                      {tx.type === "stock_in" ? <ArrowDownRight size={14} /> : <ArrowUpRight size={14} />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{tx.product_name}</p>
-                      <p className="text-[10px] text-muted-foreground">{tx.warehouse_name}</p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className={`text-sm font-bold ${
-                        tx.type === "stock_in" ? "text-success" : "text-destructive"
-                      }`}>
-                        {tx.type === "stock_in" ? "+" : "-"}{formatNumber(tx.quantity)}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground">{formatDate(tx.created_at)}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      {/* Low stock table */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-medium text-foreground tracking-tight">
+            {t("low_stock_alerts")}
+          </h2>
+          <Button variant="ghost" size="sm" asChild>
+            <a href="/dashboard/inventory">{t("view_all_inv")}</a>
+          </Button>
+        </div>
 
-        {/* Low stock table */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-          <CardHeader className="pb-3 border-b border-border/50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <AlertTriangle size={14} className="text-warning" />
-                <CardTitle className="text-sm font-medium">Stok Rendah</CardTitle>
-              </div>
-              <Button variant="ghost" size="sm" asChild>
-                <a href="/dashboard/inventory">Lihat inventaris →</a>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            {loading ? (
-              <div className="space-y-0">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 px-6 py-3.5 border-b border-border/30">
-                    <div className="flex-1 space-y-1.5">
-                      <Skeleton className="h-3.5 w-40" />
-                      <Skeleton className="h-3 w-24" />
-                    </div>
-                    <Skeleton className="h-5 w-16 rounded-full" />
-                    <Skeleton className="h-7 w-16" />
-                  </div>
-                ))}
-              </div>
-            ) : lowStock.length === 0 ? (
-              <EmptyState
-                icon={Package}
-                title="Semua stok aman"
-                description="Tidak ada produk dengan level stok rendah saat ini."
-                className="py-16"
-              />
-            ) : (
-              <div>
-                {lowStock.map((item, idx) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="flex items-center gap-3 px-6 py-3.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 transition-colors"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{item.product_name}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] text-muted-foreground font-mono">{item.product_sku}</span>
-                        <span className="text-[10px] text-muted-foreground">•</span>
-                        <span className="text-[10px] text-muted-foreground">{item.warehouse_name}</span>
+        <Card>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-secondary border-b border-border">
+                <tr>
+                  <th className="px-4 py-3 text-left text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
+                    {t("product")}
+                  </th>
+                  <th className="px-4 py-3 text-left text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
+                    {t("warehouse")}
+                  </th>
+                  <th className="px-4 py-3 text-left text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
+                    {t("stock")}
+                  </th>
+                  <th className="px-4 py-3 text-left text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
+                    {t("status")}
+                  </th>
+                  <th className="px-4 py-3 text-right text-[11px] uppercase tracking-widest font-medium text-muted-foreground">
+                    {t("action_col")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <tr key={i} className="border-b border-border">
+                      <td className="px-4 py-3"><Skeleton className="h-4 w-40" /></td>
+                      <td className="px-4 py-3"><Skeleton className="h-4 w-24" /></td>
+                      <td className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
+                      <td className="px-4 py-3"><Skeleton className="h-5 w-16" /></td>
+                      <td className="px-4 py-3"><Skeleton className="h-7 w-20 ml-auto" /></td>
+                    </tr>
+                  ))
+                ) : lowStock.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-16 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <Package size={32} className="text-muted-foreground" />
+                        <p className="text-sm text-foreground font-medium">{t("no_low_stock")}</p>
+                        <p className="text-xs text-muted-foreground">{t("healthy_levels")}</p>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <div className="text-right">
-                        <span className="text-sm font-bold text-destructive">{item.quantity}</span>
-                        <span className="text-xs text-muted-foreground"> / {item.min_stock}</span>
-                      </div>
-                      <Badge variant="destructive" className="rounded-full px-2 text-[9px]">Kritis</Badge>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </CardContent>
+                    </td>
+                  </tr>
+                ) : (
+                  lowStock.map((item) => (
+                    <tr key={item.id} className="border-b border-border hover:bg-secondary/50 transition-colors duration-100">
+                      <td className="px-4 py-3">
+                        <div>
+                          <p className="font-medium text-foreground">{item.product_name}</p>
+                          <p className="text-xs text-muted-foreground font-mono">{item.product_sku}</p>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {item.warehouse_name}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="font-medium text-destructive">{item.quantity}</span>
+                        <span className="text-muted-foreground"> / {item.min_stock}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge variant="destructive">{t("critical_badge")}</Badge>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <Button size="sm">{t("restock")}</Button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </Card>
       </div>
     </div>
