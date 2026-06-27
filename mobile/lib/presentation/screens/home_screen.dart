@@ -21,12 +21,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  final _pages = const [
-    DashboardScreen(),
-    ScannerScreen(),
-    InventoryScreen(),
-    TransactionsScreen(),
-    ProfileScreen(),
+  late final _pages = [
+    DashboardScreen(onNavigate: (index) => setState(() => _currentIndex = index)),
+    const ScannerScreen(),
+    const InventoryScreen(),
+    const TransactionsScreen(),
+    const ProfileScreen(),
   ];
 
   @override

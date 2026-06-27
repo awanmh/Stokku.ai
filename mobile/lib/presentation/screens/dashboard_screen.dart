@@ -5,11 +5,13 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/dashboard_provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/inventory_provider.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/glass_card.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final Function(int)? onNavigate;
+  const DashboardScreen({super.key, this.onNavigate});
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
@@ -99,12 +101,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Alerts
                 if (d.stats!.lowStockCount > 0) _alertCard(
                   'Stok Rendah', '${d.stats!.lowStockCount} produk perlu restock',
-                  Icons.warning_amber_rounded, AppColors.warning, AppColors.warningBg, dark)
+                  Icons.warning_amber_rounded, AppColors.warning, AppColors.warningBg, dark,
+                  () {
+                    context.read<InventoryProvider>().loadInventory(search: '');
+                    if (!context.read<InventoryProvider>().lowStockOnly) {
+                      context.read<InventoryProvider>().toggleLowStockFilter();
+                    }
+                    widget.onNavigate?.call(2);
+                  })
                     .animate().fadeIn(duration: 400.ms, delay: 500.ms)
                     .slideX(begin: -0.05, end: 0, duration: 400.ms, delay: 500.ms),
                 if (d.stats!.deadStockCount > 0) _alertCard(
                   'Dead Stock', '${d.stats!.deadStockCount} produk tidak bergerak',
-                  Icons.dangerous_outlined, AppColors.error, AppColors.errorBg, dark)
+                  Icons.dangerous_outlined, AppColors.error, AppColors.errorBg, dark,
+                  () {
+                    context.read<InventoryProvider>().loadInventory(search: '');
+                    widget.onNavigate?.call(2);
+                  })
                     .animate().fadeIn(duration: 400.ms, delay: 600.ms)
                     .slideX(begin: -0.05, end: 0, duration: 400.ms, delay: 600.ms),
 
@@ -169,18 +182,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _alertCard(String title, String sub, IconData icon, Color c, Color bg, bool dark) {
-    return GlassCard(child: Row(children: [
-      Container(padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(12)),
-        child: Icon(icon, color: c, size: 20)),
-      const SizedBox(width: 14),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-        Text(sub, style: TextStyle(fontSize: 12,
-            color: dark ? AppColors.textSecondary : AppColors.textDarkSecondary)),
-      ])),
-      const Icon(Icons.chevron_right, color: AppColors.textMuted),
-    ]));
+  Widget _alertCard(String title, String sub, IconData icon, Color c, Color bg, bool dark, [VoidCallback? onTap]) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: GlassCard(child: Row(children: [
+            Container(padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(12)),
+              child: Icon(icon, color: c, size: 20)),
+            const SizedBox(width: 14),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+              Text(sub, style: TextStyle(fontSize: 12,
+                  color: dark ? AppColors.textSecondary : AppColors.textDarkSecondary)),
+            ])),
+            const Icon(Icons.chevron_right, color: AppColors.textMuted),
+          ])),
+        ),
+      ),
+    );
   }
 }

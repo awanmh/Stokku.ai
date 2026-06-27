@@ -61,13 +61,26 @@ type TransactionRepository interface {
 }
 
 // DashboardStats holds aggregated dashboard metrics
+type WeeklyActivity struct {
+	Name     string `json:"name"`
+	StockIn  int    `json:"stockIn"`
+	StockOut int    `json:"stockOut"`
+}
+
+type TopProduct struct {
+	Name  string `json:"name"`
+	Value int    `json:"value"`
+}
+
 type DashboardStats struct {
-	TotalProducts   int     `json:"total_products"`
-	TotalWarehouses int     `json:"total_warehouses"`
-	TotalStockValue float64 `json:"total_stock_value"`
-	LowStockCount   int     `json:"low_stock_count"`
-	DeadStockCount  int     `json:"dead_stock_count"`
-	TodayTxCount    int     `json:"today_tx_count"`
+	TotalProducts   int              `json:"total_products"`
+	TotalWarehouses int              `json:"total_warehouses"`
+	TotalStockValue float64          `json:"total_stock_value"`
+	LowStockCount   int              `json:"low_stock_count"`
+	DeadStockCount  int              `json:"dead_stock_count"`
+	TodayTxCount    int              `json:"today_tx_count"`
+	WeeklyActivity  []WeeklyActivity `json:"weekly_activity"`
+	TopProducts     []TopProduct     `json:"top_products"`
 }
 
 // LockRepository for distributed locking via Redis

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/warehouse_provider.dart';
 import '../widgets/glass_card.dart';
+import 'warehouse_detail_screen.dart';
 
 class WarehousesScreen extends StatefulWidget {
   const WarehousesScreen({super.key});
@@ -65,71 +66,82 @@ class _WarehousesScreenState extends State<WarehousesScreen> {
                             itemCount: wh.warehouses.length,
                             itemBuilder: (ctx, i) {
                               final w = wh.warehouses[i];
-                              return GlassCard(
-                                padding: const EdgeInsets.all(16),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 44, height: 44,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            AppColors.indigo.withValues(alpha: 0.1),
-                                        borderRadius:
-                                            BorderRadius.circular(12),
-                                      ),
-                                      child: const Icon(
-                                          Icons.warehouse_rounded,
-                                          color: AppColors.indigo, size: 22),
+
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => WarehouseDetailScreen(warehouse: w),
                                     ),
-                                    const SizedBox(width: 14),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(w.name,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 14)),
-                                          const SizedBox(height: 2),
-                                          if (w.location.isNotEmpty)
-                                            Text('📍 ${w.location}',
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: muted)),
-                                          if (w.address.isNotEmpty)
-                                            Text(w.address,
-                                                style: TextStyle(
-                                                    fontSize: 11,
-                                                    color: muted),
-                                                maxLines: 1,
-                                                overflow:
-                                                    TextOverflow.ellipsis),
-                                        ],
+                                  );
+                                },
+                                child: GlassCard(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 44, height: 44,
+                                        decoration: BoxDecoration(
+                                          color:
+                                              AppColors.indigo.withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: const Icon(
+                                            Icons.warehouse_rounded,
+                                            color: AppColors.indigo, size: 22),
                                       ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: w.isActive
-                                            ? AppColors.successBg
-                                            : AppColors.errorBg,
-                                        borderRadius:
-                                            BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        w.isActive ? 'Aktif' : 'Nonaktif',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w700,
-                                          color: w.isActive
-                                              ? AppColors.success
-                                              : AppColors.error,
+                                      const SizedBox(width: 14),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(w.name,
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 14)),
+                                            const SizedBox(height: 2),
+                                            if (w.location.isNotEmpty)
+                                              Text('📍 ${w.location}',
+                                                  style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: muted)),
+                                            if (w.address.isNotEmpty)
+                                              Text(w.address,
+                                                  style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: muted),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis),
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: w.isActive
+                                              ? AppColors.successBg
+                                              : AppColors.errorBg,
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                        ),
+                                        child: Text(
+                                          w.isActive ? 'Aktif' : 'Nonaktif',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w700,
+                                            color: w.isActive
+                                                ? AppColors.success
+                                                : AppColors.error,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               )
                                   .animate()

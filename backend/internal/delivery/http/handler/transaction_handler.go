@@ -115,3 +115,17 @@ func (h *TransactionHandler) GetInventory(c *fiber.Ctx) error {
 
 	return response.Paginated(c, stocks, total, filter.Limit, filter.Offset)
 }
+
+func (h *TransactionHandler) GetInventoryByID(c *fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return response.BadRequest(c, "Invalid inventory ID")
+	}
+
+	stock, err := h.txUC.GetInventoryByID(c.Context(), id)
+	if err != nil {
+		return response.NotFound(c, "Inventory not found")
+	}
+
+	return response.Success(c, stock, "Inventory retrieved")
+}

@@ -27,9 +27,12 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
+  Eye,
 } from "lucide-react";
 import { formatNumber, formatDate } from "@/lib/utils";
 import { transactionApi, productApi, warehouseApi, reportApi } from "@/lib/api";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import type { TransactionView, Product, Warehouse } from "@/lib/api";
@@ -40,6 +43,7 @@ type TxSortKey = "product_name" | "quantity" | "created_at";
 type SortDir = "asc" | "desc";
 
 export default function TransactionsPage() {
+  const router = useRouter();
   const [transactions, setTransactions] = useState<TransactionView[]>([]);
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
@@ -247,6 +251,7 @@ export default function TransactionsPage() {
                       <TableHead className="text-right cursor-pointer select-none" onClick={() => toggleSort("created_at")}>
                         <span className="flex items-center justify-end">Waktu <SortIcon col="created_at" /></span>
                       </TableHead>
+                      <TableHead className="text-right w-[80px]">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -255,9 +260,10 @@ export default function TransactionsPage() {
                         <motion.tr
                           key={tx.id}
                           initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
+                          animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: idx * 0.02 }}
-                          className={`group border-border/50 hover:bg-secondary/30 transition-colors ${idx % 2 === 1 ? "bg-secondary/10" : ""}`}
+                          onClick={() => router.push(`/dashboard/transactions/${tx.id}`)}
+                          className={`group border-border/50 hover:bg-secondary/30 transition-colors cursor-pointer ${idx % 2 === 1 ? "bg-secondary/10" : ""}`}
                         >
                           <TableCell>
                             <div className="flex items-center justify-center">
@@ -302,6 +308,19 @@ export default function TransactionsPage() {
                               <span className="text-[11px] font-medium text-foreground/80">{formatDate(tx.created_at)}</span>
                               <span className="text-[9px] text-muted-foreground/60">Berhasil</span>
                             </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
+                              asChild
+                              title="Lihat Detail"
+                            >
+                              <Link href={`/dashboard/transactions/${tx.id}`}>
+                                <Eye size={14} />
+                              </Link>
+                            </Button>
                           </TableCell>
                         </motion.tr>
                       ))}

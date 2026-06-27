@@ -162,8 +162,8 @@ export function Header() {
                       {t("low_stock_alerts")}
                     </div>
                     {alerts.lowStock.map((item) => (
-                      <Link key={`low-${item.id}`} href="/dashboard/inventory?low_stock=true">
-                        <DropdownMenuItem className="cursor-pointer flex items-start gap-2.5 px-3 py-2.5 focus:bg-secondary">
+                      <DropdownMenuItem key={`low-${item.id}`} asChild className="cursor-pointer p-0">
+                        <Link href={`/dashboard/inventory/${item.id}`} className="flex items-start gap-2.5 px-3 py-2.5 focus:bg-secondary w-full">
                           <div className="mt-0.5 p-1 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400">
                             <AlertTriangle size={12} />
                           </div>
@@ -178,8 +178,8 @@ export function Header() {
                               {t("stock_status", { qty: item.quantity, min: item.min_stock })}
                             </p>
                           </div>
-                        </DropdownMenuItem>
-                      </Link>
+                        </Link>
+                      </DropdownMenuItem>
                     ))}
                   </>
                 )}
@@ -191,8 +191,8 @@ export function Header() {
                       {t("dead_stock_alerts")}
                     </div>
                     {alerts.deadStock.map((item) => (
-                      <Link key={`dead-${item.id}`} href="/dashboard/inventory">
-                        <DropdownMenuItem className="cursor-pointer flex items-start gap-2.5 px-3 py-2.5 focus:bg-secondary">
+                      <DropdownMenuItem key={`dead-${item.id}`} asChild className="cursor-pointer p-0">
+                        <Link href={`/dashboard/inventory/${item.id}`} className="flex items-start gap-2.5 px-3 py-2.5 focus:bg-secondary w-full">
                           <div className="mt-0.5 p-1 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400">
                             <Clock size={12} />
                           </div>
@@ -207,8 +207,8 @@ export function Header() {
                               {t("not_moving", { qty: item.quantity })}
                             </p>
                           </div>
-                        </DropdownMenuItem>
-                      </Link>
+                        </Link>
+                      </DropdownMenuItem>
                     ))}
                   </>
                 )}

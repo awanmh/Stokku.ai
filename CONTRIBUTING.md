@@ -28,16 +28,16 @@ Dokumen ini menjelaskan aturan kontribusi tim untuk menjaga workflow tetap rapi,
 
 ## 2. Pembagian Role Tim (Rekomendasi PALING IDEAL)
 
-### Setiawan Muhammad — Backend Lead & System Architect
-- Golang API (core logic)
-- Database design (PostgreSQL)
-- Redis locking (anti race condition)
-- API contract
+### Setiawan Muhammad — Tech Lead & Project Manager (PM)
+- System Architecture Design
+- Fullstack Integration (Backend, Frontend, Mobile)
+- Code Review & Task Management
+- DevOps & CI/CD Pipeline
 
 Branch:
 ```
 
-feature/backend-core
+feature/tech-lead
 
 ```
 
@@ -46,7 +46,7 @@ feature/backend-core
 ### Muhammad Aqil Mahdi Syarif — AI Engineer
 - Demand forecasting
 - Model training
-- AI API (FastAPI)
+- AI API (Gemini/Gemma)
 - Data preprocessing
 
 Branch:
@@ -58,10 +58,26 @@ feature/ai-forecast
 
 ---
 
-### Felix Yohanes Sangapta Simamora — Web Frontend
+### Felix Yohanes Sangapta Simamora — Backend Developer
+- Golang API (core logic)
+- OTP Authentication & Login
+- Database design (PostgreSQL)
+- Redis locking (anti race condition)
+
+Branch:
+```
+
+feature/backend-core
+
+```
+
+---
+
+### Neisya Nurul Alyazara — Web Frontend Developer
 - Dashboard Next.js
 - Analytics & chart
 - Role-based UI
+- Responsive Design
 
 Branch:
 ```
@@ -72,30 +88,16 @@ feature/web-dashboard
 
 ---
 
-### Neisya Nurul Alyazara — Mobile Developer
-- Flutter app
-- Barcode scanning
-- Offline-first sync
+### Hervin Dwicahya Kusuma — Mobile Developer
+- Flutter app development
+- Barcode scanning & Chatbot Mobile UI
+- Offline-first sync & API Integration
+- Widget testing
 
 Branch:
 ```
 
-feature/mobile-scanner
-
-```
-
----
-
-### Hervin Dwicahya Kusuma — DevOps & Integration
-- Docker & docker-compose
-- Environment setup
-- CI/CD
-- Integrasi sistem
-
-Branch:
-```
-
-feature/devops-setup
+feature/mobile-app
 
 ````
 
