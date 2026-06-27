@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/product_provider.dart';
 import '../widgets/glass_card.dart';
+import 'product_detail_screen.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -109,39 +110,49 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   itemCount: prov.products.length,
                   itemBuilder: (ctx, i) {
                     final p = prov.products[i];
-                    return GlassCard(
-                      padding: const EdgeInsets.all(14),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 44, height: 44,
-                            decoration: BoxDecoration(
-                              color: AppColors.cyan.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(Icons.category_rounded,
-                                color: AppColors.cyan, size: 22),
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProductDetailScreen(product: p),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(p.name,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14)),
-                                const SizedBox(height: 2),
-                                Text('${p.sku} • ${p.category}',
-                                    style:
-                                        TextStyle(fontSize: 11, color: muted)),
-                              ],
+                        );
+                      },
+                      child: GlassCard(
+                        padding: const EdgeInsets.all(14),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44, height: 44,
+                              decoration: BoxDecoration(
+                                color: AppColors.cyan.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(Icons.category_rounded,
+                                  color: AppColors.cyan, size: 22),
                             ),
-                          ),
-                          Text(_fmtPrice(p.price),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 13)),
-                        ],
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(p.name,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14)),
+                                  const SizedBox(height: 2),
+                                  Text('${p.sku} • ${p.category}',
+                                      style:
+                                          TextStyle(fontSize: 11, color: muted)),
+                                ],
+                              ),
+                            ),
+                            Text(_fmtPrice(p.price),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 13)),
+                          ],
+                        ),
                       ),
                     )
                         .animate()

@@ -33,8 +33,11 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
+  Eye,
 } from "lucide-react";
 import { inventoryApi, productApi, warehouseApi, transactionApi, reportApi } from "@/lib/api";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
 import { motion, AnimatePresence } from "framer-motion";
@@ -47,6 +50,7 @@ type InvSortKey = "product_name" | "warehouse_name" | "quantity" | "total_value"
 type SortDir = "asc" | "desc";
 
 export default function InventoryPage() {
+  const router = useRouter();
   const [inventory, setInventory] = useState<StockView[]>([]);
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
@@ -278,7 +282,8 @@ export default function InventoryPage() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.02 }}
-                            className={`group border-border/50 hover:bg-secondary/30 transition-colors ${idx % 2 === 1 ? "bg-secondary/10" : ""}`}
+                            onClick={() => router.push(`/dashboard/inventory/${item.id}`)}
+                            className={`group border-border/50 hover:bg-secondary/30 transition-colors cursor-pointer ${idx % 2 === 1 ? "bg-secondary/10" : ""}`}
                           >
                             <TableCell>
                               <div className="flex flex-col">
@@ -306,14 +311,27 @@ export default function InventoryPage() {
                               )}
                             </TableCell>
                             <TableCell className="text-right">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 text-xs text-primary hover:bg-primary/10 transition-colors"
-                                onClick={() => openRestockModal(item)}
-                              >
-                                Restok
-                              </Button>
+                              <div className="flex items-center justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
+                                  asChild
+                                  title="Lihat Detail"
+                                >
+                                  <Link href={`/dashboard/inventory/${item.id}`}>
+                                    <Eye size={14} />
+                                  </Link>
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 text-xs text-primary hover:bg-primary/10 transition-colors"
+                                  onClick={() => openRestockModal(item)}
+                                >
+                                  Restok
+                                </Button>
+                              </div>
                             </TableCell>
                           </motion.tr>
                         );

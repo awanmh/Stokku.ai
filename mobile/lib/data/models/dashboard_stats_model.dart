@@ -18,12 +18,12 @@ class DashboardStatsModel {
 
   factory DashboardStatsModel.fromJson(Map<String, dynamic> json) =>
       DashboardStatsModel(
-        totalProducts: json['total_products'] ?? 0,
-        totalWarehouses: json['total_warehouses'] ?? 0,
-        totalStockValue: (json['total_stock_value'] ?? 0).toDouble(),
-        lowStockCount: json['low_stock_count'] ?? 0,
-        deadStockCount: json['dead_stock_count'] ?? 0,
-        todayTxCount: json['today_tx_count'] ?? 0,
+        totalProducts: int.tryParse(json['total_products']?.toString() ?? '0') ?? 0,
+        totalWarehouses: int.tryParse(json['total_warehouses']?.toString() ?? '0') ?? 0,
+        totalStockValue: double.tryParse(json['total_stock_value']?.toString() ?? '0') ?? 0.0,
+        lowStockCount: int.tryParse(json['low_stock_count']?.toString() ?? '0') ?? 0,
+        deadStockCount: int.tryParse(json['dead_stock_count']?.toString() ?? '0') ?? 0,
+        todayTxCount: int.tryParse(json['today_tx_count']?.toString() ?? '0') ?? 0,
       );
 
   Map<String, dynamic> toJson() => {

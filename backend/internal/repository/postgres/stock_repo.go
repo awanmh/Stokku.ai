@@ -19,6 +19,26 @@ func NewStockRepository(pool *pgxpool.Pool) domain.StockRepository {
 	return &stockRepository{pool: pool}
 }
 
+func (r *stockRepository) GetByID(ctx context.Context, id uuid.UUID) (*domain.StockView, error) {
+	sv := &domain.StockView{}
+	query := `SELECT s.id, s.warehouse_id, s.product_id, s.quantity, s.updated_at,
+		p.name, p.sku, w.name, p.price, p.min_stock, (s.quantity * p.price)
+		FROM stocks s
+		JOIN products p ON p.id = s.product_id
+		JOIN warehouses w ON w.id = s.warehouse_id
+		WHERE s.id = $1`
+
+	err := r.pool.QueryRow(ctx, query, id).Scan(
+		&sv.ID, &sv.WarehouseID, &sv.ProductID, &sv.Quantity, &sv.UpdatedAt,
+		&sv.ProductName, &sv.ProductSKU, &sv.WarehouseName,
+		&sv.Price, &sv.MinStock, &sv.TotalValue,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return sv, nil
+}
+
 func (r *stockRepository) GetByWarehouseAndProduct(ctx context.Context, warehouseID, productID uuid.UUID) (*domain.Stock, error) {
 	s := &domain.Stock{}
 	query := `SELECT id, warehouse_id, product_id, quantity, updated_at

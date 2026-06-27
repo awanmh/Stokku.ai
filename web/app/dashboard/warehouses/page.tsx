@@ -10,6 +10,7 @@ import { WarehouseCardSkeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { WarehouseFormModal } from "@/components/modals/warehouse-form-modal";
 import { DeleteConfirmDialog } from "@/components/modals/delete-confirm-dialog";
+import Link from "next/link";
 import {
   Building2,
   Plus,
@@ -17,12 +18,12 @@ import {
   Edit2,
   Trash2,
   RefreshCw,
-  Package,
-  ChevronDown,
-  ChevronUp,
   Search,
+  Eye,
 } from "lucide-react";
 import { warehouseApi, inventoryApi } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/auth";
 import { formatNumber } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,6 +38,9 @@ interface WarehouseStockSummary {
 }
 
 export default function WarehousesPage() {
+  const router = useRouter();
+  const user = useAuthStore((s) => s.user);
+  const canEdit = user?.role === "admin" || user?.role === "warehouse_staff";
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
@@ -47,9 +51,7 @@ export default function WarehousesPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteWarehouse, setDeleteWarehouse] = useState<Warehouse | null>(null);
 
-  // Stock data per warehouse
   const [stockMap, setStockMap] = useState<Record<string, WarehouseStockSummary>>({});
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -107,9 +109,7 @@ export default function WarehousesPage() {
     fetchWarehouses();
   };
 
-  const toggleExpand = (id: string) => {
-    setExpandedId((prev) => (prev === id ? null : id));
-  };
+
 
   return (
     <div className="space-y-8">
@@ -187,7 +187,6 @@ export default function WarehousesPage() {
                 <AnimatePresence mode="popLayout">
                   {filtered.map((wh, idx) => {
                 const stock = stockMap[wh.id];
-                const isExpanded = expandedId === wh.id;
                 return (
                   <motion.div
                     key={wh.id}
@@ -196,6 +195,8 @@ export default function WarehousesPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                     transition={{ delay: idx * 0.05 }}
+                    onClick={() => router.push(`/dashboard/warehouses/${wh.id}`)}
+                    className="cursor-pointer"
                   >
                     <Card className="group relative overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
                       {/* Decorative element */}
@@ -246,7 +247,18 @@ export default function WarehousesPage() {
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
-                                onClick={() => { setEditWarehouse(wh); setModalOpen(true); }}
+                                asChild
+                                title="Lihat Detail Gudang"
+                              >
+                                <Link href={`/dashboard/warehouses/${wh.id}`}>
+                                  <Eye size={14} />
+                                </Link>
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
+                                onClick={(e) => { e.stopPropagation(); setEditWarehouse(wh); setModalOpen(true); }}
                                 title="Edit"
                               >
                                 <Edit2 size={14} />
@@ -255,57 +267,13 @@ export default function WarehousesPage() {
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors"
-                                onClick={() => { setDeleteWarehouse(wh); setDeleteDialogOpen(true); }}
+                                onClick={(e) => { e.stopPropagation(); setDeleteWarehouse(wh); setDeleteDialogOpen(true); }}
                                 title="Hapus"
                               >
                                 <Trash2 size={14} />
                               </Button>
                             </div>
                           </div>
-
-                          {/* Expandable stock details */}
-                          {stock && stock.items.length > 0 && (
-                            <div>
-                              <button
-                                onClick={() => toggleExpand(wh.id)}
-                                className="flex items-center gap-1.5 text-[11px] text-primary hover:text-primary/80 font-medium transition-colors w-full justify-center py-1"
-                              >
-                                {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                                {isExpanded ? "Sembunyikan Detail" : `Lihat ${stock.totalProducts} Produk`}
-                              </button>
-                              <AnimatePresence>
-                                {isExpanded && (
-                                  <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="overflow-hidden"
-                                  >
-                                    <div className="mt-2 space-y-1.5 max-h-[200px] overflow-y-auto">
-                                      {stock.items.map((item) => (
-                                        <div
-                                          key={item.id}
-                                          className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/30 text-xs"
-                                        >
-                                          <div className="flex items-center gap-2 min-w-0">
-                                            <Package size={12} className="text-muted-foreground shrink-0" />
-                                            <span className="font-medium text-foreground truncate">{item.product_name}</span>
-                                          </div>
-                                          <Badge
-                                            variant={item.quantity <= item.min_stock ? "destructive" : "success"}
-                                            className="rounded-full px-2 text-[9px] shrink-0 ml-2"
-                                          >
-                                            {formatNumber(item.quantity)} unit
-                                          </Badge>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-                            </div>
-                          )}
                         </div>
                       </CardContent>
                     </Card>

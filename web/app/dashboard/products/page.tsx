@@ -18,6 +18,8 @@ import { TableSkeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ProductFormModal } from "@/components/modals/product-form-modal";
 import { DeleteConfirmDialog } from "@/components/modals/delete-confirm-dialog";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Search,
   Plus,
@@ -25,6 +27,7 @@ import {
   Edit2,
   Trash2,
   RefreshCw,
+  Eye,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -43,6 +46,7 @@ type SortKey = "name" | "category" | "price" | "min_stock";
 type SortDir = "asc" | "desc";
 
 export default function ProductsPage() {
+  const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const canEdit = user?.role === "admin" || user?.role === "warehouse_staff";
 
@@ -229,7 +233,8 @@ export default function ProductsPage() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
                           transition={{ duration: 0.2, delay: idx * 0.03 }}
-                          className={`group border-border/50 hover:bg-secondary/30 transition-colors ${idx % 2 === 1 ? "bg-secondary/10" : ""}`}
+                          onClick={() => router.push(`/dashboard/products/${p.id}`)}
+                          className={`group border-border/50 hover:bg-secondary/30 transition-colors cursor-pointer ${idx % 2 === 1 ? "bg-secondary/10" : ""}`}
                         >
                           <TableCell>
                             <div className="flex flex-col">
@@ -260,28 +265,43 @@ export default function ProductsPage() {
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            {canEdit && (
-                              <div className="flex items-center justify-end gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
-                                  onClick={() => { setEditProduct(p); setModalOpen(true); }}
-                                >
-                                  <Edit2 size={12} />
-                                </Button>
-                                {user?.role === "admin" && (
+                            <div className="flex items-center justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
+                                asChild
+                                title="Lihat Detail"
+                              >
+                                <Link href={`/dashboard/products/${p.id}`}>
+                                  <Eye size={12} />
+                                </Link>
+                              </Button>
+                              {canEdit && (
+                                <>
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors"
-                                    onClick={() => { setDeleteProduct(p); setDeleteDialogOpen(true); }}
+                                    className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
+                                    onClick={(e) => { e.stopPropagation(); setEditProduct(p); setModalOpen(true); }}
+                                    title="Edit Produk"
                                   >
-                                    <Trash2 size={12} />
+                                    <Edit2 size={12} />
                                   </Button>
-                                )}
-                              </div>
-                            )}
+                                  {user?.role === "admin" && (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                      onClick={(e) => { e.stopPropagation(); setDeleteProduct(p); setDeleteDialogOpen(true); }}
+                                      title="Hapus Produk"
+                                    >
+                                      <Trash2 size={12} />
+                                    </Button>
+                                  )}
+                                </>
+                              )}
+                            </div>
                           </TableCell>
                         </motion.tr>
                       ))}

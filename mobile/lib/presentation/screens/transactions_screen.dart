@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/transaction_provider.dart';
 import '../widgets/glass_card.dart';
-
+import 'transaction_detail_screen.dart';
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
   @override
@@ -105,10 +105,19 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   itemBuilder: (ctx, i) {
                     final t = tx.transactions[i];
                     final isIn = t.isStockIn;
-                    return GlassCard(
-                      padding: const EdgeInsets.all(14),
-                      child: Row(
-                        children: [
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TransactionDetailScreen(tx: t),
+                          ),
+                        );
+                      },
+                      child: GlassCard(
+                        padding: const EdgeInsets.all(14),
+                        child: Row(
+                          children: [
                           Container(
                             width: 40, height: 40,
                             decoration: BoxDecoration(
@@ -172,7 +181,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           ),
                         ],
                       ),
-                    )
+                    ),
+                  )
                         .animate()
                         .fadeIn(duration: 300.ms, delay: Duration(milliseconds: i * 60))
                         .slideX(begin: 0.05, end: 0, duration: 300.ms, delay: Duration(milliseconds: i * 60));
@@ -184,4 +194,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       ),
     );
   }
+
+
 }

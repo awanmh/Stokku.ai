@@ -110,3 +110,7 @@ func (uc *TransactionUsecase) GetInventory(ctx context.Context, filter domain.St
 	}
 	return uc.stockRepo.GetAllStocks(ctx, filter)
 }
+
+func (uc *TransactionUsecase) GetInventoryByID(ctx context.Context, id uuid.UUID) (*domain.StockView, error) {
+	return uc.stockRepo.GetByID(ctx, id)
+}

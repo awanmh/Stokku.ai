@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../../../core/constants/api_constants.dart';
+import '../../../core/network/api_client.dart';
 
 /// Chat message model.
 class ChatMessage {
@@ -130,8 +131,12 @@ class ChatbotProvider extends ChangeNotifier {
           .map((m) => m.toApiFormat())
           .toList();
 
+      final token = await ApiClient.getToken();
+      final headers = token != null ? {'Authorization': 'Bearer $token'} : null;
+
       final response = await _dio.post(
         ApiConstants.chatEndpoint,
+        options: Options(headers: headers),
         data: jsonEncode({
           'model': _selectedModel,
           'message': trimmed,
@@ -163,6 +168,8 @@ class ChatbotProvider extends ChangeNotifier {
             'Tidak dapat terhubung ke server chatbot. Periksa koneksi jaringan.';
       } else if (e.response?.statusCode == 429) {
         errorText = 'Terlalu banyak permintaan. Coba lagi dalam beberapa saat.';
+      } else if (e.response?.data is Map && e.response?.data['message'] != null) {
+        errorText = e.response?.data['message'];
       } else {
         errorText = 'Gagal memproses jawaban dari AI. (${e.message})';
       }

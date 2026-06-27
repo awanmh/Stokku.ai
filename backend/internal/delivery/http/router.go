@@ -82,6 +82,7 @@ func SetupRouter(app *fiber.App, h Handlers, jwtSecret string) {
 
 	// Inventory
 	protected.Get("/inventory", h.Transaction.GetInventory)
+	protected.Get("/inventory/:id", h.Transaction.GetInventoryByID)
 
 	// Reports
 	reports := protected.Group("/reports", middleware.RoleGuard(domain.RoleAdmin, domain.RoleWarehouseStaff))

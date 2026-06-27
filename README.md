@@ -279,3 +279,26 @@ main ──────────────────────── (s
 ---
 
 > Pastikan commit message mengikuti format: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`
+
+---
+
+## 🚀 Update Terbaru: Fitur Detail (28 Juni 2026)
+
+### Backend (Golang Fiber)
+- ✅ Ditambahkan endpoint `GetByID` untuk Entitas Inventaris (`/api/v1/inventory/:id`) dan Transaksi (`/api/v1/transactions/:id`).
+- ✅ Penyesuaian domain, repository, usecase, dan handler terkait untuk mendukung pencarian detail entitas tunggal.
+
+### Frontend Web (Next.js 15)
+- ✅ **Halaman Khusus (URL Baru)** untuk melihat Detail secara komprehensif: 
+  - `/dashboard/products/[id]`
+  - `/dashboard/warehouses/[id]`
+  - `/dashboard/inventory/[id]`
+  - `/dashboard/transactions/[id]`
+- ✅ **UX Navigasi yang Seamless**: Baris pada tabel dan kartu (card) kini dapat diklik langsung untuk menuju ke halaman detail entitas masing-masing (tanpa hanya mengandalkan tombol _Eye_).
+- ✅ Penanganan turbopack _build error_ yang disebabkan oleh duplikasi import komponen/library (misal: `Link` dan `Edit2`).
+- ✅ **TDD (Test Driven Development)**: Penambahan unit test untuk implementasi pengambilan detail (GetByID API Client). `npm run test` 100% Pass.
+
+### Mobile (Flutter)
+- ✅ **Standarisasi Warna Detail Screen**: Perbaikan referensi warna `AppColors` yang sebelumnya memutus proses *build* di berbagai detail screen.
+- ✅ **Interaktivitas Kartu (GlassCard)**: Dibungkusnya komponen list utama menggunakan `GestureDetector` agar seluruh *card item* dapat menavigasi ke halaman detail (Product, Warehouse, Inventory, Transaction).
+- ✅ **Chatbot Provider Validation**: Kesalahan kompilasi chatbot selesai diperbaiki dan logika penanganan error *state* telah berfungsi optimal.

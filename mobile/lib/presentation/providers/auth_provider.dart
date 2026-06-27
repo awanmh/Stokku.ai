@@ -92,11 +92,12 @@ class AuthProvider extends ChangeNotifier {
   }
 
   String _extractError(dynamic e) {
-    if (e.toString().contains('401')) return 'Email atau password salah';
-    if (e.toString().contains('SocketException') ||
-        e.toString().contains('Connection')) {
-      return 'Tidak dapat terhubung ke server';
+    final str = e.toString().toLowerCase();
+    if (str.contains('401')) return 'Email atau password salah';
+    if (str.contains('socketexception') || str.contains('connection')) {
+      return 'Tidak dapat terhubung ke server (10.0.2.2:8080)';
     }
-    return 'Terjadi kesalahan. Silakan coba lagi.';
+    // Tampilkan pesan error aslinya agar user bisa tahu masalahnya apa
+    return 'Error: ${e.toString()}';
   }
 }

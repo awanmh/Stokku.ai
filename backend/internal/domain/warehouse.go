@@ -58,6 +58,7 @@ type StockView struct {
 }
 
 type StockRepository interface {
+	GetByID(ctx context.Context, id uuid.UUID) (*StockView, error)
 	GetByWarehouseAndProduct(ctx context.Context, warehouseID, productID uuid.UUID) (*Stock, error)
 	Upsert(ctx context.Context, stock *Stock) error
 	GetByWarehouse(ctx context.Context, warehouseID uuid.UUID, limit, offset int) ([]StockView, int, error)

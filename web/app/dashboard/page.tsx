@@ -38,31 +38,7 @@ import {
 } from "recharts";
 import { useTranslation } from "@/lib/i18n";
 
-// Mock chart data — replace with real API later
-const mockWeeklyData = [
-  { name: "Sen", stockIn: 4000, stockOut: 2400 },
-  { name: "Sel", stockIn: 3000, stockOut: 1398 },
-  { name: "Rab", stockIn: 2000, stockOut: 3800 },
-  { name: "Kam", stockIn: 2780, stockOut: 3908 },
-  { name: "Jum", stockIn: 1890, stockOut: 4800 },
-  { name: "Sab", stockIn: 2390, stockOut: 3800 },
-  { name: "Min", stockIn: 3490, stockOut: 4300 },
-];
-
-const mockCategoryData = [
-  { name: "Elektronik", value: 35, color: "hsl(198, 80%, 48%)" },
-  { name: "Material", value: 28, color: "hsl(152, 70%, 42%)" },
-  { name: "Makanan", value: 20, color: "hsl(38, 90%, 52%)" },
-  { name: "Lainnya", value: 17, color: "hsl(262, 60%, 55%)" },
-];
-
-const mockTopProducts = [
-  { name: "Semen Portland", value: 120 },
-  { name: "Besi Beton", value: 98 },
-  { name: "Pipa PVC", value: 86 },
-  { name: "Cat Tembok", value: 75 },
-  { name: "Kabel Listrik", value: 65 },
-];
+// Removed mock data as we now use real-time data from API
 
 export default function DashboardOverview() {
   const user = useAuthStore((s) => s.user);
@@ -210,7 +186,7 @@ export default function DashboardOverview() {
           <CardContent className="pt-4">
             <div className="h-72 w-full min-h-[0] min-w-[0]">
               <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-                <AreaChart data={mockWeeklyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                <AreaChart data={stats?.weekly_activity || []} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="fillIn" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(198, 80%, 48%)" stopOpacity={0.2} />
@@ -284,8 +260,8 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent className="pt-4">
             <div className="h-72 w-full min-h-[0] min-w-[0]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={mockTopProducts} layout="vertical" margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+              <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                <BarChart data={stats?.top_products || []} layout="vertical" margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border-default))" strokeOpacity={0.4} horizontal={false} />
                   <XAxis type="number" hide />
                   <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--text-muted))", fontSize: 10 }} width={80} />

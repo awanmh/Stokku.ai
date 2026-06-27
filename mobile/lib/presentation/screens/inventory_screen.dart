@@ -3,7 +3,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/inventory_provider.dart';
+import 'package:intl/intl.dart';
 import '../widgets/glass_card.dart';
+import 'inventory_detail_screen.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -122,67 +124,77 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   itemCount: inv.stocks.length,
                   itemBuilder: (ctx, i) {
                     final s = inv.stocks[i];
-                    return GlassCard(
-                      padding: const EdgeInsets.all(14),
-                      child: Row(
-                        children: [
-                          // Quantity badge
-                          Container(
-                            width: 44, height: 44,
-                            decoration: BoxDecoration(
-                              color: s.isLowStock
-                                  ? AppColors.warningBg
-                                  : AppColors.successBg,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Center(
-                                child: Text('${s.quantity}',
-                                    style: TextStyle(
-                                      color: s.isLowStock
-                                          ? AppColors.warning
-                                          : AppColors.success,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 15,
-                                    ))),
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => InventoryDetailScreen(stock: s),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(s.productName,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14)),
-                                const SizedBox(height: 2),
-                                Text('${s.productSku} • ${s.warehouseName}',
-                                    style:
-                                        TextStyle(fontSize: 11, color: muted)),
-                              ],
-                            ),
-                          ),
-                          // Status badge — Bahasa Indonesia
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: s.isLowStock
-                                  ? AppColors.warningBg
-                                  : AppColors.successBg,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              s.isLowStock ? 'Rendah' : 'Aman',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
+                        );
+                      },
+                      child: GlassCard(
+                        padding: const EdgeInsets.all(14),
+                        child: Row(
+                          children: [
+                            // Quantity badge
+                            Container(
+                              width: 44, height: 44,
+                              decoration: BoxDecoration(
                                 color: s.isLowStock
-                                    ? AppColors.warning
-                                    : AppColors.success,
+                                    ? AppColors.warningBg
+                                    : AppColors.successBg,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Center(
+                                  child: Text('${s.quantity}',
+                                      style: TextStyle(
+                                        color: s.isLowStock
+                                            ? AppColors.warning
+                                            : AppColors.success,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 15,
+                                      ))),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(s.productName,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14)),
+                                  const SizedBox(height: 2),
+                                  Text('${s.productSku} • ${s.warehouseName}',
+                                      style:
+                                          TextStyle(fontSize: 11, color: muted)),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
+                            // Status badge — Bahasa Indonesia
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: s.isLowStock
+                                    ? AppColors.warningBg
+                                    : AppColors.successBg,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                s.isLowStock ? 'Rendah' : 'Aman',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: s.isLowStock
+                                      ? AppColors.warning
+                                      : AppColors.success,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     )
                         .animate()
@@ -196,4 +208,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
       ),
     );
   }
+
+
 }

@@ -442,7 +442,8 @@ export async function POST(request: NextRequest) {
     const message = body?.message?.trim() || "";
     const messages = Array.isArray(body?.messages) ? body.messages : [];
     const model = isChatModelId(body?.model) ? body.model : GEMINI_DEFAULT_MODEL;
-    const token = request.cookies.get("token")?.value;
+    const authHeader = request.headers.get("authorization");
+    const token = request.cookies.get("token")?.value || (authHeader?.startsWith("Bearer ") ? authHeader.substring(7) : undefined);
 
 
     if (!message && messages.length === 0) {

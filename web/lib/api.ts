@@ -167,6 +167,7 @@ export const transactionApi = {
     query.set("offset", String(params?.offset || 0));
     return api.get<TransactionView[]>(`/transactions?${query}`);
   },
+  getById: (id: string) => api.get<TransactionView>(`/transactions/${id}`),
   create: (data: CreateTransactionRequest) =>
     api.post<Transaction>("/transactions", data),
 };
@@ -188,6 +189,7 @@ export const inventoryApi = {
     query.set("offset", String(params?.offset || 0));
     return api.get<StockView[]>(`/inventory?${query}`);
   },
+  getById: (id: string) => api.get<StockView>(`/inventory/${id}`),
 };
 
 // Dashboard
@@ -336,6 +338,17 @@ export interface StockView {
   total_value: number;
 }
 
+export interface WeeklyActivity {
+  name: string;
+  stockIn: number;
+  stockOut: number;
+}
+
+export interface TopProduct {
+  name: string;
+  value: number;
+}
+
 export interface DashboardStats {
   total_products: number;
   total_warehouses: number;
@@ -343,6 +356,8 @@ export interface DashboardStats {
   low_stock_count: number;
   dead_stock_count: number;
   today_tx_count: number;
+  weekly_activity: WeeklyActivity[];
+  top_products: TopProduct[];
 }
 
 export interface ForecastData {
