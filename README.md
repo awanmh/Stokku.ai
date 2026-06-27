@@ -50,13 +50,13 @@ graph TD
     classDef ai fill:#8E75B2,stroke:#fff,stroke-width:2px,color:#fff,rx:5px,ry:5px;
 
     %% Nodes
-    Mobile[📱 Flutter Mobile App<br><i>(Offline-First Hive)</i>]:::client
-    Web[💻 Next.js Web Dashboard<br><i>(React 19, Tailwind v4)</i>]:::client
-    Proxy[🌐 Next.js API Proxy / SSR]:::proxy
-    Backend[⚙️ Golang Fiber API<br><i>(Clean Architecture)</i>]:::backend
-    Postgres[(🗄️ PostgreSQL 16<br><i>Primary DB</i>)]:::db
-    Redis[(⚡ Redis 7<br><i>Cache & Mutex Lock</i>)]:::cache
-    Gemini{🤖 Google Gemini API}:::ai
+    Mobile["📱 Flutter Mobile App (Offline-First Hive)"]:::client
+    Web["💻 Next.js Web Dashboard (React 19, Tailwind v4)"]:::client
+    Proxy["🌐 Next.js API Proxy / SSR"]:::proxy
+    Backend["⚙️ Golang Fiber API (Clean Architecture)"]:::backend
+    Postgres[("🗄️ PostgreSQL 16 (Primary DB)")]:::db
+    Redis[("⚡ Redis 7 (Cache & Mutex Lock)")]:::cache
+    Gemini{"🤖 Google Gemini API"}:::ai
 
     %% Connections
     Mobile -->|REST API| Backend
