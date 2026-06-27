@@ -55,6 +55,14 @@ func (m *MockStockRepository) GetByWarehouseAndProduct(ctx context.Context, ware
 	return args.Get(0).(*domain.Stock), args.Error(1)
 }
 
+func (m *MockStockRepository) GetByID(ctx context.Context, id uuid.UUID) (*domain.StockView, error) {
+	args := m.Called(ctx, id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.StockView), args.Error(1)
+}
+
 func (m *MockStockRepository) Upsert(ctx context.Context, stock *domain.Stock) error {
 	args := m.Called(ctx, stock)
 	return args.Error(0)
